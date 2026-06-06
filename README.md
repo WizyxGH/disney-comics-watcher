@@ -1,4 +1,4 @@
-# Disney Comics Watcher 🦆
+# Disney Comics Watcher
 
 Surveille automatiquement les nouvelles sorties de magazines et BD Disney en France, et envoie une notification dans un canal Telegram à chaque nouveau numéro.
 

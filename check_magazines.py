@@ -320,87 +320,111 @@ def get_mlp_releve(codif: str):
 # ─────────────────────────────────────────────────────────────────────────────
 
 def discover_glenat():
-    """Découvre les albums BD Disney chez Glénat (annonces + sorties)."""
+    """Decouvre les albums BD Disney chez Glenat (annonces + sorties).
+
+    Corrections appliquees :
+    - Filtre uniquement les liens sous /livres-glenat-disney/ pour eviter les livres
+      non-Disney presents dans la barre de navigation globale du site.
+    - Construit l'URL de couverture a partir de l'EAN via le CDN Hachette :
+      le site utilise du lazy-loading, les <img> ne contiennent qu'un placeholder.
+    - Parcourt toutes les pages de la collection (pas seulement la 1ere).
+    """
     s = get_session()
     result = []
     seen: set[str] = set()
 
+    # Recuperer la page 1 et determiner le nombre total de pages
     try:
         r = s.get(GLENAT_COLLECTION_URL, timeout=15)
         r.raise_for_status()
     except requests.RequestException as e:
-        print(f"  [warn] Glénat: {e}")
+        print(f"  [warn] Glenat: {e}")
         return result
 
-    text = r.text
+    max_pages = 1
+    pages_m = re.search(r'Page \d+ sur (\d+)', r.text)
+    if pages_m:
+        max_pages = min(int(pages_m.group(1)), 10)  # plafond de securite
 
-    # Les EAN 13 chiffres apparaissent dans les URLs produit Glénat
-    # Ex: /serie-glenat-disney/titre/9782344060001.html
-    prod_entries = re.findall(r'href="(/[^"]*?(\d{13})(?:\.html?)?/?)"', text)
+    pages_to_scrape = [(1, r.text)]
+    for page_num in range(2, max_pages + 1):
+        try:
+            rp = s.get(f"{GLENAT_COLLECTION_URL}?page={page_num}", timeout=15)
+            rp.raise_for_status()
+            pages_to_scrape.append((page_num, rp.text))
+        except requests.RequestException as e:
+            print(f"  [warn] Glenat p{page_num}: {e}")
 
-    for raw_path, ean in prod_entries:
-        if ean in seen or not ean.startswith("978"):
-            continue
-        seen.add(ean)
+    for _page_num, text in pages_to_scrape:
 
-        url = GLENAT_BASE + raw_path.rstrip('"')
-        idx = text.find(ean)
-        ctx = text[max(0, idx - 1500): min(len(text), idx + 1500)]
+        # ── BUG 1 CORRIGE ──────────────────────────────────────────────────────
+        # On ne capture QUE les liens sous /livres-glenat-disney/.
+        # La page contient aussi une navbar globale avec des livres non-Disney
+        # (/glenat-bd/..., /manga/...) dont les EAN seraient sinon captures.
+        prod_entries = re.findall(
+            r'href="(/livres-glenat-disney/[^"]*?(\d{13})[^"]*)"',
+            text,
+        )
 
-        # Titre
-        title = ""
-        for pat in [
-            r'alt="([^"]{5,150})"',
-            r'title="([^"]{5,150})"',
-            r'<(?:h[1-6]|strong)[^>]*>\s*([^<]{5,150})\s*</(?:h[1-6]|strong)>',
-            r'class="[^"]*(?:title|name|titre)[^"]*"[^>]*>\s*([^<]{5,150})\s*<',
-        ]:
-            m = re.search(pat, ctx, re.IGNORECASE)
-            if m:
-                candidate = html_lib.unescape(m.group(1).strip())
-                if "/" not in candidate and len(candidate) > 4:
-                    title = candidate
-                    break
-        if not title:
-            title = f"Album Disney ({ean})"
+        for raw_path, ean in prod_entries:
+            if ean in seen or not ean.startswith("978"):
+                continue
+            seen.add(ean)
 
-        # Date de publication
-        date_str = None
-        dm = re.search(r'(\d{2})/(\d{2})/(\d{4})', ctx)
-        if dm:
-            date_str = f"{dm.group(1)}/{dm.group(2)}/{dm.group(3)}"
-        else:
-            dm = re.search(r'(\d{4})-(\d{2})-(\d{2})', ctx)
+            url = GLENAT_BASE + raw_path.rstrip('"')
+            idx = text.find(ean)
+            ctx = text[max(0, idx - 1500): min(len(text), idx + 1500)]
+
+            # Titre — aria-label est le plus fiable (texte alt de la couverture)
+            title = ""
+            for pat in [
+                r'aria-label="([^"]{5,150})"',
+                r'alt="([^"]{5,150})"',
+                r'title="([^"]{5,150})"',
+            ]:
+                m = re.search(pat, ctx, re.IGNORECASE)
+                if m:
+                    candidate = html_lib.unescape(m.group(1).strip())
+                    if "/" not in candidate and len(candidate) > 4:
+                        title = candidate
+                        break
+            if not title:
+                title = f"Album Disney ({ean})"
+
+            # Date de publication
+            date_str = None
+            dm = re.search(r'(\d{2})/(\d{2})/(\d{4})', ctx)
             if dm:
-                date_str = f"{dm.group(3)}/{dm.group(2)}/{dm.group(1)}"
+                date_str = f"{dm.group(1)}/{dm.group(2)}/{dm.group(3)}"
+            else:
+                dm = re.search(r'(\d{4})-(\d{2})-(\d{2})', ctx)
+                if dm:
+                    date_str = f"{dm.group(3)}/{dm.group(2)}/{dm.group(1)}"
 
-        pub_date = parse_date_fr(date_str)
+            pub_date = parse_date_fr(date_str)
 
-        # Prix
-        pm = re.search(r'([0-9]+[,\.][0-9]{2})\s*€', ctx)
-        price = pm.group(1).replace(".", ",") + " €" if pm else None
+            # Prix
+            pm = re.search(r'([0-9]+[,\.][0-9]{2})\s*\u20ac', ctx)
+            price = pm.group(1).replace(".", ",") + " \u20ac" if pm else None
 
-        # Couverture
-        cover_url = None
-        for pat in [
-            r'<img[^>]+src="(https?://[^"]+\.(?:jpg|jpeg|png|webp)[^"]*)"',
-            r'<img[^>]+src="(/[^"]+\.(?:jpg|jpeg|png|webp)[^"]*)"',
-        ]:
-            im = re.search(pat, ctx, re.IGNORECASE)
-            if im:
-                c = im.group(1)
-                cover_url = c if c.startswith("http") else GLENAT_BASE + c
-                break
+            # ── BUG 2 CORRIGE ──────────────────────────────────────────────────
+            # Le site fait du lazy-loading : <img src=""> = placeholder statique.
+            # On construit l'URL directement depuis l'EAN via le CDN Hachette
+            # Distribution (fiable, pas de JavaScript necessaire).
+            cover_url = (
+                f"https://products-images.di-static.com"
+                f"/setImageFromEan/{ean}/660x858/FSC_LOW.jpg"
+            )
 
-        result.append({
-            "ean":       ean,
-            "title":     title,
-            "url":       url,
-            "date":      date_str,
-            "pub_date":  pub_date,
-            "price":     price,
-            "cover_url": cover_url,
-        })
+            result.append({
+                "ean":       ean,
+                "title":     title,
+                "url":       url,
+                "date":      date_str,
+                "pub_date":  pub_date,
+                "price":     price,
+                "cover_url": cover_url,
+            })
 
     return result
 

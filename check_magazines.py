@@ -532,7 +532,13 @@ def build_inducks_url(inducks, numero: str) -> str | None:
     if not inducks or not numero:
         return None
     try:
-        n = int(numero.split("-")[0].strip())
+        # Extraire la partie numérique (ex: "3858-3859" -> "3858", "7H" -> "7")
+        first_part = numero.split("-")[0].strip()
+        digits = "".join(filter(str.isdigit, first_part))
+        if not digits:
+            return None
+        n = int(digits)
+        
         if isinstance(inducks, str):
             path = f"fr/{inducks}  {n}"
         elif len(inducks) == 2:

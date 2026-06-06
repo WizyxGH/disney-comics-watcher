@@ -645,15 +645,18 @@ def notify_magazine(info: dict, releve_date: str | None = None):
     if releve_date:
         lines.append(f"En kiosque jusqu'au : {releve_date}")
 
-    lines.append(f'<a href="{url}">Voir sur Direct Éditeurs</a>')
-
+    # Regrouper les liens d'actions sur la même ligne séparés par des puces
+    link_parts = [f'<a href="{url}">Voir sur Direct Éditeurs</a>']
+    
     inducks_url = build_inducks_url(ov.get("inducks"), num)
     if inducks_url:
-        lines.append(f'<a href="{inducks_url}">Sommaire Inducks</a>')
+        link_parts.append(f'<a href="{inducks_url}">Sommaire Inducks</a>')
 
     inducks_pub_url = build_inducks_pub_url(ov.get("inducks"))
     if inducks_pub_url:
-        lines.append(f'<a href="{inducks_pub_url}">Fiche du magazine (Inducks)</a>')
+        link_parts.append(f'<a href="{inducks_pub_url}">Fiche du magazine (Inducks)</a>')
+
+    lines.append(" • ".join(link_parts))
 
     send_telegram(info.get("cover_url"), "\n".join(lines))
     time.sleep(1)  # throttle
@@ -670,16 +673,17 @@ def notify_glenat_announce(album: dict):
     if album.get("price"):
         meta_lines.append(f"💶 {html_lib.escape(album['price'])}")
         
-    # 2. Construire les lignes de liens
-    link_lines = [f'<a href="{album["url"]}">Voir sur Glénat</a>']
+    # 2. Construire les lignes de liens (regroupés sur une seule ligne)
+    link_parts = [f'<a href="{album["url"]}">Voir sur Glénat</a>']
     if AMAZON_AFFILIATE_TAG:
         asin = isbn13_to_isbn10(album.get("ean", ""))
         if asin:
             amazon_url = f"https://www.amazon.fr/dp/{asin}/?tag={AMAZON_AFFILIATE_TAG}"
-            link_lines.append(f'<a href="{amazon_url}">Acheter sur Amazon</a>')
+            link_parts.append(f'<a href="{amazon_url}">Acheter sur Amazon</a>')
+    link_line = " • ".join(link_parts)
             
     # 3. Calculer dynamiquement l'espace restant pour le résumé dans la limite des 1024 caractères de Telegram
-    base_len = sum(len(line) for line in meta_lines) + sum(len(line) for line in link_lines) + len(meta_lines) + len(link_lines) + 2
+    base_len = sum(len(line) for line in meta_lines) + len(link_line) + len(meta_lines) + 3
     max_summary_len = 1024 - base_len - 25
     
     summary = album.get("summary")
@@ -693,7 +697,7 @@ def notify_glenat_announce(album: dict):
     all_lines.extend(meta_lines)
     if summary_line:
         all_lines.append(summary_line)
-    all_lines.extend(link_lines)
+    all_lines.append(link_line)
     
     send_telegram(album.get("cover_url"), "\n".join(all_lines))
     time.sleep(1)
@@ -704,22 +708,23 @@ def notify_glenat_release(album: dict):
     title = html_lib.escape(album.get("title", "Album Disney"))
     
     # 1. Construire les lignes de base (métadonnées)
-    meta_lines = [f"<b>Disponible — {title}</b>"]
+    meta_lines = [f"🟢 <b>{title}</b>"]
     if album.get("date"):
         meta_lines.append(f"🗓 Paru le : {album['date']}")
     if album.get("price"):
         meta_lines.append(f"💶 {html_lib.escape(album['price'])}")
         
-    # 2. Construire les lignes de liens
-    link_lines = [f'<a href="{album["url"]}">Voir sur Glénat</a>']
+    # 2. Construire les lignes de liens (regroupés sur une seule ligne)
+    link_parts = [f'<a href="{album["url"]}">Voir sur Glénat</a>']
     if AMAZON_AFFILIATE_TAG:
         asin = isbn13_to_isbn10(album.get("ean", ""))
         if asin:
             amazon_url = f"https://www.amazon.fr/dp/{asin}/?tag={AMAZON_AFFILIATE_TAG}"
-            link_lines.append(f'<a href="{amazon_url}">Acheter sur Amazon</a>')
+            link_parts.append(f'<a href="{amazon_url}">Acheter sur Amazon</a>')
+    link_line = " • ".join(link_parts)
             
     # 3. Calculer dynamiquement l'espace restant pour le résumé dans la limite des 1024 caractères de Telegram
-    base_len = sum(len(line) for line in meta_lines) + sum(len(line) for line in link_lines) + len(meta_lines) + len(link_lines) + 2
+    base_len = sum(len(line) for line in meta_lines) + len(link_line) + len(meta_lines) + 3
     max_summary_len = 1024 - base_len - 25
     
     summary = album.get("summary")
@@ -733,7 +738,7 @@ def notify_glenat_release(album: dict):
     all_lines.extend(meta_lines)
     if summary_line:
         all_lines.append(summary_line)
-    all_lines.extend(link_lines)
+    all_lines.append(link_line)
     
     send_telegram(album.get("cover_url"), "\n".join(all_lines))
     time.sleep(1)

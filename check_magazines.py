@@ -637,11 +637,11 @@ def notify_magazine(info: dict, releve_date: str | None = None):
 
     num_line = f"N° {num}"
     if prix:
-        num_line += f" • {html_lib.escape(prix)}"
+        num_line += f" • 💶 {html_lib.escape(prix)}"
     lines.append(num_line)
 
     if date:
-        lines.append(f"Paru le : {date}")
+        lines.append(f"📅 Paru le : {date}")
     if releve_date:
         lines.append(f"En kiosque jusqu'au : {releve_date}")
 
@@ -666,9 +666,9 @@ def notify_glenat_announce(album: dict):
     # 1. Construire les lignes de base (métadonnées)
     meta_lines = [f"<b>Annonce — {title}</b>"]
     if album.get("date"):
-        meta_lines.append(f"Parution prévue : {album['date']}")
+        meta_lines.append(f"🗓 Parution prévue : {album['date']}")
     if album.get("price"):
-        meta_lines.append(f"{html_lib.escape(album['price'])}")
+        meta_lines.append(f"💶 {html_lib.escape(album['price'])}")
         
     # 2. Construire les lignes de liens
     link_lines = [f'<a href="{album["url"]}">Voir sur Glénat</a>']
@@ -706,9 +706,9 @@ def notify_glenat_release(album: dict):
     # 1. Construire les lignes de base (métadonnées)
     meta_lines = [f"<b>Disponible — {title}</b>"]
     if album.get("date"):
-        meta_lines.append(f"Paru le : {album['date']}")
+        meta_lines.append(f"🗓 Paru le : {album['date']}")
     if album.get("price"):
-        meta_lines.append(f"{html_lib.escape(album['price'])}")
+        meta_lines.append(f"💶 {html_lib.escape(album['price'])}")
         
     # 2. Construire les lignes de liens
     link_lines = [f'<a href="{album["url"]}">Voir sur Glénat</a>']

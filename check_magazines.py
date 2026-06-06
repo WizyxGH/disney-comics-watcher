@@ -322,11 +322,10 @@ def get_mlp_releve(codif: str):
 def discover_glenat():
     """Découvre les albums BD Disney chez Glénat (annonces + sorties).
 
-    - Filtre uniquement les liens sous /glenat-disney/ pour éviter les livres
-      non-Disney présents dans la barre de navigation globale du site.
-    - Construit l'URL de couverture à partir de l'EAN via le CDN Hachette (les images
-      du catalogue utilisent un placeholder en lazy-loading).
-    - Parcourt toutes les pages de la collection (max 10).
+    - Récupère les données depuis le bloc JSON-LD __NEXT_DATA__ de chaque page
+      pour une extraction robuste des EAN, titres, dates de parution et couvertures.
+    - Évite l'ancienne regex HTML qui provoquait des collisions de contexte de titre.
+    - Parcourt les pages du catalogue en utilisant la pagination par chemin (ex: /2/).
     """
     s = get_session()
     result = []
@@ -349,76 +348,90 @@ def discover_glenat():
     pages_to_scrape = [(1, r.text)]
     for page_num in range(2, max_pages + 1):
         try:
-            rp = s.get(f"{GLENAT_COLLECTION_URL}?page={page_num}", timeout=15)
+            url = f"{GLENAT_COLLECTION_URL}{page_num}/"
+            rp = s.get(url, timeout=15)
             rp.raise_for_status()
             rp.encoding = "utf-8"
             pages_to_scrape.append((page_num, rp.text))
         except requests.RequestException as e:
             print(f"  [warn] Glenat p{page_num}: {e}")
 
-    for _page_num, text in pages_to_scrape:
-        # On ne capture QUE les liens sous /glenat-disney/.
-        prod_entries = re.findall(
-            r'href="(/glenat-disney/[^"]*?(\d{13})[^"]*)"',
-            text,
-        )
+    for page_num, html_text in pages_to_scrape:
+        m = re.search(r'<script id="__NEXT_DATA__" type="application/json">(.*?)</script>', html_text)
+        if not m:
+            print(f"  [warn] Glénat p{page_num}: Aucun bloc __NEXT_DATA__ trouvé.")
+            continue
 
-        for raw_path, ean in prod_entries:
-            if ean in seen or not ean.startswith("978"):
+        try:
+            data = json.loads(m.group(1))
+            sections = data.get("props", {}).get("pageProps", {}).get("sections", [])
+            
+            # Recherche de la section contenant prefilter_results
+            target_sec = None
+            for sec in sections:
+                sec_data = sec.get("data") or {}
+                if "prefilter_results" in sec_data:
+                    target_sec = sec_data
+                    break
+
+            if not target_sec:
                 continue
-            seen.add(ean)
 
-            url = GLENAT_BASE + raw_path.rstrip('"')
-            idx = text.find(raw_path)
-            ctx = text[idx: idx + 1500]
+            results = target_sec.get("prefilter_results", [])
+            for item in results:
+                ean_list = item.get("product__ean")
+                if not ean_list or not ean_list[0]:
+                    continue
+                ean = ean_list[0]
+                if ean in seen or not ean.startswith("978"):
+                    continue
+                seen.add(ean)
 
-            # Extraction du titre en évitant les placeholders
-            title = ""
-            for pat in [
-                r'aria-label="([^"]{5,150})"',
-                r'<(?:h[1-6]|strong)[^>]*class="[^"]*Title[^"]*"[^>]*>\s*([^<]{5,150})\s*</(?:h[1-6]|strong)>',
-                r'<(?:h[1-6]|strong)[^>]*>\s*([^<]{5,150})\s*</(?:h[1-6]|strong)>',
-                r'title="([^"]{5,150})"',
-                r'alt="([^"]{5,150})"',
-            ]:
-                m = re.search(pat, ctx, re.IGNORECASE)
-                if m:
-                    candidate = html_lib.unescape(m.group(1).strip())
-                    if "Couverture de produit indisponible" in candidate:
-                        continue
-                    if "/" not in candidate and len(candidate) > 4:
-                        title = candidate
-                        break
-            if not title:
-                title = f"Album Disney ({ean})"
+                path = item.get("path", [""])[0]
+                url = GLENAT_BASE + path
 
-            # Date de publication
-            date_str = None
-            dm = re.search(r'(\d{2})/(\d{2})/(\d{4})', ctx)
-            if dm:
-                date_str = f"{dm.group(1)}/{dm.group(2)}/{dm.group(3)}"
-            else:
-                dm = re.search(r'(\d{4})-(\d{2})-(\d{2})', ctx)
-                if dm:
-                    date_str = f"{dm.group(3)}/{dm.group(2)}/{dm.group(1)}"
+                title = item.get("product__titre_de_couverture", [None])[0] or item.get("title", [None])[0]
+                if not title:
+                    title = f"Album Disney ({ean})"
 
-            pub_date = parse_date_fr(date_str)
+                # Extraction de la date de parution
+                date_str = item.get("product__date_parution", [None])[0]
+                if not date_str:
+                    date_str_raw = item.get("product__date_parution__date", [None])[0]
+                    if date_str_raw:
+                        try:
+                            y, m, d = date_str_raw.split("-")
+                            date_str = f"{d}/{m}/{y}"
+                        except Exception:
+                            pass
+                else:
+                    date_str = date_str.replace("-", "/")
 
-            # Couverture CDN Hachette Distribution
-            cover_url = (
-                f"https://products-images.di-static.com"
-                f"/setImageFromEan/{ean}/660x858/FSC_LOW.jpg"
-            )
+                pub_date = parse_date_fr(date_str)
 
-            result.append({
-                "ean":       ean,
-                "title":     title,
-                "url":       url,
-                "date":      date_str,
-                "pub_date":  pub_date,
-                "price":     None,  # Récupéré à la demande lors de la notification
-                "cover_url": cover_url,
-            })
+                # URL de couverture
+                cover_url = item.get("product__image_de_couverture", [None])[0]
+                if cover_url:
+                    # Nettoie les paramètres d'URL (?v=...) car le domaine images.hachette-livre.fr
+                    # est accessible publiquement et accepte les requêtes sans cache-buster.
+                    cover_url = cover_url.split("?")[0]
+
+                # Fallback si l'image est manquante dans le JSON mais qu'on a le millésime
+                if not cover_url and pub_date:
+                    year = pub_date.year
+                    cover_url = f"https://www.images.hachette-livre.fr/media/imgArticle/GLENAT/{year}/{ean}-001-X.jpeg"
+
+                result.append({
+                    "ean":       ean,
+                    "title":     title,
+                    "url":       url,
+                    "date":      date_str,
+                    "pub_date":  pub_date,
+                    "price":     None,  # Récupéré à la demande lors de la notification
+                    "cover_url": cover_url,
+                })
+        except Exception as e:
+            print(f"  [warn] Glénat p{page_num}: Erreur de parsing JSON-LD: {e}")
 
     return result
 

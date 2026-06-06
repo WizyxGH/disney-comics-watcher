@@ -627,34 +627,33 @@ def notify_magazine(info: dict, releve_date: str | None = None):
     """Envoie la notification Telegram pour un nouveau numéro de magazine."""
     codif = info["codif"]
     ov    = OVERRIDES.get(codif, {})
-    emoji = ov.get("emoji", DEFAULT_EMOJI)
     name  = ov.get("name") or info.get("site_name") or info.get("slug") or codif
     num   = info.get("numero", "?")
     prix  = info.get("prix")
     date  = info.get("date_mise_en_vente")
     url   = info.get("url", SITE_BASE)
 
-    lines = [f"{emoji} <b>{html_lib.escape(name)}</b>"]
+    lines = [f"<b>{html_lib.escape(name)}</b>"]
 
-    num_line = f"📌 N° {num}"
+    num_line = f"N° {num}"
     if prix:
         num_line += f" • {html_lib.escape(prix)}"
     lines.append(num_line)
 
     if date:
-        lines.append(f"📅 Paru le : {date}")
+        lines.append(f"Paru le : {date}")
     if releve_date:
-        lines.append(f"🔚 En kiosque jusqu'au : {releve_date}")
+        lines.append(f"En kiosque jusqu'au : {releve_date}")
 
-    lines.append(f'🔗 <a href="{url}">Voir sur Direct Éditeurs</a>')
+    lines.append(f'<a href="{url}">Voir sur Direct Éditeurs</a>')
 
     inducks_url = build_inducks_url(ov.get("inducks"), num)
     if inducks_url:
-        lines.append(f'📖 <a href="{inducks_url}">Sommaire Inducks</a>')
+        lines.append(f'<a href="{inducks_url}">Sommaire Inducks</a>')
 
     inducks_pub_url = build_inducks_pub_url(ov.get("inducks"))
     if inducks_pub_url:
-        lines.append(f'🗂 <a href="{inducks_pub_url}">Fiche du magazine (Inducks)</a>')
+        lines.append(f'<a href="{inducks_pub_url}">Fiche du magazine (Inducks)</a>')
 
     send_telegram(info.get("cover_url"), "\n".join(lines))
     time.sleep(1)  # throttle
@@ -665,19 +664,19 @@ def notify_glenat_announce(album: dict):
     title = html_lib.escape(album.get("title", "Album Disney"))
     
     # 1. Construire les lignes de base (métadonnées)
-    meta_lines = [f"📢 <b>Annonce — {title}</b>"]
+    meta_lines = [f"<b>Annonce — {title}</b>"]
     if album.get("date"):
-        meta_lines.append(f"🗓 Parution prévue : {album['date']}")
+        meta_lines.append(f"Parution prévue : {album['date']}")
     if album.get("price"):
-        meta_lines.append(f"💶 {html_lib.escape(album['price'])}")
+        meta_lines.append(f"{html_lib.escape(album['price'])}")
         
     # 2. Construire les lignes de liens
-    link_lines = [f'🔗 <a href="{album["url"]}">Voir sur Glénat</a>']
+    link_lines = [f'<a href="{album["url"]}">Voir sur Glénat</a>']
     if AMAZON_AFFILIATE_TAG:
         asin = isbn13_to_isbn10(album.get("ean", ""))
         if asin:
             amazon_url = f"https://www.amazon.fr/dp/{asin}/?tag={AMAZON_AFFILIATE_TAG}"
-            link_lines.append(f'🛒 <a href="{amazon_url}">Acheter sur Amazon</a>')
+            link_lines.append(f'<a href="{amazon_url}">Acheter sur Amazon</a>')
             
     # 3. Calculer dynamiquement l'espace restant pour le résumé dans la limite des 1024 caractères de Telegram
     base_len = sum(len(line) for line in meta_lines) + sum(len(line) for line in link_lines) + len(meta_lines) + len(link_lines) + 2
@@ -687,7 +686,7 @@ def notify_glenat_announce(album: dict):
     summary_line = ""
     if summary and max_summary_len > 50:
         truncated = truncate_summary(summary, max_len=max_summary_len)
-        summary_line = f"\n📝 <i>{html_lib.escape(truncated)}</i>"
+        summary_line = f"\n<i>{html_lib.escape(truncated)}</i>"
         
     # 4. Assembler le message final
     all_lines = []
@@ -705,19 +704,19 @@ def notify_glenat_release(album: dict):
     title = html_lib.escape(album.get("title", "Album Disney"))
     
     # 1. Construire les lignes de base (métadonnées)
-    meta_lines = [f"📚 <b>Disponible — {title}</b>"]
+    meta_lines = [f"<b>Disponible — {title}</b>"]
     if album.get("date"):
-        meta_lines.append(f"🗓 Paru le : {album['date']}")
+        meta_lines.append(f"Paru le : {album['date']}")
     if album.get("price"):
-        meta_lines.append(f"💶 {html_lib.escape(album['price'])}")
+        meta_lines.append(f"{html_lib.escape(album['price'])}")
         
     # 2. Construire les lignes de liens
-    link_lines = [f'🔗 <a href="{album["url"]}">Voir sur Glénat</a>']
+    link_lines = [f'<a href="{album["url"]}">Voir sur Glénat</a>']
     if AMAZON_AFFILIATE_TAG:
         asin = isbn13_to_isbn10(album.get("ean", ""))
         if asin:
             amazon_url = f"https://www.amazon.fr/dp/{asin}/?tag={AMAZON_AFFILIATE_TAG}"
-            link_lines.append(f'🛒 <a href="{amazon_url}">Acheter sur Amazon</a>')
+            link_lines.append(f'<a href="{amazon_url}">Acheter sur Amazon</a>')
             
     # 3. Calculer dynamiquement l'espace restant pour le résumé dans la limite des 1024 caractères de Telegram
     base_len = sum(len(line) for line in meta_lines) + sum(len(line) for line in link_lines) + len(meta_lines) + len(link_lines) + 2
@@ -727,7 +726,7 @@ def notify_glenat_release(album: dict):
     summary_line = ""
     if summary and max_summary_len > 50:
         truncated = truncate_summary(summary, max_len=max_summary_len)
-        summary_line = f"\n📝 <i>{html_lib.escape(truncated)}</i>"
+        summary_line = f"\n<i>{html_lib.escape(truncated)}</i>"
         
     # 4. Assembler le message final
     all_lines = []

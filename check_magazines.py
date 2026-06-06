@@ -75,10 +75,8 @@ OVERRIDES = {
 }
 DEFAULT_EMOJI = "🦆"
 
-# Fenêtre calme : aucune notification ni mise à jour du state entre 23h et 7h (Paris)
-QUIET_TZ    = ZoneInfo("Europe/Paris")
-QUIET_START = 23  # inclusif
-QUIET_END   = 7   # exclusif
+# Fuseau horaire de Paris pour la cohérence des dates
+PARIS_TZ = ZoneInfo("Europe/Paris")
 
 SEARCH_URL     = "https://direct-editeurs.fr/nos-magazines"
 SITE_BASE      = "https://direct-editeurs.fr"
@@ -202,6 +200,7 @@ def discover_de():
         try:
             r = s.post(SEARCH_URL, data={"searchParution.title": kw}, timeout=15)
             r.raise_for_status()
+            r.encoding = "utf-8"
         except requests.RequestException as e:
             print(f"  [warn] DE kw='{kw}': {e}")
             continue
@@ -306,6 +305,7 @@ def get_mlp_releve(codif: str):
             r = s.get(url, timeout=10)
             if r.status_code != 200:
                 continue
+            r.encoding = "utf-8"
             for pat in patterns:
                 m = re.search(pat, r.text)
                 if m:
@@ -320,23 +320,23 @@ def get_mlp_releve(codif: str):
 # ─────────────────────────────────────────────────────────────────────────────
 
 def discover_glenat():
-    """Decouvre les albums BD Disney chez Glenat (annonces + sorties).
+    """Découvre les albums BD Disney chez Glénat (annonces + sorties).
 
-    Corrections appliquees :
-    - Filtre uniquement les liens sous /livres-glenat-disney/ pour eviter les livres
-      non-Disney presents dans la barre de navigation globale du site.
-    - Construit l'URL de couverture a partir de l'EAN via le CDN Hachette :
-      le site utilise du lazy-loading, les <img> ne contiennent qu'un placeholder.
-    - Parcourt toutes les pages de la collection (pas seulement la 1ere).
+    - Filtre uniquement les liens sous /glenat-disney/ pour éviter les livres
+      non-Disney présents dans la barre de navigation globale du site.
+    - Construit l'URL de couverture à partir de l'EAN via le CDN Hachette (les images
+      du catalogue utilisent un placeholder en lazy-loading).
+    - Parcourt toutes les pages de la collection (max 10).
     """
     s = get_session()
     result = []
     seen: set[str] = set()
 
-    # Recuperer la page 1 et determiner le nombre total de pages
+    # Récupérer la page 1 et déterminer le nombre total de pages
     try:
         r = s.get(GLENAT_COLLECTION_URL, timeout=15)
         r.raise_for_status()
+        r.encoding = "utf-8"
     except requests.RequestException as e:
         print(f"  [warn] Glenat: {e}")
         return result
@@ -344,25 +344,22 @@ def discover_glenat():
     max_pages = 1
     pages_m = re.search(r'Page \d+ sur (\d+)', r.text)
     if pages_m:
-        max_pages = min(int(pages_m.group(1)), 10)  # plafond de securite
+        max_pages = min(int(pages_m.group(1)), 10)  # plafond de sécurité
 
     pages_to_scrape = [(1, r.text)]
     for page_num in range(2, max_pages + 1):
         try:
             rp = s.get(f"{GLENAT_COLLECTION_URL}?page={page_num}", timeout=15)
             rp.raise_for_status()
+            rp.encoding = "utf-8"
             pages_to_scrape.append((page_num, rp.text))
         except requests.RequestException as e:
             print(f"  [warn] Glenat p{page_num}: {e}")
 
     for _page_num, text in pages_to_scrape:
-
-        # ── BUG 1 CORRIGE ──────────────────────────────────────────────────────
-        # On ne capture QUE les liens sous /livres-glenat-disney/.
-        # La page contient aussi une navbar globale avec des livres non-Disney
-        # (/glenat-bd/..., /manga/...) dont les EAN seraient sinon captures.
+        # On ne capture QUE les liens sous /glenat-disney/.
         prod_entries = re.findall(
-            r'href="(/livres-glenat-disney/[^"]*?(\d{13})[^"]*)"',
+            r'href="(/glenat-disney/[^"]*?(\d{13})[^"]*)"',
             text,
         )
 
@@ -372,19 +369,23 @@ def discover_glenat():
             seen.add(ean)
 
             url = GLENAT_BASE + raw_path.rstrip('"')
-            idx = text.find(ean)
-            ctx = text[max(0, idx - 1500): min(len(text), idx + 1500)]
+            idx = text.find(raw_path)
+            ctx = text[idx: idx + 1500]
 
-            # Titre — aria-label est le plus fiable (texte alt de la couverture)
+            # Extraction du titre en évitant les placeholders
             title = ""
             for pat in [
                 r'aria-label="([^"]{5,150})"',
-                r'alt="([^"]{5,150})"',
+                r'<(?:h[1-6]|strong)[^>]*class="[^"]*Title[^"]*"[^>]*>\s*([^<]{5,150})\s*</(?:h[1-6]|strong)>',
+                r'<(?:h[1-6]|strong)[^>]*>\s*([^<]{5,150})\s*</(?:h[1-6]|strong)>',
                 r'title="([^"]{5,150})"',
+                r'alt="([^"]{5,150})"',
             ]:
                 m = re.search(pat, ctx, re.IGNORECASE)
                 if m:
                     candidate = html_lib.unescape(m.group(1).strip())
+                    if "Couverture de produit indisponible" in candidate:
+                        continue
                     if "/" not in candidate and len(candidate) > 4:
                         title = candidate
                         break
@@ -403,14 +404,7 @@ def discover_glenat():
 
             pub_date = parse_date_fr(date_str)
 
-            # Prix
-            pm = re.search(r'([0-9]+[,\.][0-9]{2})\s*\u20ac', ctx)
-            price = pm.group(1).replace(".", ",") + " \u20ac" if pm else None
-
-            # ── BUG 2 CORRIGE ──────────────────────────────────────────────────
-            # Le site fait du lazy-loading : <img src=""> = placeholder statique.
-            # On construit l'URL directement depuis l'EAN via le CDN Hachette
-            # Distribution (fiable, pas de JavaScript necessaire).
+            # Couverture CDN Hachette Distribution
             cover_url = (
                 f"https://products-images.di-static.com"
                 f"/setImageFromEan/{ean}/660x858/FSC_LOW.jpg"
@@ -422,11 +416,40 @@ def discover_glenat():
                 "url":       url,
                 "date":      date_str,
                 "pub_date":  pub_date,
-                "price":     price,
+                "price":     None,  # Récupéré à la demande lors de la notification
                 "cover_url": cover_url,
             })
 
     return result
+
+
+def fetch_glenat_price(url: str) -> str | None:
+    """Récupère à la demande le prix d'un album depuis sa fiche produit Glénat."""
+    s = get_session()
+    try:
+        r = s.get(url, timeout=10)
+        r.raise_for_status()
+        r.encoding = "utf-8"
+        text = r.text
+
+        # 1. Chercher dans les attributs JSON-LD "price":"..."
+        m = re.search(r'"price"\s*:\s*"([0-9.]+)"', text)
+        if m:
+            return m.group(1).replace(".", ",") + " €"
+
+        # 2. Chercher dans les balises meta itemprop="price"
+        m = re.search(r'itemprop="price"\s*content="([^"]+)"', text)
+        if m:
+            return m.group(1).replace(".", ",") + " €"
+
+        # 3. Chercher dans le HTML classique (ex: 19,00 €)
+        m = re.search(r'([0-9]+[,\.][0-9]{2})\s*(?:€|\u20ac)', text)
+        if m:
+            return m.group(1).replace(".", ",") + " €"
+
+    except Exception as e:
+        print(f"  [warn] Impossible de récupérer le prix pour {url}: {e}")
+    return None
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -574,13 +597,6 @@ def notify_glenat_release(album: dict):
 # ─────────────────────────────────────────────────────────────────────────────
 
 def main():
-    # ── Fenêtre calme ─────────────────────────────────────────────────────────
-    now_paris = datetime.now(QUIET_TZ)
-    hour = now_paris.hour
-    if QUIET_START <= hour or hour < QUIET_END:
-        print(f"[quiet] {hour}h (Paris) — fenêtre calme {QUIET_START}h–{QUIET_END}h. Arrêt.")
-        return
-
     # ── State ─────────────────────────────────────────────────────────────────
     state = load_state()
     first_run = not state
@@ -588,7 +604,7 @@ def main():
         print("[init] Premier run — initialisation silencieuse (aucune notification).")
 
     notif_count = 0
-    today = datetime.now(QUIET_TZ).date()
+    today = datetime.now(PARIS_TZ).date()
 
     # ── Direct Éditeurs ───────────────────────────────────────────────────────
     print("[DE] Découverte des magazines…")
@@ -655,18 +671,26 @@ def main():
 
         if current is None:
             # Nouvel album détecté → notification d'annonce
-            print(f"  [ANNONCE] {album.get('title', ean)}")
             if not first_run:
+                # Récupère le prix à la demande avant d'envoyer la notification
+                album["price"] = fetch_glenat_price(album["url"])
+                print(f"  [ANNONCE] {album.get('title', ean)} — Prix: {album.get('price') or 'non renseigné'}")
                 notify_glenat_announce(album)
                 notif_count += 1
+            else:
+                print(f"  [ANNONCE-SILENT] {album.get('title', ean)}")
             state[key] = "announced"
 
         elif current == "announced" and pub_date and pub_date <= today:
             # Album annoncé dont la date de parution est atteinte → sortie en librairie
-            print(f"  [SORTIE]  {album.get('title', ean)}")
             if not first_run:
+                # Récupère le prix à la demande avant d'envoyer la notification
+                album["price"] = fetch_glenat_price(album["url"])
+                print(f"  [SORTIE]  {album.get('title', ean)} — Prix: {album.get('price') or 'non renseigné'}")
                 notify_glenat_release(album)
                 notif_count += 1
+            else:
+                print(f"  [SORTIE-SILENT] {album.get('title', ean)}")
             state[key] = "released"
 
     # ── Sauvegarde ────────────────────────────────────────────────────────────

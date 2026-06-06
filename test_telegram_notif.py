@@ -12,12 +12,12 @@ telegram_chat = os.environ.get("TELEGRAM_CHAT_ID_FR") or os.environ.get("TELEGRA
 if not telegram_token or not telegram_chat:
     print("Error: TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID must be set in your environment.")
     print("You can run it like this in PowerShell:")
-    print('  $env:TELEGRAM_BOT_TOKEN="your_token"; $env:TELEGRAM_CHAT_ID="your_chat_id"; python test_telegram_notif.py')
+    print('  $env:TELEGRAM_BOT_TOKEN="your_token"; $env:TELEGRAM_CHAT_ID="your_chat_id"; $env:AMAZON_AFFILIATE_TAG="your_tag"; python test_telegram_notif.py')
     sys.exit(1)
 
-from check_magazines import notify_magazine
+from check_magazines import notify_magazine, notify_glenat_release, fetch_glenat_details
 
-# Test data for Direct Editeurs magazine
+# 1. Test data for Direct Editeurs magazine
 test_magazine = {
     "codif": "14067",  # Journal de Mickey
     "numero": "3858",
@@ -29,9 +29,32 @@ test_magazine = {
     "site_name": "LE JOURNAL DE MICKEY"
 }
 
+# 2. Test data for Glénat album
+test_album = {
+    "ean": "9782344062081",
+    "title": "Picsou et les bit-coincoins - Collector",
+    "date": "08/10/2025",
+    "url": "https://www.glenat.com/glenat-disney/disney-glenat-picsou-et-les-bit-coincoins-collector-9782344062081",
+    "cover_url": "https://www.images.hachette-livre.fr/media/imgArticle/GLENAT/2025/9782344062081-001-X.jpeg"
+}
+
+# Send Magazine notification
 print(f"Sending test notification for magazine: {test_magazine['site_name']} N° {test_magazine['numero']}...")
 try:
     notify_magazine(test_magazine, releve_date="15/07/2026")
-    print("Test notification sent successfully! Check your Telegram channel.")
+    print("Test magazine notification sent successfully!")
 except Exception as e:
-    print(f"Error sending notification: {e}")
+    print(f"Error sending magazine notification: {e}")
+
+# Fetch live Glénat details & send Album notification
+print(f"\nFetching live details for Glénat album: {test_album['title']}...")
+try:
+    details = fetch_glenat_details(test_album["url"])
+    test_album["price"] = details.get("price")
+    test_album["summary"] = details.get("summary")
+    
+    print(f"Sending test notification for Glénat album: {test_album['title']}...")
+    notify_glenat_release(test_album)
+    print("Test Glénat album notification sent successfully! Check your Telegram channel.")
+except Exception as e:
+    print(f"Error sending Glénat notification: {e}")

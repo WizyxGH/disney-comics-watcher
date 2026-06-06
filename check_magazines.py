@@ -585,23 +585,6 @@ def build_inducks_url(inducks, numero: str) -> str | None:
     except (ValueError, TypeError, AttributeError):
         return None
 
-
-def build_inducks_pub_url(inducks) -> str | None:
-    """Construit l'URL Inducks pour la série de publication (le magazine)."""
-    if not inducks:
-        return None
-    try:
-        if isinstance(inducks, str):
-            code = inducks
-        elif isinstance(inducks, (list, tuple)) and len(inducks) > 0:
-            code = inducks[0]
-        else:
-            return None
-        return f"https://inducks.org/publication.php?c=fr/{quote(code)}"
-    except (ValueError, TypeError, AttributeError):
-        return None
-
-
 def isbn13_to_isbn10(isbn13: str) -> str | None:
     """Convertit un ISBN-13 (commençant par 978) en ISBN-10 (ASIN Amazon)."""
     clean = "".join(filter(str.isdigit, isbn13))
@@ -651,10 +634,6 @@ def notify_magazine(info: dict, releve_date: str | None = None):
     inducks_url = build_inducks_url(ov.get("inducks"), num)
     if inducks_url:
         link_parts.append(f'<a href="{inducks_url}">Sommaire Inducks</a>')
-
-    inducks_pub_url = build_inducks_pub_url(ov.get("inducks"))
-    if inducks_pub_url:
-        link_parts.append(f'<a href="{inducks_pub_url}">Fiche du magazine (Inducks)</a>')
 
     lines.append(" • ".join(link_parts))
 

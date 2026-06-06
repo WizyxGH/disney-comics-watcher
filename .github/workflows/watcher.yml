@@ -1,0 +1,75 @@
+name: Disney Comics Watcher 🦆
+
+on:
+  schedule:
+    # Toutes les heures, à la minute 0
+    - cron: "0 * * * *"
+  workflow_dispatch: # Lancement manuel depuis l'onglet Actions
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Nécessaire pour pusher sur la branche datas
+
+    steps:
+      # 1. Checkout du code (branche main)
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      # 2. Récupérer le state.json depuis la branche datas
+      - name: Récupérer state.json
+        run: |
+          git fetch origin datas 2>/dev/null || true
+          git checkout origin/datas -- state.json 2>/dev/null || echo '{}' > state.json
+          echo "State chargé : $(wc -c < state.json) octets"
+
+      # 3. Python
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # 4. Dépendances
+      - name: Installer les dépendances
+        run: pip install requests
+
+      # 5. Lancer le watcher
+      - name: Lancer le watcher
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID_FR: ${{ secrets.TELEGRAM_CHAT_ID_FR }}
+        run: python check_magazines.py
+
+      # 6. Pousser le state mis à jour sur la branche datas
+      - name: Sauvegarder state.json
+        if: always() # Toujours sauvegarder, même en cas d'erreur partielle
+        run: |
+          # Sauvegarder le state dans /tmp avant de changer de branche
+          cp state.json /tmp/state_updated.json
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Basculer sur la branche datas (ou la créer si elle n'existe pas encore)
+          if git ls-remote --exit-code --heads origin datas > /dev/null 2>&1; then
+            git fetch origin datas
+            git checkout -B datas origin/datas
+          else
+            git checkout --orphan datas
+            git rm -rf . --quiet 2>/dev/null || true
+          fi
+
+          # Écrire le state et commiter s'il y a des changements
+          cp /tmp/state_updated.json state.json
+          git add state.json
+          if git diff --cached --quiet; then
+            echo "Aucun changement dans le state — rien à commiter."
+          else
+            git commit -m "state: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            git push origin datas
+          fi

@@ -1,0 +1,19 @@
+# Fichiers générés / temporaires
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# State local (stocké sur la branche datas, pas sur main)
+state.json
+
+# Variables d'environnement locales (ne jamais commiter !)
+.env
+.env.local
+
+# Éditeurs
+.vscode/
+.idea/
+*.swp
+*.swo

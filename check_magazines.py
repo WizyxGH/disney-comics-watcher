@@ -438,33 +438,65 @@ def discover_glenat():
     return result
 
 
-def fetch_glenat_price(url: str) -> str | None:
-    """Récupère à la demande le prix d'un album depuis sa fiche produit Glénat."""
+def fetch_glenat_details(url: str) -> dict:
+    """Récupère à la demande le prix et le résumé d'un album depuis sa fiche produit Glénat."""
     s = get_session()
+    details = {"price": None, "summary": None}
     try:
         r = s.get(url, timeout=10)
         r.raise_for_status()
         r.encoding = "utf-8"
         text = r.text
 
-        # 1. Chercher dans les attributs JSON-LD "price":"..."
-        m = re.search(r'"price"\s*:\s*"([0-9.]+)"', text)
-        if m:
-            return m.group(1).replace(".", ",") + " €"
+        # 1. Extraction du prix
+        price_m = re.search(r'"price"\s*:\s*"([0-9.]+)"', text)
+        if price_m:
+            details["price"] = price_m.group(1).replace(".", ",") + " €"
+        else:
+            price_m = re.search(r'itemprop="price"\s*content="([^"]+)"', text)
+            if price_m:
+                details["price"] = price_m.group(1).replace(".", ",") + " €"
+            else:
+                price_m = re.search(r'([0-9]+[,\.][0-9]{2})\s*(?:€|\u20ac)', text)
+                if price_m:
+                    details["price"] = price_m.group(1).replace(".", ",") + " €"
 
-        # 2. Chercher dans les balises meta itemprop="price"
-        m = re.search(r'itemprop="price"\s*content="([^"]+)"', text)
-        if m:
-            return m.group(1).replace(".", ",") + " €"
-
-        # 3. Chercher dans le HTML classique (ex: 19,00 €)
-        m = re.search(r'([0-9]+[,\.][0-9]{2})\s*(?:€|\u20ac)', text)
-        if m:
-            return m.group(1).replace(".", ",") + " €"
+        # 2. Extraction du résumé (__NEXT_DATA__)
+        next_m = re.search(r'<script id="__NEXT_DATA__" type="application/json">(.*?)</script>', text)
+        if next_m:
+            try:
+                data = json.loads(next_m.group(1))
+                raw_summary = data.get('props', {}).get('pageProps', {}).get('data', {}).get('presentation_editoriale')
+                if raw_summary:
+                    summary_text = re.sub(r'</?(?:p|br|div)[^>]*>', '\n', raw_summary)
+                    summary_text = re.sub(r'<[^>]+>', '', summary_text)
+                    summary_text = html_lib.unescape(summary_text)
+                    
+                    lines = [l.strip() for l in summary_text.split('\n')]
+                    cleaned_lines = []
+                    for line in lines:
+                        if line:
+                            cleaned_lines.append(line)
+                        elif cleaned_lines and cleaned_lines[-1] != "":
+                            cleaned_lines.append("")
+                    details["summary"] = "\n".join(cleaned_lines).strip()
+            except Exception as e:
+                print(f"  [warn] Impossible de décoder le résumé pour {url}: {e}")
 
     except Exception as e:
-        print(f"  [warn] Impossible de récupérer le prix pour {url}: {e}")
-    return None
+        print(f"  [warn] Impossible de récupérer les détails pour {url}: {e}")
+    return details
+
+
+def truncate_summary(text: str, max_len: int = 400) -> str:
+    """Tronque proprement le résumé pour ne pas couper de mot."""
+    if not text or len(text) <= max_len:
+        return text or ""
+    truncated = text[:max_len]
+    last_space = truncated.rfind(' ')
+    if last_space > 0:
+        truncated = truncated[:last_space]
+    return truncated.strip() + "…"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -631,42 +663,80 @@ def notify_magazine(info: dict, releve_date: str | None = None):
 def notify_glenat_announce(album: dict):
     """Notification d'annonce Glénat (album à paraître)."""
     title = html_lib.escape(album.get("title", "Album Disney"))
-    lines = [f"📢 <b>Annonce — {title}</b>"]
-    if album.get("date"):
-        lines.append(f"🗓 Parution prévue : {album['date']}")
-    if album.get("price"):
-        lines.append(f"💶 {html_lib.escape(album['price'])}")
-    lines.append(f'🔗 <a href="{album["url"]}">Voir sur Glénat</a>')
     
-    # Lien d'affiliation Amazon si configuré et EAN valide
+    # 1. Construire les lignes de base (métadonnées)
+    meta_lines = [f"📢 <b>Annonce — {title}</b>"]
+    if album.get("date"):
+        meta_lines.append(f"🗓 Parution prévue : {album['date']}")
+    if album.get("price"):
+        meta_lines.append(f"💶 {html_lib.escape(album['price'])}")
+        
+    # 2. Construire les lignes de liens
+    link_lines = [f'🔗 <a href="{album["url"]}">Voir sur Glénat</a>']
     if AMAZON_AFFILIATE_TAG:
         asin = isbn13_to_isbn10(album.get("ean", ""))
         if asin:
             amazon_url = f"https://www.amazon.fr/dp/{asin}/?tag={AMAZON_AFFILIATE_TAG}"
-            lines.append(f'🛒 <a href="{amazon_url}">Acheter sur Amazon</a>')
-
-    send_telegram(album.get("cover_url"), "\n".join(lines))
+            link_lines.append(f'🛒 <a href="{amazon_url}">Acheter sur Amazon</a>')
+            
+    # 3. Calculer dynamiquement l'espace restant pour le résumé dans la limite des 1024 caractères de Telegram
+    base_len = sum(len(line) for line in meta_lines) + sum(len(line) for line in link_lines) + len(meta_lines) + len(link_lines) + 2
+    max_summary_len = 1024 - base_len - 25
+    
+    summary = album.get("summary")
+    summary_line = ""
+    if summary and max_summary_len > 50:
+        truncated = truncate_summary(summary, max_len=max_summary_len)
+        summary_line = f"\n📝 <i>{html_lib.escape(truncated)}</i>"
+        
+    # 4. Assembler le message final
+    all_lines = []
+    all_lines.extend(meta_lines)
+    if summary_line:
+        all_lines.append(summary_line)
+    all_lines.extend(link_lines)
+    
+    send_telegram(album.get("cover_url"), "\n".join(all_lines))
     time.sleep(1)
 
 
 def notify_glenat_release(album: dict):
     """Notification de sortie Glénat (album disponible en librairie)."""
     title = html_lib.escape(album.get("title", "Album Disney"))
-    lines = [f"📚 <b>Disponible — {title}</b>"]
-    if album.get("date"):
-        lines.append(f"🗓 Paru le : {album['date']}")
-    if album.get("price"):
-        lines.append(f"💶 {html_lib.escape(album['price'])}")
-    lines.append(f'🔗 <a href="{album["url"]}">Voir sur Glénat</a>')
     
-    # Lien d'affiliation Amazon si configuré et EAN valide
+    # 1. Construire les lignes de base (métadonnées)
+    meta_lines = [f"📚 <b>Disponible — {title}</b>"]
+    if album.get("date"):
+        meta_lines.append(f"🗓 Paru le : {album['date']}")
+    if album.get("price"):
+        meta_lines.append(f"💶 {html_lib.escape(album['price'])}")
+        
+    # 2. Construire les lignes de liens
+    link_lines = [f'🔗 <a href="{album["url"]}">Voir sur Glénat</a>']
     if AMAZON_AFFILIATE_TAG:
         asin = isbn13_to_isbn10(album.get("ean", ""))
         if asin:
             amazon_url = f"https://www.amazon.fr/dp/{asin}/?tag={AMAZON_AFFILIATE_TAG}"
-            lines.append(f'🛒 <a href="{amazon_url}">Acheter sur Amazon</a>')
-
-    send_telegram(album.get("cover_url"), "\n".join(lines))
+            link_lines.append(f'🛒 <a href="{amazon_url}">Acheter sur Amazon</a>')
+            
+    # 3. Calculer dynamiquement l'espace restant pour le résumé dans la limite des 1024 caractères de Telegram
+    base_len = sum(len(line) for line in meta_lines) + sum(len(line) for line in link_lines) + len(meta_lines) + len(link_lines) + 2
+    max_summary_len = 1024 - base_len - 25
+    
+    summary = album.get("summary")
+    summary_line = ""
+    if summary and max_summary_len > 50:
+        truncated = truncate_summary(summary, max_len=max_summary_len)
+        summary_line = f"\n📝 <i>{html_lib.escape(truncated)}</i>"
+        
+    # 4. Assembler le message final
+    all_lines = []
+    all_lines.extend(meta_lines)
+    if summary_line:
+        all_lines.append(summary_line)
+    all_lines.extend(link_lines)
+    
+    send_telegram(album.get("cover_url"), "\n".join(all_lines))
     time.sleep(1)
 
 
@@ -756,8 +826,10 @@ def main():
             else:
                 # Album à paraître -> notification d'annonce
                 if not first_run:
-                    # Récupère le prix à la demande avant d'envoyer la notification
-                    album["price"] = fetch_glenat_price(album["url"])
+                    # Récupère les détails à la demande avant d'envoyer la notification
+                    details = fetch_glenat_details(album["url"])
+                    album["price"] = details.get("price")
+                    album["summary"] = details.get("summary")
                     print(f"  [ANNONCE] {album.get('title', ean)} — Prix: {album.get('price') or 'non renseigné'}")
                     notify_glenat_announce(album)
                     notif_count += 1
@@ -768,8 +840,10 @@ def main():
         elif current == "announced" and pub_date and pub_date <= today:
             # Album annoncé dont la date de parution est atteinte → sortie en librairie
             if not first_run:
-                # Récupère le prix à la demande avant d'envoyer la notification
-                album["price"] = fetch_glenat_price(album["url"])
+                # Récupère les détails à la demande avant d'envoyer la notification
+                details = fetch_glenat_details(album["url"])
+                album["price"] = details.get("price")
+                album["summary"] = details.get("summary")
                 print(f"  [SORTIE]  {album.get('title', ean)} — Prix: {album.get('price') or 'non renseigné'}")
                 notify_glenat_release(album)
                 notif_count += 1

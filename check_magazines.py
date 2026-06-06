@@ -99,6 +99,8 @@ TELEGRAM_API = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; DisneyComicsWatcher/1.0)"}
 
+AMAZON_AFFILIATE_TAG = os.environ.get("AMAZON_AFFILIATE_TAG", "")
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  Session HTTP partagée
@@ -546,6 +548,27 @@ def build_inducks_url(inducks, numero: str) -> str | None:
         return None
 
 
+def isbn13_to_isbn10(isbn13: str) -> str | None:
+    """Convertit un ISBN-13 (commençant par 978) en ISBN-10 (ASIN Amazon)."""
+    clean = "".join(filter(str.isdigit, isbn13))
+    if len(clean) != 13 or not clean.startswith("978"):
+        return None
+    
+    digits = clean[3:12]
+    
+    total = sum(int(digit) * (10 - i) for i, digit in enumerate(digits))
+    rem = total % 11
+    check = 11 - rem
+    if check == 10:
+        check_char = "X"
+    elif check == 11:
+        check_char = "0"
+    else:
+        check_char = str(check)
+        
+    return digits + check_char
+
+
 def notify_magazine(info: dict, releve_date: str | None = None):
     """Envoie la notification Telegram pour un nouveau numéro de magazine."""
     codif = info["codif"]
@@ -588,6 +611,14 @@ def notify_glenat_announce(album: dict):
     if album.get("price"):
         lines.append(f"💶 {html_lib.escape(album['price'])}")
     lines.append(f'🔗 <a href="{album["url"]}">Voir sur Glénat</a>')
+    
+    # Lien d'affiliation Amazon si configuré et EAN valide
+    if AMAZON_AFFILIATE_TAG:
+        asin = isbn13_to_isbn10(album.get("ean", ""))
+        if asin:
+            amazon_url = f"https://www.amazon.fr/dp/{asin}/?tag={AMAZON_AFFILIATE_TAG}"
+            lines.append(f'🛒 <a href="{amazon_url}">Acheter sur Amazon</a>')
+
     send_telegram(album.get("cover_url"), "\n".join(lines))
     time.sleep(1)
 
@@ -601,6 +632,14 @@ def notify_glenat_release(album: dict):
     if album.get("price"):
         lines.append(f"💶 {html_lib.escape(album['price'])}")
     lines.append(f'🔗 <a href="{album["url"]}">Voir sur Glénat</a>')
+    
+    # Lien d'affiliation Amazon si configuré et EAN valide
+    if AMAZON_AFFILIATE_TAG:
+        asin = isbn13_to_isbn10(album.get("ean", ""))
+        if asin:
+            amazon_url = f"https://www.amazon.fr/dp/{asin}/?tag={AMAZON_AFFILIATE_TAG}"
+            lines.append(f'🛒 <a href="{amazon_url}">Acheter sur Amazon</a>')
+
     send_telegram(album.get("cover_url"), "\n".join(lines))
     time.sleep(1)
 

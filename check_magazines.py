@@ -683,16 +683,22 @@ def main():
         pub_date = album.get("pub_date")
 
         if current is None:
-            # Nouvel album détecté → notification d'annonce
-            if not first_run:
-                # Récupère le prix à la demande avant d'envoyer la notification
-                album["price"] = fetch_glenat_price(album["url"])
-                print(f"  [ANNONCE] {album.get('title', ean)} — Prix: {album.get('price') or 'non renseigné'}")
-                notify_glenat_announce(album)
-                notif_count += 1
+            # Nouvel album détecté
+            if pub_date and pub_date <= today:
+                # Déjà sorti dans le passé -> on l'enregistre directement comme sorti sans notifier
+                print(f"  [SORTIE-SILENT-INIT] {album.get('title', ean)}")
+                state[key] = "released"
             else:
-                print(f"  [ANNONCE-SILENT] {album.get('title', ean)}")
-            state[key] = "announced"
+                # Album à paraître -> notification d'annonce
+                if not first_run:
+                    # Récupère le prix à la demande avant d'envoyer la notification
+                    album["price"] = fetch_glenat_price(album["url"])
+                    print(f"  [ANNONCE] {album.get('title', ean)} — Prix: {album.get('price') or 'non renseigné'}")
+                    notify_glenat_announce(album)
+                    notif_count += 1
+                else:
+                    print(f"  [ANNONCE-SILENT] {album.get('title', ean)}")
+                state[key] = "announced"
 
         elif current == "announced" and pub_date and pub_date <= today:
             # Album annoncé dont la date de parution est atteinte → sortie en librairie

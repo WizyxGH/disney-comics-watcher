@@ -71,5 +71,5 @@ jobs:
             echo "Aucun changement dans le state — rien à commiter."
           else
             git commit -m "state: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            git push origin datas
+            git push origin datas --force
           fi

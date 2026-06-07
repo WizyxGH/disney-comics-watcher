@@ -12,7 +12,7 @@ Surveille automatiquement les nouvelles sorties de magazines et BD Disney en Fra
 
 ## Types de notifications
 
-- 🦆 / 💰 / 🐭 … **Nouveau numéro de magazine** — avec cover, numéro, prix, dates et lien Inducks
+- 🦆 / 💰 / 🐭 … **Nouveau numéro de magazine** — avec cover, numéro, prix et dates
 - 📢 **Annonce Glénat** — quand un album apparaît « à paraître » dans le catalogue
 - 📚 **Sortie Glénat** — quand la date de parution est atteinte
 
@@ -61,10 +61,9 @@ Les runs suivants notifient uniquement les nouveaux numéros.
 1. Le script tourne **toutes les heures** (à la minute 0) via GitHub Actions
 2. Il interroge Direct Éditeurs et MLP pour découvrir tous les magazines Disney actifs
 3. Il compare avec le dernier numéro connu (stocké dans `state.json` sur la branche `datas`)
-4. Pour chaque nouveau numéro → notification Telegram avec cover, prix, dates et lien Inducks
+4. Pour chaque nouveau numéro → notification Telegram avec cover, prix et dates
 5. En parallèle, il surveille les albums Glénat (annonces + sorties)
-6. **Fenêtre calme** : aucune notification entre 23h et 7h (heure Paris)
-7. Le `state.json` est commité sur la branche `datas` (le code reste propre sur `main`)
+6. Le `state.json` est commité sur la branche `datas` (le code reste propre sur `main`)
 
 ## Personnaliser un magazine
 

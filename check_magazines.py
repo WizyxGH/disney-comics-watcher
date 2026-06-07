@@ -8,6 +8,8 @@ from datetime import datetime
 from urllib.parse import quote, quote_plus
 from zoneinfo import ZoneInfo
 
+from dbi_generator import build_inducks_path, generate_dbi_skeleton, DBI_FILE
+
 # ─────────────────────────────────────────────────────────────────────────────
 #  Configuration
 # ─────────────────────────────────────────────────────────────────────────────
@@ -84,7 +86,7 @@ GLENAT_COLLECTION_URL = "https://www.glenat.com/livres-glenat-disney/"
 GLENAT_BASE           = "https://www.glenat.com"
 GLENAT_KEY_PREFIX     = "glenat:"
 
-STATE_FILE = "state.json"
+STATE_FILE    = "state.json"
 
 # Credentials Telegram — injectés via secrets GitHub Actions
 TELEGRAM_BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
@@ -435,9 +437,9 @@ def discover_glenat():
 
 
 def fetch_glenat_details(url: str) -> dict:
-    """Récupère à la demande le prix et le résumé d'un album depuis sa fiche produit Glénat."""
+    """Récupère à la demande prix, résumé, nb. de pages, dimensions et traducteur depuis la fiche produit Glénat."""
     s = get_session()
-    details = {"price": None, "summary": None}
+    details = {"price": None, "summary": None, "pages": None, "size": None, "isstrans": None}
     try:
         r = s.get(url, timeout=10)
         r.raise_for_status()
@@ -457,17 +459,18 @@ def fetch_glenat_details(url: str) -> dict:
                 if price_m:
                     details["price"] = price_m.group(1).replace(".", ",") + " €"
 
-        # 2. Extraction du résumé (__NEXT_DATA__)
+        # 2. Extraction du résumé, pages, dimensions et traducteur (__NEXT_DATA__)
         next_m = re.search(r'<script id="__NEXT_DATA__" type="application/json">(.*?)</script>', text)
         if next_m:
             try:
                 data = json.loads(next_m.group(1))
-                raw_summary = data.get('props', {}).get('pageProps', {}).get('data', {}).get('presentation_editoriale')
+                product_data = data.get('props', {}).get('pageProps', {}).get('data', {})
+
+                raw_summary = product_data.get('presentation_editoriale')
                 if raw_summary:
                     summary_text = re.sub(r'</?(?:p|br|div)[^>]*>', '\n', raw_summary)
                     summary_text = re.sub(r'<[^>]+>', '', summary_text)
                     summary_text = html_lib.unescape(summary_text)
-                    
                     lines = [l.strip() for l in summary_text.split('\n')]
                     cleaned_lines = []
                     for line in lines:
@@ -476,8 +479,32 @@ def fetch_glenat_details(url: str) -> dict:
                         elif cleaned_lines and cleaned_lines[-1] != "":
                             cleaned_lines.append("")
                     details["summary"] = "\n".join(cleaned_lines).strip()
+
+                # Nombre de pages
+                nb_pages = product_data.get('nb_pages') or product_data.get('pages')
+                if nb_pages:
+                    try:
+                        details["pages"] = int(nb_pages)
+                    except (ValueError, TypeError):
+                        pass
+
+                # Dimensions (format : ex. "21 x 28 cm" ou "22 x 29" depuis plusieurs champs)
+                format_val = (product_data.get('format_du_produit')
+                              or product_data.get('format')
+                              or product_data.get('dimensions'))
+                if format_val and isinstance(format_val, str):
+                    details["size"] = format_val.strip()
+
+                # Traducteur
+                for contributor in product_data.get('contribuants', []) or []:
+                    role = (contributor.get('role') or contributor.get('role_libelle') or "").lower()
+                    if 'traduct' in role:
+                        name = contributor.get('prenom', "").strip() + " " + contributor.get('nom', "").strip()
+                        details["isstrans"] = name.strip() or None
+                        break
+
             except Exception as e:
-                print(f"  [warn] Impossible de décoder le résumé pour {url}: {e}")
+                print(f"  [warn] Impossible de décoder les détails JSON pour {url}: {e}")
 
     except Exception as e:
         print(f"  [warn] Impossible de récupérer les détails pour {url}: {e}")
@@ -562,44 +589,11 @@ def send_telegram(photo_url: str | None, caption: str, buttons: list | None = No
 
 def build_inducks_url(inducks, numero: str) -> str | None:
     """Construit l'URL Inducks pour un numéro de parution donné."""
-    if not inducks or not numero:
+    path = build_inducks_path(inducks, numero)
+    if not path:
         return None
-    try:
-        # Formater le numéro s'il y a un tiret (double numéro), ex: "3858-3859" -> "3858-59"
-        numero = str(numero).strip()
-        if "-" in numero:
-            parts = [p.strip() for p in numero.split("-")]
-            if len(parts) == 2 and parts[0].isdigit() and parts[1].isdigit():
-                p1, p2 = parts[0], parts[1]
-                if len(p1) == len(p2) and len(p1) >= 3 and p1[:-2] == p2[:-2]:
-                    num_str = f"{p1}-{p2[-2:]}"
-                else:
-                    num_str = f"{p1}-{p2}"
-            else:
-                num_str = numero
-        else:
-            num_str = numero
+    return f"https://inducks.org/issue.php?c={quote_plus(path)}"
 
-        # Extraire le premier nombre pour les cas où on doit appliquer un rjust
-        first_part = numero.split("-")[0].strip()
-        digits = "".join(filter(str.isdigit, first_part))
-        if not digits:
-            return None
-        n = int(digits)
-
-        if isinstance(inducks, str):
-            path = f"fr/{inducks} {num_str}"
-        elif len(inducks) == 2:
-            code, width = inducks
-            path = f"fr/{code}{str(n).rjust(width)}"
-        elif len(inducks) == 3:
-            code, width, suffix = inducks
-            path = f"fr/{code} {suffix}{num_str}"
-        else:
-            return None
-        return f"https://inducks.org/issue.php?c={quote_plus(path)}"
-    except Exception:
-        return None
 
 def isbn13_to_isbn10(isbn13: str) -> str | None:
     """Convertit un ISBN-13 (commençant par 978) en ISBN-10 (ASIN Amazon)."""
@@ -692,6 +686,9 @@ def notify_magazine(info: dict, releve_date: str | None = None):
     send_telegram(cover_url, "\n".join(lines), buttons=buttons)
     time.sleep(1)  # throttle
 
+    # Génération du squelette de pré-index Inducks
+    generate_dbi_skeleton(info, publication_type="magazine", overrides=OVERRIDES)
+
 
 
 def build_glenat_inducks_url(title: str) -> str:
@@ -748,6 +745,9 @@ def notify_glenat_announce(album: dict):
     send_telegram(album.get("cover_url"), caption, buttons=buttons)
     time.sleep(1)
 
+    # Génération du squelette de pré-index Inducks
+    generate_dbi_skeleton(album, publication_type="glenat", overrides=OVERRIDES)
+
 
 def notify_glenat_release(album: dict):
     """Notification de sortie Glénat (album disponible en librairie)."""
@@ -782,10 +782,8 @@ def notify_glenat_release(album: dict):
     send_telegram(album.get("cover_url"), caption, buttons=buttons)
     time.sleep(1)
 
-
-
-
-
+    # Génération du squelette de pré-index Inducks
+    generate_dbi_skeleton(album, publication_type="glenat", overrides=OVERRIDES)
 
 
 # ─────────────────────────────────────────────────────────────────────────────

@@ -64,6 +64,54 @@ Les runs suivants notifient uniquement les nouveaux numéros.
 4. Pour chaque nouveau numéro → notification Telegram avec cover, prix et dates
 5. En parallèle, il surveille les albums Glénat (annonces + sorties)
 6. Le `state.json` est commité sur la branche `datas` (le code reste propre sur `main`)
+7. À chaque nouvelle parution détectée, un **squelette de pré-index Inducks** (format `.dbi`) est ajouté au fichier local `fr.dbi` à la racine du projet.
+
+## Pré-index Inducks (`fr.dbi`)
+
+À chaque nouvelle parution notifiée, le script génère automatiquement un fichier de pré-index au format [Inducks Bolderbast DBI](https://inducks.org/bolderbast/xh7111_DBIReader.html) et l'ajoute par concaténation (mode *append*) dans le fichier `fr.dbi` à la racine.
+
+### Ce que contient le fichier
+
+Chaque squelette d'index généré contient :
+
+- Une **ligne d'en-tête `h3`** correctement formatée (positions fixes selon la spec Bolderbast) avec :
+  - Le code Inducks de la parution (ex: `fr/PM  580` ou `->` si le code dépasse 12 caractères comme pour `fr/JM 3858-59`)
+  - La date de parution `[issdate:YYYY-MM-DD]`
+  - Le prix `[price:X.XX EUR]`
+  - Pour les albums Glénat : le titre du livre, le nombre de pages `[pages:XX]`, les dimensions `[size:...]`, le traducteur `[isstrans:...]` et l'EAN `[EAN:...]` (si disponibles)
+  - `[inx:-]` indiquant que l'index est à compléter
+- Une **ligne d'entrée pré-remplie pour la couverture** (pages = `1`, brokpg = vide, pagel = `c`)
+- Un **gabarit commenté** (lignes `^^`) expliquant le format des lignes d'entrée (couverture, histoires) pour aider l'indexeur
+
+### Exemple de fichier généré (magazine)
+
+```
+^^ Pre-index genere automatiquement par DisneyComicsWatcher
+^^ Source : magazine
+^^ A completer et soumettre sur https://inducks.org/bolderbast/
+fr/PM  580   h3 [issdate:2026-06-10] [price:6.50 EUR] [inx:-]
+fr/PM  580a ?              1 c                      
+
+^^ -- Entrees a completer ci-dessous --
+...
+```
+
+### Comment l'utiliser
+
+1. Récupère le fichier `fr.dbi` à la racine du projet (disponible dans les artefacts de run de la GitHub Action).
+2. Complète la ligne de couverture et les entrées avec les histoires du numéro (storycode, pages, crédits…).
+3. Soumets le contenu correspondant à ton index sur [Inducks Bolderbast](https://inducks.org/bolderbast/).
+
+### Codes Inducks pré-configurés
+
+Les publications dont le code Inducks est connu (configuré dans `OVERRIDES`) génèrent directement le bon code (ex: `fr/PM`, `fr/JM`, `fr/CF`). Pour les autres, un code provisoire `fr/TODO_<codif>` est utilisé — à corriger avant soumission.
+
+Pour les albums Glénat, les séries connues sont automatiquement reconnues :
+
+| Série | Code Inducks |
+|---|---|
+| La Grande Histoire de Picsou (Don Rosa) | `fr/GHP` |
+| Les Âges d'or de Disney | `fr/AOD` |
 
 ## Personnaliser un magazine
 

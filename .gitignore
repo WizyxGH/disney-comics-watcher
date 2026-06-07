@@ -8,6 +8,9 @@ __pycache__/
 # State local (stocké sur la branche datas, pas sur main)
 state.json
 
+# Pré-index Inducks généré localement
+fr.dbi
+
 # Variables d'environnement locales (ne jamais commiter !)
 .env
 .env.local

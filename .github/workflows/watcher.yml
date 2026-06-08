@@ -39,7 +39,7 @@ jobs:
 
       # 4. Dépendances
       - name: Installer les dépendances
-        run: pip install requests
+        run: pip install requests beautifulsoup4
 
       # 5. Lancer le watcher
       - name: Lancer le watcher

@@ -56,6 +56,21 @@ Va dans l'onglet **Actions** de ton repo. Si désactivé, clique sur
 Le premier run initialise le state silencieusement (aucun flood).
 Les runs suivants notifient uniquement les nouveaux numéros.
 
+### 7. Développement et tests locaux
+
+Vous pouvez lancer le script de surveillance et ses tests sur votre machine sans configurer de variables système globales. 
+Pour cela, créez simplement un fichier `.env` à la racine du projet (ce fichier est déjà configuré dans `.gitignore`) :
+
+```env
+TELEGRAM_BOT_TOKEN=votre_token_de_test
+TELEGRAM_CHAT_ID_FR=votre_chat_id_de_test
+```
+
+Puis lancez la suite de tests avec :
+```powershell
+python test_telegram_notif.py
+```
+
 ## Comment ça marche
 
 1. Le script tourne **toutes les heures** (à la minute 0) via GitHub Actions
@@ -81,7 +96,6 @@ Chaque squelette d'index généré contient :
   - Pour les albums Glénat : le titre du livre, le nombre de pages `[pages:XX]`, les dimensions `[size:...]`, le traducteur `[isstrans:...]` et l'EAN `[EAN:...]` (si disponibles)
   - `[inx:-]` indiquant que l'index est à compléter
 - Une **ligne d'entrée pré-remplie pour la couverture** (pages = `1`, brokpg = vide, pagel = `c`)
-- Un **gabarit commenté** (lignes `^^`) expliquant le format des lignes d'entrée (couverture, histoires) pour aider l'indexeur
 
 ### Exemple de fichier généré (magazine)
 
@@ -91,9 +105,6 @@ Chaque squelette d'index généré contient :
 ^^ A completer et soumettre sur https://inducks.org/bolderbast/
 fr/PM  580   h3 [issdate:2026-06-10] [price:6.50 EUR] [inx:-]
 fr/PM  580a ?              1 c                      
-
-^^ -- Entrees a completer ci-dessous --
-...
 ```
 
 ### Comment l'utiliser

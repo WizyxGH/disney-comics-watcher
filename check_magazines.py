@@ -295,6 +295,10 @@ def discover_mlp_families(known_codifs: set, state: dict | None = None):
             link       = cat.find('a', href=True)
 
             title       = titre_span.get_text(strip=True) if titre_span else ""
+            title_lower = title.lower()
+            if codif not in OVERRIDES and not any(kw in title_lower for kw in KEYWORDS):
+                continue
+
             numero_list = num_span.get_text(strip=True) if num_span else ""
             date_list   = date_span.get_text(strip=True) if date_span else ""
             href        = link['href'] if link else ""

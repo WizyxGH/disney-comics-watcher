@@ -768,8 +768,9 @@ def notify_magazine(info: dict, releve_date: str | None = None):
     inducks_url = build_inducks_url(ov.get("inducks"), num)
     if not inducks_url:
         inducks_url = f"https://inducks.org/search.php?search={quote(f'{name} {num}')}"
+    btn_text = "Voir sur MLP" if "mlp.fr" in url.lower() else "Voir sur Direct-éditeurs"
     buttons = [
-        [{"text": "Voir sur Direct-éditeurs", "url": url}],
+        [{"text": btn_text, "url": url}],
         [{"text": "Sommaire sur Inducks", "url": inducks_url}],
     ]
 

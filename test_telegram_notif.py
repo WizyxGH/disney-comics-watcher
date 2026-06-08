@@ -75,13 +75,14 @@ fantomiald = {
 # 5. Test SPG HS Les Méchants
 spg_hs_mechants = {
     "codif": "11065",
-    "numero": "1",
-    "date_mise_en_vente": "07/06/2026",
-    "prix": "3,50 €",
+    "numero": "1H",
+    "date_mise_en_vente": "06/06/2026",
+    "prix": "6,99 €",
     "cover_url": "https://catalogueproduits.mlp.fr/Images/Grande_couvertures/5357208.jpg",
     "url": "https://catalogueproduits.mlp.fr/produit.aspx?tit_code=1VNav4SoK%2Bk%3D&par_num=Y8rsBoIKnD8%3D",
     "slug": "11065",
-    "site_name": "SPG HS Les Méchants"
+    "site_name": "SPG HS Les Méchants",
+    "releve_date": "04/09/2026"
 }
 
 # 6. Test Glénat Album - Picsou et les bit-coincoins (Standard)
@@ -123,7 +124,8 @@ magazines = [
 for name, data in magazines:
     print(f"\nSending test notification for: {name} N° {data['numero']}...")
     try:
-        notify_magazine(data, releve_date="15/07/2026")
+        releve = data.get("releve_date") or "15/07/2026"
+        notify_magazine(data, releve_date=releve)
         print(f"Success for {name}!")
     except Exception as e:
         print(f"Error for {name}: {e}")

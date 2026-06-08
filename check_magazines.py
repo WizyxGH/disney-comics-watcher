@@ -53,6 +53,7 @@ OVERRIDES = {
     "18262": {"name": "SPG HS Super Donald Géant (REV)",        "inducks": ("SPGHS", 3, "D")},
     "18268": {"name": "SPG HS Donald Double Duck (REV)",        "inducks": ("DON", 4)},
     "13459": {"name": "SPG HS Jeux",                            "inducks": ("SPGHS", 3, "J")},
+    "11065": {"name": "SPG HS Les Méchants",                    "inducks": ("SPGHS", 3, "M")},
     # ── Trésors de Picsou ────────────────────────────────────────────────────
     "14068": {"name": "Les Trésors de Picsou",                  "inducks": "TP"},
     # ── Journal de Mickey et déclinaisons ────────────────────────────────────
@@ -80,7 +81,7 @@ SEARCH_URL     = "https://direct-editeurs.fr/nos-magazines"
 SITE_BASE      = "https://direct-editeurs.fr"
 MLP_URL        = "https://catalogueproduits.mlp.fr/Default.aspx"
 MLP_FAMILY_URL = "https://catalogueproduits.mlp.fr/liste.aspx?ssFam={}"
-MLP_FAMILIES   = ["D23"]
+MLP_FAMILIES   = ["D23", "D15"]
 
 GLENAT_COLLECTION_URL = "https://www.glenat.com/livres-glenat-disney/"
 GLENAT_BASE           = "https://www.glenat.com"
@@ -246,45 +247,104 @@ def discover_de():
 #  MLP — découverte complémentaire et date de relève
 # ─────────────────────────────────────────────────────────────────────────────
 
-def discover_mlp_families(known_codifs: set):
-    """Rattrape les magazines absents de DE via les sous-familles MLP (ex: D23)."""
+def discover_mlp_families(known_codifs: set, state: dict | None = None):
+    """Rattrape les magazines absents de DE via les sous-familles MLP (ex: D23, D15) et récupère leurs détails."""
     s = get_session()
     result: dict[str, dict] = {}
+    state = state or {}
+
+    from bs4 import BeautifulSoup
 
     for family in MLP_FAMILIES:
         try:
             r = s.get(MLP_FAMILY_URL.format(family), timeout=15)
             r.raise_for_status()
+            r.encoding = "utf-8"
         except requests.RequestException as e:
             print(f"  [warn] MLP famille={family}: {e}")
             continue
 
-        text = r.text
+        soup = BeautifulSoup(r.text, 'html.parser')
 
-        # Extraire les codifs depuis les contextes typiques (liens, attributs, libellés)
-        found = set()
-        for pat in [
-            r'[?&](?:codif|ref|id)=(\d{5})\b',
-            r'/produits?/(\d{5})\b',
-            r'[Cc]odif\s*:?\s*(\d{5})\b',
-            r'data-(?:codif|ref|id)="(\d{5})"',
-        ]:
-            found.update(re.findall(pat, text))
+        # Parcourir les blocs de produits de la classe 'catalogue'
+        for cat in soup.find_all(class_='catalogue'):
+            code_span = cat.find(id=re.compile('results_ctl.*_titCode'))
+            if not code_span:
+                continue
+            codif = code_span.get_text(strip=True)
 
-        for codif in found:
             if codif in known_codifs or codif in result or codif in SKIP_CODIFS:
                 continue
-            result[codif] = {
-                "codif":              codif,
-                "numero":             None,
-                "date_mise_en_vente": None,
-                "prix":               None,
-                "cover_url":          None,
-                "url":                MLP_FAMILY_URL.format(family),
-                "slug":               codif,
-                "site_name":          "",
-                "expired_on":         None,
-            }
+
+            titre_span = cat.find(id=re.compile('results_ctl.*_titre'))
+            num_span   = cat.find(id=re.compile('results_ctl.*_parNumero'))
+            date_span  = cat.find(id=re.compile('results_ctl.*_dateParution'))
+            link       = cat.find('a', href=True)
+
+            title       = titre_span.get_text(strip=True) if titre_span else ""
+            numero_list = num_span.get_text(strip=True) if num_span else ""
+            date_list   = date_span.get_text(strip=True) if date_span else ""
+            href        = link['href'] if link else ""
+
+            # Optimisation : Si le codif est déjà connu dans state et que le numéro
+            # de parution (chiffres uniquement) correspond, on évite la requête détail.
+            state_val = state.get(codif)
+            if state_val:
+                digits_list = "".join(filter(str.isdigit, numero_list))
+                digits_state = "".join(filter(str.isdigit, state_val))
+                if digits_list and digits_state and digits_list == digits_state:
+                    continue
+
+            # Fetch la fiche produit pour récupérer le prix, la grande image et la relève
+            if href:
+                prod_url = f"https://catalogueproduits.mlp.fr/{href}"
+                try:
+                    rp = s.get(prod_url, timeout=10)
+                    if rp.status_code == 200:
+                        rp.encoding = "utf-8"
+                        unescaped_text = html_lib.unescape(rp.text)
+                        psoup = BeautifulSoup(unescaped_text, "html.parser")
+
+                        prix_span = psoup.find(id="ContentPlaceHolder1_ctl01_prix")
+                        num_detail_span = psoup.find(id="ContentPlaceHolder1_ctl00_num")
+                        meta_img = psoup.find("meta", property="og:image")
+
+                        prix = prix_span.get_text(strip=True) if prix_span else None
+                        num_detail = num_detail_span.get_text(strip=True) if num_detail_span else None
+                        cover_url = meta_img["content"] if meta_img else None
+
+                        if num_detail:
+                            num_detail = re.sub(r"(?i)N°\s*", "", num_detail).strip()
+
+                        numero = num_detail or numero_list
+
+                        # Date de relève
+                        releve = None
+                        patterns = [
+                            r"[Jj]usqu[\x27\x22]au\s*:?\s*(?:<[^>]+>)?\s*(\d{2}/\d{2}/\d{4})",
+                            r"[Rr]el[eè]ve?\s*(?:le|pr[eé]vue?)?\s*:?\s*(?:<[^>]+>)?\s*(\d{2}/\d{2}/\d{4})",
+                        ]
+                        for pat in patterns:
+                            m = re.search(pat, unescaped_text)
+                            if m:
+                                releve = m.group(1)
+                                break
+
+                        result[codif] = {
+                            "codif":              codif,
+                            "numero":             numero,
+                            "date_mise_en_vente": date_list.replace("-", "/"),
+                            "prix":               prix,
+                            "cover_url":          cover_url,
+                            "url":                prod_url,
+                            "slug":               codif,
+                            "site_name":          title,
+                            "expired_on":         None,
+                            "releve_date":        releve,
+                        }
+
+                except Exception as e:
+                    print(f"  [warn] MLP codif={codif} details: {e}")
 
     return result
 
@@ -293,9 +353,36 @@ def get_mlp_releve(codif: str):
     """Retourne la date de relève prévisionnelle (« Jusqu'au ») depuis MLP."""
     s = get_session()
     patterns = [
-        r"[Jj]usqu['']au\s*:?\s*(?:<[^>]+>)?\s*(\d{2}/\d{2}/\d{4})",
+        r"[Jj]usqu[\x27\x22]au\s*:?\s*(?:<[^>]+>)?\s*(\d{2}/\d{2}/\d{4})",
         r"[Rr]el[eè]ve?\s*(?:le|pr[eé]vue?)?\s*:?\s*(?:<[^>]+>)?\s*(\d{2}/\d{2}/\d{4})",
     ]
+
+    # On commence par chercher les liens de recherche pour trouver la vraie fiche produit
+    search_url = f"{MLP_URL}?recherche={codif}"
+    try:
+        r = s.get(search_url, timeout=10)
+        if r.status_code == 200:
+            r.encoding = "utf-8"
+            from bs4 import BeautifulSoup
+            soup = BeautifulSoup(r.text, 'html.parser')
+            for cat in soup.find_all(class_='catalogue'):
+                code_span = cat.find(id=re.compile('results_ctl.*_titCode'))
+                if code_span and code_span.get_text(strip=True) == codif:
+                    link = cat.find('a', href=True)
+                    if link:
+                        prod_url = f"https://catalogueproduits.mlp.fr/{link['href']}"
+                        rp = s.get(prod_url, timeout=10)
+                        if rp.status_code == 200:
+                            rp.encoding = "utf-8"
+                            unescaped = html_lib.unescape(rp.text)
+                            for pat in patterns:
+                                m = re.search(pat, unescaped)
+                                if m:
+                                    return m.group(1)
+    except Exception:
+        pass
+
+    # Fallback sur les URLs classiques
     for url in [
         f"{MLP_URL}?recherche={codif}",
         f"{MLP_URL}?ref={codif}",
@@ -306,8 +393,9 @@ def get_mlp_releve(codif: str):
             if r.status_code != 200:
                 continue
             r.encoding = "utf-8"
+            unescaped = html_lib.unescape(r.text)
             for pat in patterns:
-                m = re.search(pat, r.text)
+                m = re.search(pat, unescaped)
                 if m:
                     return m.group(1)
         except requests.RequestException:
@@ -812,7 +900,7 @@ def main():
     # ── MLP complémentaire ────────────────────────────────────────────────────
     print("[MLP] Découverte complémentaire…")
     try:
-        mlp_extra = discover_mlp_families(known_codifs=set(magazines))
+        mlp_extra = discover_mlp_families(known_codifs=set(magazines), state=state)
         added = {c: v for c, v in mlp_extra.items() if c not in magazines}
         magazines.update(added)
         print(f"  → +{len(added)} codif(s) MLP unique(s).")
@@ -836,11 +924,12 @@ def main():
         print(f"  [NEW] {name} — N°{numero}  (précédent: {last or '—'})")
 
         if not first_run:
-            releve = None
-            try:
-                releve = get_mlp_releve(codif)
-            except Exception:
-                pass
+            releve = info.get("releve_date")
+            if not releve:
+                try:
+                    releve = get_mlp_releve(codif)
+                except Exception:
+                    pass
             notify_magazine(info, releve_date=releve)
             notif_count += 1
 

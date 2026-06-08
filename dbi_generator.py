@@ -242,29 +242,7 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
             f"^^ A completer et soumettre sur https://inducks.org/bolderbast/\n"
         )
         body_parts.append(h3_line + "\n")
-        body_parts.append(cover_line + "\n")
-        body_parts.append(
-            "\n"
-            "^^ -- Entrees a completer ci-dessous --\n"
-            "^^ Format d'une ligne d'entree (positions 1-indexed) :\n"
-            "^^   1-12  entrycode (ex: fr/PM   580a)\n"
-            "^^  13-26  storycode (ex: I TL 3400-1  )\n"
-            "^^  27-28  pages\n"
-            "^^  29     brokpg (p/= ou vide)\n"
-            "^^  30-31  pagel\n"
-            "^^  32     ignore\n"
-            "^^  33-36  plot\n"
-            "^^  37-40  writ\n"
-            "^^  41-44  art\n"
-            "^^  45-48  ink\n"
-            "^^  49-52  hero\n"
-            "^^  53+    titre + [xref:...] etc.\n"
-            "^^\n"
-            "^^ Exemple couverture :\n"
-            f"^^ {issue_path}c  HC {issue_path}  1 c                 ??  \n"
-            "^^ Exemple histoire :\n"
-            f"^^ {issue_path}a  I TL    0-1  24             ??    Titre original\n"
-        )
+        body_parts.append(cover_line + "\n\n")
 
         # ── Écriture (ASCII + remplacement des caractères non-ASCII) ──────────
         content = "".join(body_parts)

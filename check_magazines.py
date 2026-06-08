@@ -53,7 +53,7 @@ OVERRIDES = {
     "18262": {"name": "SPG HS Super Donald Géant (REV)",        "inducks": ("SPGHS", 3, "D")},
     "18268": {"name": "SPG HS Donald Double Duck (REV)",        "inducks": ("DON", 4)},
     "13459": {"name": "SPG HS Jeux",                            "inducks": ("SPGHS", 3, "J")},
-    "11065": {"name": "SPG HS Les Méchants",                    "inducks": ("SPGHS", 3, "M")},
+    "11065": {"name": "Les grands méchants",                    "inducks": ("SPGHS", 3, "M")},
     # ── Trésors de Picsou ────────────────────────────────────────────────────
     "14068": {"name": "Les Trésors de Picsou",                  "inducks": "TP"},
     # ── Journal de Mickey et déclinaisons ────────────────────────────────────
@@ -180,9 +180,13 @@ def parse_block(block):
         if cover_url.startswith("/"):
             cover_url = SITE_BASE + cover_url
 
+    numero = num_m.group(1) if num_m else None
+    if numero and numero.upper().endswith("H"):
+        numero = numero[:-1].strip()
+
     return {
         "codif":              codif_m.group(1),
-        "numero":             num_m.group(1) if num_m else None,
+        "numero":             numero,
         "date_mise_en_vente": paru_m.group(1) if paru_m else None,
         "prix":               re.sub(r"\s+", " ", prix_m.group(1)).strip() if prix_m else None,
         "expired_on":         expired_m.group(1) if expired_m else None,
@@ -326,6 +330,8 @@ def discover_mlp_families(known_codifs: set, state: dict | None = None):
                             num_detail = re.sub(r"(?i)N°\s*", "", num_detail).strip()
 
                         numero = num_detail or numero_list
+                        if numero and numero.upper().endswith("H"):
+                            numero = numero[:-1].strip()
 
                         # Date de relève
                         releve = None
@@ -926,6 +932,8 @@ def main():
             continue
 
         last = state.get(codif)
+        if last and last.upper().endswith("H"):
+            last = last[:-1].strip()
         if numero == last:
             continue  # pas de changement
 

@@ -75,13 +75,13 @@ fantomiald = {
 # 5. Test SPG HS Les Méchants
 spg_hs_mechants = {
     "codif": "11065",
-    "numero": "1H",
+    "numero": "1",
     "date_mise_en_vente": "06/06/2026",
     "prix": "6,99 €",
     "cover_url": "https://catalogueproduits.mlp.fr/Images/Grande_couvertures/5357208.jpg",
     "url": "https://catalogueproduits.mlp.fr/produit.aspx?tit_code=1VNav4SoK%2Bk%3D&par_num=Y8rsBoIKnD8%3D",
     "slug": "11065",
-    "site_name": "SPG HS Les Méchants",
+    "site_name": "Les grands méchants",
     "releve_date": "04/09/2026"
 }
 

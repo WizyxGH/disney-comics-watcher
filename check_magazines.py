@@ -89,6 +89,15 @@ GLENAT_KEY_PREFIX     = "glenat:"
 
 STATE_FILE    = "state.json"
 
+# Chargement du fichier .env local s'il existe
+if os.path.exists(".env"):
+    with open(".env", "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                key, val = line.split("=", 1)
+                os.environ[key.strip()] = val.strip().strip('"').strip("'")
+
 # Credentials Telegram — injectés via secrets GitHub Actions
 TELEGRAM_BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 TELEGRAM_CHAT_ID   = (

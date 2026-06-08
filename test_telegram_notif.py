@@ -4,6 +4,15 @@ import sys
 # Ensure check_magazines can be imported
 sys.path.insert(0, os.path.abspath("."))
 
+# Chargement du fichier .env local s'il existe
+if os.path.exists(".env"):
+    with open(".env", "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                key, val = line.split("=", 1)
+                os.environ[key.strip()] = val.strip().strip('"').strip("'")
+
 telegram_token = os.environ.get("TELEGRAM_BOT_TOKEN")
 telegram_chat = os.environ.get("TELEGRAM_CHAT_ID_FR") or os.environ.get("TELEGRAM_CHAT_ID")
 
@@ -63,7 +72,19 @@ fantomiald = {
     "site_name": "LES CHRONIQUES DE FANTOMIALD"
 }
 
-# 5. Test Glénat Album - Picsou et les bit-coincoins (Standard)
+# 5. Test SPG HS Les Méchants
+spg_hs_mechants = {
+    "codif": "11065",
+    "numero": "1",
+    "date_mise_en_vente": "07/06/2026",
+    "prix": "3,50 €",
+    "cover_url": "https://catalogueproduits.mlp.fr/Images/Grande_couvertures/5357208.jpg",
+    "url": "https://catalogueproduits.mlp.fr/produit.aspx?tit_code=1VNav4SoK%2Bk%3D&par_num=Y8rsBoIKnD8%3D",
+    "slug": "11065",
+    "site_name": "SPG HS Les Méchants"
+}
+
+# 6. Test Glénat Album - Picsou et les bit-coincoins (Standard)
 test_album = {
     "ean": "9782344062081",
     "title": "Picsou et les bit-coincoins - Collector",
@@ -72,7 +93,7 @@ test_album = {
     "cover_url": "https://www.images.hachette-livre.fr/media/imgArticle/GLENAT/2025/9782344062081-001-X.jpeg"
 }
 
-# 6. Test Glénat Album - Les Âges d'or de Picsou (Tome 03)
+# 7. Test Glénat Album - Les Âges d'or de Picsou (Tome 03)
 test_album_aod = {
     "ean": "9782344075210",
     "title": "Les Âges d'or de Picsou - Tome 03",
@@ -81,7 +102,7 @@ test_album_aod = {
     "cover_url": "https://www.images.hachette-livre.fr/media/imgArticle/GLENAT/2026/9782344075210-001-X.jpeg"
 }
 
-# 7. Test Glénat Album - La Grande Histoire de Picsou (Tome 01)
+# 8. Test Glénat Album - La Grande Histoire de Picsou (Tome 01)
 test_album_ghp = {
     "ean": "9782344072578",
     "title": "La Grande Histoire de Picsou - Tome 01",
@@ -96,6 +117,7 @@ magazines = [
     ("Picsou Magazine", picsou_mag),
     ("Super Picsou Géant", super_picsou),
     ("Les Chroniques de Fantomiald", fantomiald),
+    ("SPG HS Les Méchants", spg_hs_mechants),
 ]
 
 for name, data in magazines:

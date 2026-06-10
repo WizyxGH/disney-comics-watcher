@@ -4,7 +4,7 @@ import sys
 # Ensure check_magazines can be imported
 sys.path.insert(0, os.path.abspath("."))
 
-# Chargement du fichier .env local s'il existe
+# Load local .env file if it exists
 if os.path.exists(".env"):
     with open(".env", "r", encoding="utf-8") as f:
         for line in f:

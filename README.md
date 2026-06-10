@@ -1,103 +1,103 @@
 # Disney Comics Watcher
 
-Surveille automatiquement les nouvelles sorties de magazines et BD Disney en France, et envoie une notification dans un canal Telegram à chaque nouveau numéro.
+Automatically monitors new releases of Disney magazines and comic books in France, and sends a notification to a Telegram channel for every new issue.
 
-## Sources surveillées
+## Monitored Sources
 
-| Source | Ce qu'elle couvre |
+| Source | What it covers |
 |---|---|
-| [direct-editeurs.fr](https://direct-editeurs.fr) | Magazines actifs (Picsou, Mickey, Fantomiald…) |
-| [catalogueproduits.mlp.fr](https://catalogueproduits.mlp.fr) | Complémentaire : titres absents de DE (Picsou Soir, Destin de Picsou…) |
-| [glenat.com/livres-glenat-disney](https://www.glenat.com/livres-glenat-disney/) | Albums BD Disney (Picsou, Mickey, Don Rosa, Scarpa…) |
+| [direct-editeurs.fr](https://direct-editeurs.fr) | Active magazines (Picsou, Mickey, Fantomiald…) |
+| [catalogueproduits.mlp.fr](https://catalogueproduits.mlp.fr) | Complementary: issues missing from DE (Picsou Soir, Destin de Picsou…) |
+| [glenat.com/livres-glenat-disney](https://www.glenat.com/livres-glenat-disney/) | Disney comic books/graphic novels (Picsou, Mickey, Don Rosa, Scarpa…) |
 
-## Types de notifications
+## Notification Types
 
-- 🦆 / 💰 / 🐭 … **Nouveau numéro de magazine** — avec cover, numéro, prix et dates
-- 📢 **Annonce Glénat** — quand un album apparaît « à paraître » dans le catalogue
-- 📚 **Sortie Glénat** — quand la date de parution est atteinte
+- 🦆 / 💰 / 🐭 … **New magazine issue** — with cover, issue number, price, and dates
+- 📢 **Glénat announcement** — when a book appears as "to be published" in the catalog
+- 📚 **Glénat release** — when the publication date is reached
 
 ## Installation
 
-### 1. Créer le bot Telegram
+### 1. Create the Telegram Bot
 
-1. Ouvre Telegram → cherche **@BotFather**
-2. Envoie `/newbot`, suis les instructions
-3. Copie le **token** (ex: `123456:ABC-DEF...`)
+1. Open Telegram → search for **@BotFather**
+2. Send `/newbot` and follow the instructions
+3. Copy the **token** (e.g., `123456:ABC-DEF...`)
 
-### 2. Créer le canal d'annonce
+### 2. Create the Announcement Channel
 
-1. Crée un canal Telegram (public recommandé)
-2. Ajoute le bot comme **administrateur** avec la permission "Poster des messages"
-3. Note l'username du canal (ex: `@DisneyComicsWatcher`)
+1. Create a Telegram channel (public recommended)
+2. Add the bot as an **administrator** with "Post Messages" permission
+3. Note the channel's username (e.g., `@DisneyComicsWatcher`)
 
-### 3. Créer le repo GitHub
+### 3. Create the GitHub Repository
 
-1. Crée un nouveau repo GitHub (public ou privé)
-2. Pousse ce code sur la branche `main`
+1. Create a new GitHub repository (public or private)
+2. Push this code to the `main` branch
 
-### 4. Ajouter les secrets GitHub
+### 4. Add GitHub Secrets
 
-Dans ton repo → **Settings → Secrets and variables → Actions → New repository secret** :
+In your repository → **Settings → Secrets and variables → Actions → New repository secret**:
 
-| Nom du secret | Valeur |
+| Secret Name | Value |
 |---|---|
-| `TELEGRAM_BOT_TOKEN` | Le token obtenu via @BotFather |
-| `TELEGRAM_CHAT_ID_FR` | L'username du canal (ex: `@DisneyComicsWatcher`) |
+| `TELEGRAM_BOT_TOKEN` | The token obtained via @BotFather |
+| `TELEGRAM_CHAT_ID_FR` | The channel's username (e.g., `@DisneyComicsWatcher`) |
 
-### 5. Activer GitHub Actions
+### 5. Enable GitHub Actions
 
-Va dans l'onglet **Actions** de ton repo. Si désactivé, clique sur
+Go to the **Actions** tab of your repository. If disabled, click on
 *"I understand my workflows, go ahead and enable them"*.
 
-### 6. Test manuel
+### 6. Manual Test
 
 **Actions → Disney Comics Watcher 🦆 → Run workflow**
 
-Le premier run initialise le state silencieusement (aucun flood).
-Les runs suivants notifient uniquement les nouveaux numéros.
+The first run initializes the state silently (no flooding).
+Subsequent runs will only notify you of new issues.
 
-### 7. Développement et tests locaux
+### 7. Development and Local Testing
 
-Vous pouvez lancer le script de surveillance et ses tests sur votre machine sans configurer de variables système globales. 
-Pour cela, créez simplement un fichier `.env` à la racine du projet (ce fichier est déjà configuré dans `.gitignore`) :
+You can run the monitoring script and its tests on your machine without configuring global system variables.
+To do this, simply create a `.env` file at the root of the project (this file is already configured in `.gitignore`):
 
 ```env
-TELEGRAM_BOT_TOKEN=votre_token_de_test
-TELEGRAM_CHAT_ID_FR=votre_chat_id_de_test
+TELEGRAM_BOT_TOKEN=your_test_token
+TELEGRAM_CHAT_ID_FR=your_test_chat_id
 ```
 
-Puis lancez la suite de tests avec :
+Then run the test suite with:
 ```powershell
 python test_telegram_notif.py
 ```
 
-## Comment ça marche
+## How It Works
 
-1. Le script tourne **toutes les heures** (à la minute 0) via GitHub Actions
-2. Il interroge Direct Éditeurs et MLP pour découvrir tous les magazines Disney actifs
-3. Il compare avec le dernier numéro connu (stocké dans `state.json` sur la branche `datas`)
-4. Pour chaque nouveau numéro → notification Telegram avec cover, prix et dates
-5. En parallèle, il surveille les albums Glénat (annonces + sorties)
-6. Le `state.json` est commité sur la branche `datas` (le code reste propre sur `main`)
-7. À chaque nouvelle parution détectée, un **squelette de pré-index Inducks** (format `.dbi`) est ajouté au fichier local `fr.dbi` à la racine du projet.
+1. The script runs **hourly** (at minute 0) via GitHub Actions.
+2. It queries Direct Éditeurs and MLP to discover all active Disney magazines.
+3. It compares them with the last known issue (stored in `state.json` on the `datas` branch).
+4. For each new issue → Telegram notification with cover, price, and dates.
+5. In parallel, it monitors Glénat albums (announcements + releases).
+6. `state.json` is committed to the `datas` branch (keeping the code clean on `main`).
+7. For each detected new release, an **Inducks pre-index skeleton** (in `.dbi` format) is appended to the local `fr.dbi` file at the project root.
 
-## Pré-index Inducks (`fr.dbi`)
+## Inducks Pre-index (`fr.dbi`)
 
-À chaque nouvelle parution notifiée, le script génère automatiquement un fichier de pré-index au format [Inducks Bolderbast DBI](https://inducks.org/bolderbast/xh7111_DBIReader.html) et l'ajoute par concaténation (mode *append*) dans le fichier `fr.dbi` à la racine.
+For every new notified release, the script automatically generates a pre-index skeleton in the [Inducks Bolderbast DBI format](https://inducks.org/bolderbast/xh7111_DBIReader.html) and appends it to the `fr.dbi` file at the root.
 
-### Ce que contient le fichier
+### What the File Contains
 
-Chaque squelette d'index généré contient :
+Each generated skeleton index contains:
 
-- Une **ligne d'en-tête `h3`** correctement formatée (positions fixes selon la spec Bolderbast) avec :
-  - Le code Inducks de la parution (ex: `fr/PM  580` ou `->` si le code dépasse 12 caractères comme pour `fr/JM 3858-59`)
-  - La date de parution `[issdate:YYYY-MM-DD]`
-  - Le prix `[price:X.XX EUR]`
-  - Pour les albums Glénat : le titre du livre, le nombre de pages `[pages:XX]`, les dimensions `[size:...]`, le traducteur `[isstrans:...]` et l'EAN `[EAN:...]` (si disponibles)
-  - `[inx:-]` indiquant que l'index est à compléter
-- Une **ligne d'entrée pré-remplie pour la couverture** (pages = `1`, brokpg = vide, pagel = `c`)
+- A properly formatted **`h3` header line** (fixed positions according to the Bolderbast spec) with:
+  - The publication's Inducks code (e.g., `fr/PM  580` or `->` if the code exceeds 12 characters, such as `fr/JM 3858-59`)
+  - The publication date `[issdate:YYYY-MM-DD]`
+  - The price `[price:X.XX EUR]`
+  - For Glénat albums: book title, page count `[pages:XX]`, size `[size:...]`, translator name `[isstrans:...]`, and EAN `[EAN:...]` (if available)
+  - `[inx:-]` indicating the index needs to be completed
+- A **pre-filled entry line for the cover** (pages = `1`, brokpg = empty, pagel = `c`)
 
-### Exemple de fichier généré (magazine)
+### Example of a Generated File (magazine)
 
 ```
 ^^ Pre-index genere automatiquement par DisneyComicsWatcher
@@ -107,40 +107,39 @@ fr/PM  580   h3 [issdate:2026-06-10] [price:6.50 EUR] [inx:-]
 fr/PM  580a ?              1 c                      
 ```
 
-### Comment l'utiliser
+### How to Use It
 
-1. Récupère le fichier `fr.dbi` à la racine du projet (disponible dans les artefacts de run de la GitHub Action).
-2. Complète la ligne de couverture et les entrées avec les histoires du numéro (storycode, pages, crédits…).
-3. Soumets le contenu correspondant à ton index sur [Inducks Bolderbast](https://inducks.org/bolderbast/).
+1. Retrieve the `fr.dbi` file at the project root (available in the run artifacts of the GitHub Action).
+2. Complete the cover line and add entries for the issue's stories (storycode, pages, credits…).
+3. Submit the completed index on [Inducks Bolderbast](https://inducks.org/bolderbast/).
 
-### Codes Inducks pré-configurés
+### Pre-configured Inducks Codes
 
-Les publications dont le code Inducks est connu (configuré dans `OVERRIDES`) génèrent directement le bon code (ex: `fr/PM`, `fr/JM`, `fr/CF`). Pour les autres, un code provisoire `fr/TODO_<codif>` est utilisé — à corriger avant soumission.
+Publications with known Inducks codes (configured in `OVERRIDES`) directly generate the correct code (e.g., `fr/PM`, `fr/JM`, `fr/CF`). For others, a temporary code `fr/TODO_<codif>` is used — to be corrected before submission.
 
-Pour les albums Glénat, les séries connues sont automatiquement reconnues :
+For Glénat albums, known series are automatically recognized:
 
-| Série | Code Inducks |
+| Series | Inducks Code |
 |---|---|
 | La Grande Histoire de Picsou (Don Rosa) | `fr/GHP` |
 | Les Âges d'or de Disney | `fr/AOD` |
 
-## Personnaliser un magazine
+## Customizing a Magazine
 
-Pour ajouter un emoji ou un nom dédié à un magazine découvert automatiquement,
-ajoute son `codif` dans `OVERRIDES` dans `check_magazines.py` :
+To add an emoji or a dedicated name for an automatically discovered magazine, add its `codif` to `OVERRIDES` in `check_magazines.py`:
 
 ```python
 OVERRIDES = {
-    "12345": {"name": "Mon Magazine", "emoji": "📰"},
+    "13159": {"name": "Picsou Magazine", "inducks": ("PM", 5)},
     ...
 }
 ```
 
-Le codif est visible dans l'URL sur direct-editeurs.fr.
+The codif is visible in the URL on direct-editeurs.fr.
 
-## Ajouter un nouveau pays (future extension)
+## Adding a New Country (future extension)
 
-1. Crée un nouveau canal Telegram pour le pays
-2. Ajoute un secret `TELEGRAM_CHAT_ID_XX` (ex: `TELEGRAM_CHAT_ID_DE` pour l'Allemagne)
-3. Duplique le job dans `watcher.yml` avec `TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID_XX }}`
-4. Adapte les sources et mots-clés pour le nouveau pays
+1. Create a new Telegram channel for the country.
+2. Add a secret `TELEGRAM_CHAT_ID_XX` (e.g., `TELEGRAM_CHAT_ID_DE` for Germany).
+3. Duplicate the job in `watcher.yml` with `TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID_XX }}`.
+4. Adapt the sources and keywords for the new country.

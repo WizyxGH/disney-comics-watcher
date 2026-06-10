@@ -1,10 +1,10 @@
-"""dbi_generator.py — Générateur de squelettes de pré-index Inducks (.dbi).
+"""dbi_generator.py — Inducks pre-index skeleton (.dbi) generator.
 
-Ce module est autonome : il n'importe rien de check_magazines afin d'éviter
-les imports circulaires. Les données nécessaires (OVERRIDES, prix, date…) lui
-sont passées en paramètres.
+This module is self-contained: it does not import anything from check_magazines
+to avoid circular imports. Necessary data (OVERRIDES, price, date...) are passed
+as parameters.
 
-Format de référence : https://inducks.org/bolderbast/xh7111_DBIReader.html
+Reference format: https://inducks.org/bolderbast/xh7111_DBIReader.html
 """
 
 import os
@@ -19,11 +19,11 @@ DBI_FILE = "fr.dbi"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  Utilitaires de formatage
+#  Formatting Utilities
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _parse_date_fr(s: str | None):
-    """DD/MM/YYYY → objet date, ou None si invalide."""
+    """DD/MM/YYYY → date object, or None if invalid."""
     if not s:
         return None
     try:
@@ -34,7 +34,7 @@ def _parse_date_fr(s: str | None):
 
 
 def _format_price_for_dbi(prix_str: str | None) -> str | None:
-    """Convertit un prix comme '7,50 €' ou '7.50€' en format DBI 'X.XX EUR'."""
+    """Converts a price like '7,50 €' or '7.50€' to the DBI format 'X.XX EUR'."""
     if not prix_str:
         return None
     m = re.search(r'([0-9]+)[,\.]([0-9]{1,2})', prix_str)
@@ -46,28 +46,28 @@ def _format_price_for_dbi(prix_str: str | None) -> str | None:
 
 
 def _format_date_for_dbi(date_str: str | None) -> str | None:
-    """Convertit DD/MM/YYYY ou YYYY-MM-DD en format DBI 'YYYY-MM-DD'."""
+    """Converts DD/MM/YYYY or YYYY-MM-DD to the DBI format 'YYYY-MM-DD'."""
     if not date_str:
         return None
     d = _parse_date_fr(date_str)
     if d:
         return d.strftime("%Y-%m-%d")
-    # Essai format ISO direct
+    # Try direct ISO format
     if re.match(r'^\d{4}-\d{2}-\d{2}$', date_str.strip()):
         return date_str.strip()
     return None
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  Construction du code Inducks
+#  Inducks Code Construction
 # ─────────────────────────────────────────────────────────────────────────────
 
 def build_inducks_path(inducks, numero: str) -> str | None:
-    """Construit le chemin Inducks brut (ex: 'fr/PM  580') pour un numéro donné.
+    """Builds the raw Inducks path (e.g., 'fr/PM  580') for a given issue.
 
     Args:
-        inducks : config depuis OVERRIDES — str, (code, width) ou (code, width, suffix).
-        numero  : numéro de parution (ex: '580' ou '3858-3859').
+        inducks : config from OVERRIDES — str, (code, width) or (code, width, suffix).
+        numero  : issue number (e.g., '580' or '3858-3859').
     """
     if not inducks or not numero:
         return None
@@ -107,9 +107,9 @@ def build_inducks_path(inducks, numero: str) -> str | None:
 
 
 def _build_glenat_inducks_path(title: str, ean: str | None = None) -> str:
-    """Construit le chemin Inducks pour un album Glénat (séries connues ou fallback).
+    """Builds the Inducks path for a Glénat album (known series or fallback).
 
-    Séries reconnues automatiquement :
+    Automatically recognized series:
       - La Grande Histoire / Grande Épopée de Picsou → fr/GHP
       - Les Âges d'or de Disney                      → fr/AOD
     """
@@ -123,26 +123,26 @@ def _build_glenat_inducks_path(title: str, ean: str | None = None) -> str:
     if any(k in title_lower for k in ("ages d'or", "âges d'or", "age d'or", "âge d'or")):
         return f"fr/AOD{str(tome_num).rjust(4)}" if tome_num is not None else "fr/AOD"
 
-    # Fallback avec les 6 derniers chiffres de l'EAN pour un code provisoire unique
+    # Fallback with the last 6 digits of the EAN for a unique temporary code
     return f"fr/GL_{ean[-6:]}" if ean else "fr/GL_TODO"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  Point d'entrée public
+#  Public Entry Point
 # ─────────────────────────────────────────────────────────────────────────────
 
 def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | None = None) -> None:
-    """Génère et sauvegarde un squelette de pré-index Inducks (.dbi).
+    """Generates and saves an Inducks pre-index skeleton (.dbi).
 
     Args:
-        info             : dict décrivant la parution (codif/ean, prix, date, …).
-        publication_type : ``'magazine'`` ou ``'glenat'``.
-        overrides        : dict OVERRIDES de check_magazines (optionnel pour les magazines).
+        info             : dict describing the release (codif/ean, price, date, ...).
+        publication_type : ``'magazine'`` or ``'glenat'``.
+        overrides        : check_magazines OVERRIDES dict (optional for magazines).
     """
     overrides = overrides or {}
     try:
 
-        # ── Résoudre les métadonnées selon la source ──────────────────────────
+        # ── Resolve metadata depending on the source ──────────────────────────
         if publication_type == "magazine":
             codif      = info.get("codif", "")
             ov         = overrides.get(codif, {})
@@ -159,7 +159,7 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
             isstrans   = None
             ean_val    = None
 
-        else:  # glenat
+        else:  # Glenat
             title      = info.get("title", "Album Disney")
             ean_val    = info.get("ean", "")
             name       = title
@@ -170,29 +170,29 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
             size_val   = info.get("size")
             isstrans   = info.get("isstrans")
 
-        # ── Formater les champs ───────────────────────────────────────────────
+        # ── Format fields ─────────────────────────────────────────────────────
         issdate = _format_date_for_dbi(date_raw)
         price   = _format_price_for_dbi(prix_raw)
 
-        # ── Nom du fichier de sortie ──────────────────────────────────────────
+        # ── Output file name ──────────────────────────────────────────────────
         dbi_path = DBI_FILE
 
-        # ── Ligne h3 au format DBI fixe ────────────────────────────────────
-        # Positions (1-indexed, spec Bolderbast) :
-        #   1-12  issuecode  (12 car., espace-padded à droite)
-        #   13    espace
+        # ── h3 line with fixed DBI format ────────────────────────────────────
+        # Positions (1-indexed, Bolderbast spec):
+        #   1-12  issuecode  (12 chars, space-padded on the right)
+        #   13    space
         #   14    'h'
         #   15    '3'
-        #   16    espace
-        #   17+   titre + champs entre crochets
+        #   16    space
+        #   17+   title + bracketed fields
         #
-        # Si le code dépasse 12 caractères (ex: fr/JM 3858-59 = 14 car.),
-        # la position fixe est laissée vide (12 espaces) et le code complet
-        # est renseigné via [entrycode:...] — cf. spec xe27.html#a_h3IssueCode
+        # If the code exceeds 12 characters (e.g., fr/JM 3858-59 = 14 chars),
+        # the fixed position is left empty (12 spaces) and the full code
+        # is specified via [entrycode:...] — see spec xe27.html#a_h3IssueCode
         if len(issue_path) <= 12:
             issue_code_field = issue_path.ljust(12)
         else:
-            issue_code_field = "->" + " " * 10  # visuel : entrycode dans les entrées ci-dessous
+            issue_code_field = "->" + " " * 10  # visual: entrycode in the entries below
 
         fields = []
         if publication_type != "magazine":
@@ -213,42 +213,42 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
 
         h3_line = f"{issue_code_field} h3 {' '.join(fields)}"
 
-        # ── Ligne d'entrée couverture (entrycode + "a") ──────────────────────
-        # Format DBI (positions 1-indexed) :
-        #   1-12  entrycode   (padded à 12, ou [entrycode:...] si > 12 chars)
-        #  13-26  storycode   (14 chars — "?" si inconnu)
-        #  27-28  pages       (" 1" pour 1 page, right-aligned)
-        #    29   brokpg      (vide/espace)
-        #  30-31  pagel       ("c " pour couverture)
-        #    32   ignoré
-        #  33-52  plot/writ/art/ink/hero (vide)
+        # ── Cover entry line (entrycode + "a") ──────────────────────────────
+        # DBI format (1-indexed positions):
+        #   1-12  entrycode   (padded to 12, or [entrycode:...] if > 12 chars)
+        #  13-26  storycode   (14 chars — "?" if unknown)
+        #  27-28  pages       (" 1" for 1 page, right-aligned)
+        #    29   brokpg      (empty/space)
+        #  30-31  pagel       ("c " for cover)
+        #    32   ignored
+        #  33-52  plot/writ/art/ink/hero (empty)
         cover_ec = issue_path + "a"
-        storycode_field = "?".ljust(14)   # storycode inconnu
-        pages_field     = " 1"            # 1 page, right-aligned sur 2 chars
-        brokpg          = " "             # vide
-        pagel           = "c "            # "c" en pagel
-        rest            = " " * 21        # ignoré(1) + plot/writ/art/ink/hero(20)
+        storycode_field = "?".ljust(14)   # unknown storycode
+        pages_field     = " 1"            # 1 page, right-aligned to 2 chars
+        brokpg          = " "             # empty
+        pagel           = "c "            # "c" in pagel
+        rest            = " " * 21        # ignored(1) + plot/writ/art/ink/hero(20)
 
         if len(cover_ec) <= 12:
             cover_line = f"{cover_ec.ljust(12)}{storycode_field}{pages_field}{brokpg}{pagel}{rest}"
         else:
             cover_line = f"->          {storycode_field}{pages_field}{brokpg}{pagel}{rest} [entrycode:{cover_ec}]"
 
-        # ── Corps du fichier ──────────────────────────────────────────────────
+        # ── File body ─────────────────────────────────────────────────────────
         body_parts = []
         body_parts.append(
-            f"^^ Pre-index genere automatiquement par DisneyComicsWatcher\n"
-            f"^^ Source : {publication_type}\n"
-            f"^^ A completer et soumettre sur https://inducks.org/bolderbast/\n"
+            f"^^ Pre-index automatically generated by DisneyComicsWatcher\n"
+            f"^^ Source: {publication_type}\n"
+            f"^^ Complete and submit on https://inducks.org/bolderbast/\n"
         )
         body_parts.append(h3_line + "\n")
         body_parts.append(cover_line + "\n\n")
 
-        # ── Écriture (ASCII + remplacement des caractères non-ASCII) ──────────
+        # ── Writing (ASCII + replacement of non-ASCII characters) ───────────
         content = "".join(body_parts)
         with open(dbi_path, "a", encoding="ascii", errors="replace") as f:
             f.write(content)
-        print(f"  [DBI] Entrée ajoutée dans {dbi_path} ({issue_path})")
+        print(f"  [DBI] Entry added to {dbi_path} ({issue_path})")
 
     except Exception as e:
-        print(f"  [warn] Impossible de générer le squelette DBI : {e}")
+        print(f"  [warn] Unable to generate DBI skeleton: {e}")

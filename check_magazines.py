@@ -14,27 +14,27 @@ from dbi_generator import build_inducks_path, generate_dbi_skeleton, DBI_FILE
 #  Configuration
 # ─────────────────────────────────────────────────────────────────────────────
 
-# Mots-clés pour la découverte automatique sur Direct Éditeurs + MLP
+# Keywords for automatic discovery on Direct Éditeurs + MLP
 KEYWORDS = ["picsou", "mickey", "mickey hs", "mickey parade", "fantomiald", "donald"]
 
-# Codifs à ignorer explicitement (mal catégorisés sur MLP)
+# Codifs to explicitly ignore (misclassified on MLP)
 SKIP_CODIFS = {
-    "11560",  # ANIME CULT (classé à tort en sous-famille Disney D23)
+    "11560",  # ANIME CULT (incorrectly classified under Disney D23 sub-family)
 }
 
-# Magazines qui paraissent en double numéro (ex: JdM 3856-3857).
-# Si DE/MLP ne publie que la forme simple N, on synthétise N-(N+1).
+# Magazines published as double issues (e.g. JdM 3856-3857).
+# If DE/MLP only publishes the single issue N, we synthesize N-(N+1).
 BI_ISSUE_CODIFS = {
     "14067",  # Journal de Mickey
 }
 
-# Overrides : nom affiché et code Inducks (optionnel).
-# Format inducks :
-#   - str simple   : code → fr/<code> <num>
-#   - (code, w)    : numéro zfill(w)
-#   - (code, w, s) : numéro zfill(w) + suffixe s
+# Overrides: displayed name and Inducks code (optional).
+# Inducks format:
+#   - simple str   : code → fr/<code> <num>
+#   - (code, w)    : number zfill(w)
+#   - (code, w, s) : number zfill(w) + suffix s
 OVERRIDES = {
-    # ── Picsou Magazine et déclinaisons ──────────────────────────────────────
+    # ── Picsou Magazine and spin-offs ────────────────────────────────────────
     "13159": {"name": "Picsou Magazine",                        "inducks": ("PM", 5)},
     "15681": {"name": "Picsou Magazine HS Collection Deluxe",   "inducks": ("CD", 5)},
     "15930": {"name": "Picsou Mag HS Collection Deluxe vol.2",  "inducks": ("CD", 5)},
@@ -45,7 +45,7 @@ OVERRIDES = {
     "18360": {"name": "Nouvelle Jeunesse de Picsou"},
     "19607": {"name": "Le Destin de Picsou"},
     "19052": {"name": "Pochette Picsou Magazine"},
-    # ── Super Picsou Géant et déclinaisons ───────────────────────────────────
+    # ── Super Picsou Géant and spin-offs ─────────────────────────────────────
     "14016": {"name": "Super Picsou Géant",                     "inducks": "SPG"},
     "12651": {"name": "SPG HS Dynastie de Picsou",              "inducks": ("SPGHS", 3, "H")},
     "15599": {"name": "SPG HS Dynastie de Picsou (REV)",        "inducks": ("SPGHS", 3, "H")},
@@ -56,7 +56,7 @@ OVERRIDES = {
     "11065": {"name": "Les grands méchants",                    "inducks": ("SPGHS", 3, "M")},
     # ── Trésors de Picsou ────────────────────────────────────────────────────
     "14068": {"name": "Les Trésors de Picsou",                  "inducks": "TP"},
-    # ── Journal de Mickey et déclinaisons ────────────────────────────────────
+    # ── Journal de Mickey and spin-offs ──────────────────────────────────────
     "14067": {"name": "Journal de Mickey",                      "inducks": "JM"},
     "14108": {"name": "Journal de Mickey HS",                   "inducks": ("JMHSN", 3)},
     "13588": {"name": "JdM HS Spécial Aventures (REV)"},
@@ -68,13 +68,13 @@ OVERRIDES = {
     "11068": {"name": "Pochette Mickey Parade"},
     # ── Fantomiald ───────────────────────────────────────────────────────────
     "15190": {"name": "Les Chroniques de Fantomiald",           "inducks": ("CF", 5)},
-    # ── Disney divers ────────────────────────────────────────────────────────
+    # ── Miscellaneous Disney ─────────────────────────────────────────────────
     "14268": {"name": "Les Incontournables de Disney",          "inducks": ("LI", 4)},
     "19064": {"name": "Les Incontournables (REV)",              "inducks": ("LI", 4)},
 }
 
 
-# Fuseau horaire de Paris pour la cohérence des dates
+# Paris time zone for date consistency
 PARIS_TZ = ZoneInfo("Europe/Paris")
 
 SEARCH_URL     = "https://direct-editeurs.fr/nos-magazines"
@@ -89,7 +89,7 @@ GLENAT_KEY_PREFIX     = "glenat:"
 
 STATE_FILE    = "state.json"
 
-# Chargement du fichier .env local s'il existe
+# Load local .env file if it exists
 if os.path.exists(".env"):
     with open(".env", "r", encoding="utf-8") as f:
         for line in f:
@@ -98,7 +98,7 @@ if os.path.exists(".env"):
                 key, val = line.split("=", 1)
                 os.environ[key.strip()] = val.strip().strip('"').strip("'")
 
-# Credentials Telegram — injectés via secrets GitHub Actions
+# Telegram credentials — injected via GitHub Actions secrets
 TELEGRAM_BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 TELEGRAM_CHAT_ID   = (
     os.environ.get("TELEGRAM_CHAT_ID_FR") or os.environ.get("TELEGRAM_CHAT_ID", "")
@@ -110,15 +110,15 @@ HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; DisneyComicsWatcher/1.0)"}
 AMAZON_AFFILIATE_TAG = os.environ.get("AMAZON_AFFILIATE_TAG", "")
 
 def format_price_fr(prix_str: str | None) -> str | None:
-    """Harmonise le format de prix en français (ex: '4,9 €' -> '4,90 €')."""
+    """Standardizes the price format in French (e.g., '4,9 €' -> '4,90 €')."""
     if not prix_str:
         return None
     prix_str = prix_str.strip()
-    # On enlève le symbole euro et les espaces superflus pour nettoyer la chaîne
+    # Remove the euro symbol and superfluous spaces to clean the string
     clean_str = re.sub(r'(?i)\s*e?ur\s*$', '', prix_str)
     clean_str = re.sub(r'\s*€\s*$', '', clean_str).strip()
     
-    # On cherche un nombre avec décimales (virgule ou point)
+    # Search for a number with decimals (comma or dot)
     m = re.search(r'(\d+)[,.](\d+)', clean_str)
     if m:
         euros = m.group(1)
@@ -129,7 +129,7 @@ def format_price_fr(prix_str: str | None) -> str | None:
             dec = dec[:2]
         return f"{euros},{dec} €"
     
-    # Si c'est un entier
+    # If it is an integer
     if re.match(r'^\d+$', clean_str):
         return f"{clean_str} €"
         
@@ -137,7 +137,7 @@ def format_price_fr(prix_str: str | None) -> str | None:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  Session HTTP partagée
+#  Shared HTTP Session
 # ─────────────────────────────────────────────────────────────────────────────
 
 _session = None
@@ -155,7 +155,7 @@ def get_session():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  Gestion du state
+#  State Management
 # ─────────────────────────────────────────────────────────────────────────────
 
 def load_state():
@@ -173,11 +173,11 @@ def save_state(state):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  Parsing Direct Éditeurs
+#  Direct Éditeurs Parsing
 # ─────────────────────────────────────────────────────────────────────────────
 
 def parse_date_fr(s):
-    """DD/MM/YYYY → objet date, ou None si invalide."""
+    """DD/MM/YYYY → date object, or None if invalid."""
     if not s:
         return None
     try:
@@ -188,7 +188,7 @@ def parse_date_fr(s):
 
 
 def parse_block(block):
-    """Extrait codif/numéro/date/cover/url depuis un bloc <div class='info-mag'>."""
+    """Extracts codif/number/date/cover/url from a <div class='info-mag'> block."""
     codif_m   = re.search(r"<span>Codif :</span>\s*(\d+)", block)
     if not codif_m:
         return None
@@ -224,13 +224,13 @@ def parse_block(block):
 
 
 def discover_de():
-    """Découvre tous les magazines Disney actifs sur Direct Éditeurs.
+    """Discovers all active Disney magazines on Direct Éditeurs.
 
-    - Interroge chaque mot-clé et déduplique par codif.
-    - Ignore les magazines périmés (date 'Trop vieux' dans le passé).
-    - À date égale, préfère le format bi-numéro (3856-3857 > 3856).
-    - Synthétise le format bi-numéro pour les codifs BI_ISSUE_CODIFS si DE
-      n'a publié que la forme simple.
+    - Queries each keyword and deduplicates by codif.
+    - Ignores expired magazines ('Trop vieux' date in the past).
+    - If dates are equal, prefers the double issue format (3856-3857 > 3856).
+    - Synthesizes the double issue format for BI_ISSUE_CODIFS if DE
+      only published the single issue format.
     """
     s = get_session()
     today = datetime.now().date()
@@ -256,10 +256,10 @@ def discover_de():
             if info["expired_on"]:
                 d = parse_date_fr(info["expired_on"])
                 if d and d < today:
-                    continue  # magazine périmé
+                    continue  # expired magazine
             candidates.setdefault(info["codif"], []).append(info)
 
-    # Déduplication : date la plus récente, puis préférence pour le tiret
+    # Deduplication: most recent date first, then preference for the dash (double issue)
     result: dict[str, dict] = {}
     for codif, entries in candidates.items():
         def _key(e):
@@ -268,7 +268,7 @@ def discover_de():
             return (d or datetime.min.date(), has_dash)
         result[codif] = max(entries, key=_key)
 
-    # Synthèse bi-numéro si nécessaire
+    # Double issue synthesis if necessary
     for codif in BI_ISSUE_CODIFS:
         if codif in result:
             num = result[codif].get("numero") or ""
@@ -283,11 +283,11 @@ def discover_de():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  MLP — découverte complémentaire et date de relève
+#  MLP — complementary discovery and off-sale date
 # ─────────────────────────────────────────────────────────────────────────────
 
 def discover_mlp_families(known_codifs: set, state: dict | None = None):
-    """Rattrape les magazines absents de DE via les sous-familles MLP (ex: D23, D15) et récupère leurs détails."""
+    """Finds magazines missing from DE via MLP sub-families (e.g. D23, D15) and retrieves their details."""
     s = get_session()
     result: dict[str, dict] = {}
     state = state or {}
@@ -300,12 +300,12 @@ def discover_mlp_families(known_codifs: set, state: dict | None = None):
             r.raise_for_status()
             r.encoding = "utf-8"
         except requests.RequestException as e:
-            print(f"  [warn] MLP famille={family}: {e}")
+            print(f"  [warn] MLP family={family}: {e}")
             continue
 
         soup = BeautifulSoup(r.text, 'html.parser')
 
-        # Parcourir les blocs de produits de la classe 'catalogue'
+        # Iterate over product blocks of the 'catalogue' class
         for cat in soup.find_all(class_='catalogue'):
             code_span = cat.find(id=re.compile('results_ctl.*_titCode'))
             if not code_span:
@@ -329,8 +329,8 @@ def discover_mlp_families(known_codifs: set, state: dict | None = None):
             date_list   = date_span.get_text(strip=True) if date_span else ""
             href        = link['href'] if link else ""
 
-            # Optimisation : Si le codif est déjà connu dans state et que le numéro
-            # de parution (chiffres uniquement) correspond, on évite la requête détail.
+            # Optimization: If the codif is already known in state and the issue
+            # number (digits only) matches, we avoid the detail request.
             state_val = state.get(codif)
             if state_val:
                 digits_list = "".join(filter(str.isdigit, numero_list))
@@ -338,7 +338,7 @@ def discover_mlp_families(known_codifs: set, state: dict | None = None):
                 if digits_list and digits_state and digits_list == digits_state:
                     continue
 
-            # Fetch la fiche produit pour récupérer le prix, la grande image et la relève
+            # Fetch the product details to retrieve price, large cover image, and off-sale date
             if href:
                 prod_url = f"https://catalogueproduits.mlp.fr/{href}"
                 try:
@@ -363,7 +363,7 @@ def discover_mlp_families(known_codifs: set, state: dict | None = None):
                         if numero and numero.upper().endswith("H"):
                             numero = numero[:-1].strip()
 
-                        # Date de relève
+                        # Off-sale date
                         releve = None
                         patterns = [
                             r"[Jj]usqu[\x27\x22]au\s*:?\s*(?:<[^>]+>)?\s*(\d{2}/\d{2}/\d{4})",
@@ -395,14 +395,14 @@ def discover_mlp_families(known_codifs: set, state: dict | None = None):
 
 
 def get_mlp_releve(codif: str):
-    """Retourne la date de relève prévisionnelle (« Jusqu'au ») depuis MLP."""
+    """Returns the expected off-sale date ('Jusqu'au') from MLP."""
     s = get_session()
     patterns = [
         r"[Jj]usqu[\x27\x22]au\s*:?\s*(?:<[^>]+>)?\s*(\d{2}/\d{2}/\d{4})",
         r"[Rr]el[eè]ve?\s*(?:le|pr[eé]vue?)?\s*:?\s*(?:<[^>]+>)?\s*(\d{2}/\d{2}/\d{4})",
     ]
 
-    # On commence par chercher les liens de recherche pour trouver la vraie fiche produit
+    # Start by searching for the search links to find the actual product page
     search_url = f"{MLP_URL}?recherche={codif}"
     try:
         r = s.get(search_url, timeout=10)
@@ -427,7 +427,7 @@ def get_mlp_releve(codif: str):
     except Exception:
         pass
 
-    # Fallback sur les URLs classiques
+    # Fallback to standard URLs
     for url in [
         f"{MLP_URL}?recherche={codif}",
         f"{MLP_URL}?ref={codif}",
@@ -449,22 +449,22 @@ def get_mlp_releve(codif: str):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  Glénat — albums BD Disney
+#  Glénat — Disney Comic Books
 # ─────────────────────────────────────────────────────────────────────────────
 
 def discover_glenat():
-    """Découvre les albums BD Disney chez Glénat (annonces + sorties).
+    """Discovers Disney comic books at Glénat (announcements + releases).
 
-    - Récupère les données depuis le bloc JSON-LD __NEXT_DATA__ de chaque page
-      pour une extraction robuste des EAN, titres, dates de parution et couvertures.
-    - Évite l'ancienne regex HTML qui provoquait des collisions de contexte de titre.
-    - Parcourt les pages du catalogue en utilisant la pagination par chemin (ex: /2/).
+    - Retrieves data from the __NEXT_DATA__ JSON-LD block on each page
+      for robust extraction of EAN, titles, release dates, and covers.
+    - Avoids the old HTML regex which caused title context collisions.
+    - Iterates over catalog pages using path-based pagination (e.g., /2/).
     """
     s = get_session()
     result = []
     seen: set[str] = set()
 
-    # Récupérer la page 1 et déterminer le nombre total de pages
+    # Retrieve page 1 and determine the total number of pages
     try:
         r = s.get(GLENAT_COLLECTION_URL, timeout=15)
         r.raise_for_status()
@@ -476,7 +476,7 @@ def discover_glenat():
     max_pages = 1
     pages_m = re.search(r'Page \d+ sur (\d+)', r.text)
     if pages_m:
-        max_pages = min(int(pages_m.group(1)), 10)  # plafond de sécurité
+        max_pages = min(int(pages_m.group(1)), 10)  # safety cap
 
     pages_to_scrape = [(1, r.text)]
     for page_num in range(2, max_pages + 1):
@@ -492,14 +492,14 @@ def discover_glenat():
     for page_num, html_text in pages_to_scrape:
         m = re.search(r'<script id="__NEXT_DATA__" type="application/json">(.*?)</script>', html_text)
         if not m:
-            print(f"  [warn] Glénat p{page_num}: Aucun bloc __NEXT_DATA__ trouvé.")
+            print(f"  [warn] Glénat p{page_num}: No __NEXT_DATA__ block found.")
             continue
 
         try:
             data = json.loads(m.group(1))
             sections = data.get("props", {}).get("pageProps", {}).get("sections", [])
             
-            # Recherche de la section contenant prefilter_results
+            # Search for the section containing prefilter_results
             target_sec = None
             for sec in sections:
                 sec_data = sec.get("data") or {}
@@ -527,7 +527,7 @@ def discover_glenat():
                 if not title:
                     title = f"Album Disney ({ean})"
 
-                # Extraction de la date de parution
+                # Extraction of the publication date
                 date_str = item.get("product__date_parution", [None])[0]
                 if not date_str:
                     date_str_raw = item.get("product__date_parution__date", [None])[0]
@@ -542,14 +542,14 @@ def discover_glenat():
 
                 pub_date = parse_date_fr(date_str)
 
-                # URL de couverture
+                # Cover URL
                 cover_url = item.get("product__image_de_couverture", [None])[0]
                 if cover_url:
-                    # Nettoie les paramètres d'URL (?v=...) car le domaine images.hachette-livre.fr
-                    # est accessible publiquement et accepte les requêtes sans cache-buster.
+                    # Clean URL query parameters (?v=...) as the images.hachette-livre.fr domain
+                    # is publicly accessible and accepts requests without a cache-buster.
                     cover_url = cover_url.split("?")[0]
 
-                # Fallback si l'image est manquante dans le JSON mais qu'on a le millésime
+                # Fallback if image is missing in the JSON but we have the publication year
                 if not cover_url and pub_date:
                     year = pub_date.year
                     cover_url = f"https://www.images.hachette-livre.fr/media/imgArticle/GLENAT/{year}/{ean}-001-X.jpeg"
@@ -560,17 +560,17 @@ def discover_glenat():
                     "url":       url,
                     "date":      date_str,
                     "pub_date":  pub_date,
-                    "price":     None,  # Récupéré à la demande lors de la notification
+                    "price":     None,  # Retrieved on-demand during notification
                     "cover_url": cover_url,
                 })
         except Exception as e:
-            print(f"  [warn] Glénat p{page_num}: Erreur de parsing JSON-LD: {e}")
+            print(f"  [warn] Glénat p{page_num}: JSON-LD parsing error: {e}")
 
     return result
 
 
 def fetch_glenat_details(url: str) -> dict:
-    """Récupère à la demande prix, résumé, nb. de pages, dimensions et traducteur depuis la fiche produit Glénat."""
+    """Retrieves on-demand price, summary, page count, size, and translator from the Glénat product page."""
     s = get_session()
     details = {"price": None, "summary": None, "pages": None, "size": None, "isstrans": None}
     try:
@@ -579,7 +579,7 @@ def fetch_glenat_details(url: str) -> dict:
         r.encoding = "utf-8"
         text = r.text
 
-        # 1. Extraction du prix
+        # 1. Price extraction
         price_m = re.search(r'"price"\s*:\s*"([0-9.]+)"', text)
         if price_m:
             details["price"] = price_m.group(1).replace(".", ",") + " €"
@@ -592,7 +592,7 @@ def fetch_glenat_details(url: str) -> dict:
                 if price_m:
                     details["price"] = price_m.group(1).replace(".", ",") + " €"
 
-        # 2. Extraction du résumé, pages, dimensions et traducteur (__NEXT_DATA__)
+        # 2. Extraction of summary, page count, size, and translator (__NEXT_DATA__)
         next_m = re.search(r'<script id="__NEXT_DATA__" type="application/json">(.*?)</script>', text)
         if next_m:
             try:
@@ -613,7 +613,7 @@ def fetch_glenat_details(url: str) -> dict:
                             cleaned_lines.append("")
                     details["summary"] = "\n".join(cleaned_lines).strip()
 
-                # Nombre de pages
+                # Page count
                 nb_pages = product_data.get('nb_pages') or product_data.get('pages')
                 if nb_pages:
                     try:
@@ -621,14 +621,14 @@ def fetch_glenat_details(url: str) -> dict:
                     except (ValueError, TypeError):
                         pass
 
-                # Dimensions (format : ex. "21 x 28 cm" ou "22 x 29" depuis plusieurs champs)
+                # Size (format: e.g. "21 x 28 cm" or "22 x 29" from multiple fields)
                 format_val = (product_data.get('format_du_produit')
                               or product_data.get('format')
                               or product_data.get('dimensions'))
                 if format_val and isinstance(format_val, str):
                     details["size"] = format_val.strip()
 
-                # Traducteur
+                # Translator
                 for contributor in product_data.get('contribuants', []) or []:
                     role = (contributor.get('role') or contributor.get('role_libelle') or "").lower()
                     if 'traduct' in role:
@@ -637,15 +637,15 @@ def fetch_glenat_details(url: str) -> dict:
                         break
 
             except Exception as e:
-                print(f"  [warn] Impossible de décoder les détails JSON pour {url}: {e}")
+                print(f"  [warn] Unable to decode JSON details for {url}: {e}")
 
     except Exception as e:
-        print(f"  [warn] Impossible de récupérer les détails pour {url}: {e}")
+        print(f"  [warn] Unable to fetch details for {url}: {e}")
     return details
 
 
 def truncate_summary(text: str, max_len: int = 400) -> str:
-    """Tronque proprement le résumé pour ne pas couper de mot."""
+    """Cleanly truncates the summary to avoid cutting a word in half."""
     if not text or len(text) <= max_len:
         return text or ""
     truncated = text[:max_len]
@@ -656,14 +656,14 @@ def truncate_summary(text: str, max_len: int = 400) -> str:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  Notifications Telegram
+#  Telegram Notifications
 # ─────────────────────────────────────────────────────────────────────────────
 
 def send_telegram(photo_url: str | None, caption: str, buttons: list | None = None, retries: int = 5):
-    """Envoie un message Telegram avec photo (sendPhoto) ou texte seul (sendMessage).
-    Gère automatiquement les rate limits (429) et les photos inaccessibles.
-    buttons : liste de lignes de boutons, ex: [[{"text": "Voir", "url": "..."}]]
-    Retourne le message_id Telegram (int) si succès, None sinon."""
+    """Sends a Telegram message with a photo (sendPhoto) or text only (sendMessage).
+    Automatically handles rate limits (429) and inaccessible photos.
+    buttons: list of button rows, e.g. [[{"text": "Voir", "url": "..."}]]
+    Returns the Telegram message_id (int) if successful, None otherwise."""
     delay = 2
     reply_markup = {"inline_keyboard": buttons} if buttons else None
     for attempt in range(retries):
@@ -678,12 +678,12 @@ def send_telegram(photo_url: str | None, caption: str, buttons: list | None = No
                 if reply_markup:
                     payload["reply_markup"] = reply_markup
                 resp = requests.post(f"{TELEGRAM_API}/sendPhoto", json=payload, timeout=15)
-                # Fallback texte si l'image est inaccessible
+                # Text fallback if image is inaccessible
                 if resp.status_code == 400:
-                    print(f"  [debug] Telegram 400 error: {resp.text}")
-                    desc = resp.json().get("description", "").lower()
-                    if any(k in desc for k in ("photo", "wrong url", "failed to get", "url")):
-                        print(f"  [warn] Photo inaccessible → fallback texte")
+                     print(f"  [debug] Telegram 400 error: {resp.text}")
+                     desc = resp.json().get("description", "").lower()
+                     if any(k in desc for k in ("photo", "wrong url", "failed to get", "url")):
+                        print(f"  [warn] Photo inaccessible → fallback to text")
                         photo_url = None
                         continue
             else:
@@ -699,7 +699,7 @@ def send_telegram(photo_url: str | None, caption: str, buttons: list | None = No
 
             if resp.status_code == 429:
                 retry_after = resp.json().get("parameters", {}).get("retry_after", delay)
-                print(f"  [429] Rate limit Telegram — attente {retry_after}s…")
+                print(f"  [429] Telegram rate limit — waiting {retry_after}s…")
                 time.sleep(retry_after)
                 delay = max(delay * 2, retry_after + 1)
                 continue
@@ -708,20 +708,17 @@ def send_telegram(photo_url: str | None, caption: str, buttons: list | None = No
             return resp.json().get("result", {}).get("message_id")
 
         except requests.RequestException as e:
-            print(f"  [erreur] Telegram (tentative {attempt + 1}/{retries}): {e}")
+            print(f"  [error] Telegram (attempt {attempt + 1}/{retries}): {e}")
             if attempt < retries - 1:
                 time.sleep(delay)
                 delay = min(delay * 2, 60)
 
-    print("  [ECHEC] Notification Telegram non envoyée.")
+    print("  [FAILURE] Telegram notification not sent.")
     return None
 
 
-
-
-
 def build_inducks_url(inducks, numero: str) -> str | None:
-    """Construit l'URL Inducks pour un numéro de parution donné."""
+    """Builds the Inducks URL for a given issue number."""
     path = build_inducks_path(inducks, numero)
     if not path:
         return None
@@ -729,7 +726,7 @@ def build_inducks_url(inducks, numero: str) -> str | None:
 
 
 def isbn13_to_isbn10(isbn13: str) -> str | None:
-    """Convertit un ISBN-13 (commençant par 978) en ISBN-10 (ASIN Amazon)."""
+    """Converts an ISBN-13 (starting with 978) to an ISBN-10 (Amazon ASIN)."""
     clean = "".join(filter(str.isdigit, isbn13))
     if len(clean) != 13 or not clean.startswith("978"):
         return None
@@ -750,7 +747,7 @@ def isbn13_to_isbn10(isbn13: str) -> str | None:
 
 
 def fetch_disneymagazines_cover(slug: str) -> str | None:
-    """Tente de récupérer une meilleure image de couverture depuis disneymagazines.fr."""
+    """Attempts to retrieve a higher quality cover image from disneymagazines.fr."""
     if not slug:
         return None
     url = f"https://www.disneymagazines.fr/titre/{slug}"
@@ -764,25 +761,25 @@ def fetch_disneymagazines_cover(slug: str) -> str | None:
             timeout=10
         )
         if r.status_code == 200:
-            # 1er choix : URL twic.pics (CDN natif, meilleure qualité) — on retire les query params
+            # 1st choice: twic.pics URL (native CDN, higher quality) — remove query parameters
             m = re.search(r'"(https://fleuruspresse-disney\.twic\.pics/media/[^"]+\.jpg)[^"]*"', r.text)
             if m:
                 return m.group(1)
-            # 2e choix : URL cache Google Merchant sur disneymagazines.fr
+            # 2nd choice: Google Merchant cache URL on disneymagazines.fr
             m = re.search(r'"(https://www\.disneymagazines\.fr/media/cache/[^"]+\.jpg)"', r.text)
             if m:
                 return m.group(1)
-            # 3e choix : src relatif
+            # 3rd choice: relative src
             m = re.search(r'src="(/media/image/[^"]+\.jpg)"', r.text)
             if m:
                 return f"https://www.disneymagazines.fr{m.group(1)}"
     except Exception as e:
-        print(f"  [warn] Impossible de récupérer la couverture sur DisneyMagazines pour {slug}: {e}")
+        print(f"  [warn] Unable to retrieve cover from DisneyMagazines for {slug}: {e}")
     return None
 
 
 def notify_magazine(info: dict, releve_date: str | None = None):
-    """Envoie la notification Telegram pour un nouveau numéro de magazine."""
+    """Sends the Telegram notification for a new magazine issue."""
     codif = info["codif"]
     ov    = OVERRIDES.get(codif, {})
     name  = ov.get("name") or info.get("site_name") or info.get("slug") or codif
@@ -810,37 +807,36 @@ def notify_magazine(info: dict, releve_date: str | None = None):
         [{"text": "Sommaire sur Inducks", "url": inducks_url}],
     ]
 
-    # Essayer de récupérer d'abord une couverture de meilleure qualité sur DisneyMagazines
+    # Try to retrieve a better quality cover from DisneyMagazines first
     cover_url = None
     if info.get("slug"):
         cover_url = fetch_disneymagazines_cover(info.get("slug"))
         if cover_url:
-            print(f"  [info] Couverture haute qualité trouvée sur DisneyMagazines: {cover_url}")
+            print(f"  [info] High quality cover found on DisneyMagazines: {cover_url}")
     if not cover_url:
         cover_url = info.get("cover_url")
 
     send_telegram(cover_url, "\n".join(lines), buttons=buttons)
     time.sleep(1)  # throttle
 
-    # Génération du squelette de pré-index Inducks
+    # Generation of the Inducks pre-index skeleton
     generate_dbi_skeleton(info, publication_type="magazine", overrides=OVERRIDES)
 
 
-
 def build_glenat_inducks_url(title: str) -> str:
-    """Construit l'URL Inducks pour un album Glénat (si possible direct, sinon recherche)."""
+    """Builds the Inducks URL for a Glénat album (direct page if possible, otherwise search)."""
     title_lower = title.lower()
     tome_match = re.search(r'(?:tome|t\.)\s*(\d+)', title_lower)
     tome_num = int(tome_match.group(1)) if tome_match else None
 
-    # 1. La Grande Histoire/Épopée de Picsou (Don Rosa) -> code GHP
+    # 1. La Grande Histoire/Épopée de Picsou (Don Rosa) -> GHP code
     if "grande histoire de picsou" in title_lower or "grande epopee de picsou" in title_lower or "grande épopée de picsou" in title_lower:
         if tome_num is not None:
             code = f"fr/GHP{str(tome_num).rjust(4)}"
             return f"https://inducks.org/issue.php?c={quote_plus(code)}"
         return "https://inducks.org/publication.php?c=fr/GHP"
 
-    # 2. Les Âges d'or (Picsou, Donald, Mickey, etc.) -> code AOD
+    # 2. Les Âges d'or (Picsou, Donald, Mickey, etc.) -> AOD code
     if "ages d'or" in title_lower or "âges d'or" in title_lower or "age d'or" in title_lower or "âge d'or" in title_lower:
         if tome_num is not None:
             code = f"fr/AOD{str(tome_num).rjust(4)}"
@@ -851,11 +847,11 @@ def build_glenat_inducks_url(title: str) -> str:
 
 
 def notify_glenat_announce(album: dict):
-    """Notification d'annonce Glénat (album à paraître)."""
+    """Glénat announcement notification (upcoming album)."""
     title = html_lib.escape(album.get("title", "Album Disney"))
     raw_title = album.get("title", "Album Disney")
 
-    # 1. Caption : métadonnées + résumé tronqué
+    # 1. Caption: metadata + truncated summary
     meta_lines = [f"<b>Annonce — {title}</b>", ""]
     if album.get("date"):
         meta_lines.append(f"🗓 Parution prévue : {album['date']}")
@@ -872,7 +868,7 @@ def notify_glenat_announce(album: dict):
     else:
         caption = base_caption
 
-    # 2. Boutons inline keyboard
+    # 2. Inline keyboard buttons
     row1 = [{"text": "Voir sur Glénat", "url": album["url"]}]
     if AMAZON_AFFILIATE_TAG:
         asin = isbn13_to_isbn10(album.get("ean", ""))
@@ -884,16 +880,16 @@ def notify_glenat_announce(album: dict):
     send_telegram(album.get("cover_url"), caption, buttons=buttons)
     time.sleep(1)
 
-    # Génération du squelette de pré-index Inducks
+    # Generation of the Inducks pre-index skeleton
     generate_dbi_skeleton(album, publication_type="glenat", overrides=OVERRIDES)
 
 
 def notify_glenat_release(album: dict):
-    """Notification de sortie Glénat (album disponible en librairie)."""
+    """Glénat release notification (album available in bookstores)."""
     title = html_lib.escape(album.get("title", "Album Disney"))
     raw_title = album.get("title", "Album Disney")
 
-    # 1. Caption : métadonnées + résumé tronqué
+    # 1. Caption: metadata + truncated summary
     meta_lines = [f"<b>{title}</b>", ""]
     if album.get("date"):
         meta_lines.append(f"🗓 Paru le : {album['date']}")
@@ -910,7 +906,7 @@ def notify_glenat_release(album: dict):
     else:
         caption = base_caption
 
-    # 2. Boutons inline keyboard
+    # 2. Inline keyboard buttons
     row1 = [{"text": "Voir sur Glénat", "url": album["url"]}]
     if AMAZON_AFFILIATE_TAG:
         asin = isbn13_to_isbn10(album.get("ean", ""))
@@ -922,12 +918,12 @@ def notify_glenat_release(album: dict):
     send_telegram(album.get("cover_url"), caption, buttons=buttons)
     time.sleep(1)
 
-    # Génération du squelette de pré-index Inducks
+    # Generation of the Inducks pre-index skeleton
     generate_dbi_skeleton(album, publication_type="glenat", overrides=OVERRIDES)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  Point d'entrée
+#  Entry Point
 # ─────────────────────────────────────────────────────────────────────────────
 
 def main():
@@ -935,31 +931,31 @@ def main():
     state = load_state()
     first_run = not state
     if first_run:
-        print("[init] Premier run — initialisation silencieuse (aucune notification).")
+        print("[init] First run — silent initialization (no notifications).")
 
     notif_count = 0
     today = datetime.now(PARIS_TZ).date()
 
     # ── Direct Éditeurs ───────────────────────────────────────────────────────
-    print("[DE] Découverte des magazines…")
+    print("[DE] Discovering magazines…")
     try:
         magazines = discover_de()
     except Exception as e:
-        print(f"  [erreur] discover_de: {e}")
+        print(f"  [error] discover_de: {e}")
         magazines = {}
-    print(f"  → {len(magazines)} magazine(s) actif(s).")
+    print(f"  → {len(magazines)} active magazine(s).")
 
-    # ── MLP complémentaire ────────────────────────────────────────────────────
-    print("[MLP] Découverte complémentaire…")
+    # ── MLP complementary ────────────────────────────────────────────────────
+    print("[MLP] Complementary discovery…")
     try:
         mlp_extra = discover_mlp_families(known_codifs=set(magazines), state=state)
         added = {c: v for c, v in mlp_extra.items() if c not in magazines}
         magazines.update(added)
-        print(f"  → +{len(added)} codif(s) MLP unique(s).")
+        print(f"  → +{len(added)} unique MLP codif(s).")
     except Exception as e:
-        print(f"  [erreur] discover_mlp: {e}")
+        print(f"  [error] discover_mlp: {e}")
 
-    # ── Traitement magazines ──────────────────────────────────────────────────
+    # ── Magazine processing ───────────────────────────────────────────────────
     for codif, info in magazines.items():
         if codif in SKIP_CODIFS:
             continue
@@ -971,11 +967,11 @@ def main():
         if last and last.upper().endswith("H"):
             last = last[:-1].strip()
         if numero == last:
-            continue  # pas de changement
+            continue  # no change
 
         ov   = OVERRIDES.get(codif, {})
         name = ov.get("name") or info.get("site_name") or codif
-        print(f"  [NEW] {name} — N°{numero}  (précédent: {last or '—'})")
+        print(f"  [NEW] {name} — N°{numero}  (previous: {last or '—'})")
 
         if not first_run:
             releve = info.get("releve_date")
@@ -990,12 +986,12 @@ def main():
         state[codif] = numero
 
     # ── Glénat ────────────────────────────────────────────────────────────────
-    print("[Glénat] Découverte des albums BD Disney…")
+    print("[Glénat] Discovering Disney comic books…")
     try:
         glenat_albums = discover_glenat()
-        print(f"  → {len(glenat_albums)} album(s) trouvé(s).")
+        print(f"  → {len(glenat_albums)} album(s) found.")
     except Exception as e:
-        print(f"  [erreur] discover_glenat: {e}")
+        print(f"  [error] discover_glenat: {e}")
         glenat_albums = []
 
     for album in glenat_albums:
@@ -1007,46 +1003,46 @@ def main():
         pub_date = album.get("pub_date")
 
         if current is None:
-            # Nouvel album détecté
+            # New album detected
             if pub_date and pub_date <= today:
-                # Déjà sorti dans le passé -> on l'enregistre directement comme sorti sans notifier
-                print(f"  [SORTIE-SILENT-INIT] {album.get('title', ean)}")
+                # Already released in the past -> we record it directly as released without notifying
+                print(f"  [RELEASE-SILENT-INIT] {album.get('title', ean)}")
                 state[key] = "released"
             else:
-                # Album à paraître -> notification d'annonce
+                # Upcoming album -> announcement notification
                 if not first_run:
-                    # Récupère les détails à la demande avant d'envoyer la notification
+                    # Retrieve details on-demand before sending the notification
                     details = fetch_glenat_details(album["url"])
                     album["price"] = details.get("price")
                     album["summary"] = details.get("summary")
-                    print(f"  [ANNONCE] {album.get('title', ean)} — Prix: {album.get('price') or 'non renseigné'}")
+                    print(f"  [ANNOUNCEMENT] {album.get('title', ean)} — Price: {album.get('price') or 'not specified'}")
                     notify_glenat_announce(album)
                     notif_count += 1
                 else:
-                    print(f"  [ANNONCE-SILENT] {album.get('title', ean)}")
+                    print(f"  [ANNOUNCEMENT-SILENT] {album.get('title', ean)}")
                 state[key] = "announced"
 
         elif current == "announced" and pub_date and pub_date <= today:
-            # Album annoncé dont la date de parution est atteinte → sortie en librairie
+            # Announced album whose publication date is reached → release in bookstores
             if not first_run:
-                # Récupère les détails à la demande avant d'envoyer la notification
+                # Retrieve details on-demand before sending the notification
                 details = fetch_glenat_details(album["url"])
                 album["price"] = details.get("price")
                 album["summary"] = details.get("summary")
-                print(f"  [SORTIE]  {album.get('title', ean)} — Prix: {album.get('price') or 'non renseigné'}")
+                print(f"  [RELEASE]  {album.get('title', ean)} — Price: {album.get('price') or 'not specified'}")
                 notify_glenat_release(album)
                 notif_count += 1
             else:
-                print(f"  [SORTIE-SILENT] {album.get('title', ean)}")
+                print(f"  [RELEASE-SILENT] {album.get('title', ean)}")
             state[key] = "released"
 
-    # ── Sauvegarde ────────────────────────────────────────────────────────────
+    # ── Saving State ──────────────────────────────────────────────────────────
     save_state(state)
 
     if first_run:
-        print(f"[init] State initialisé avec {len(state)} entrée(s). Prêt pour le prochain run !")
+        print(f"[init] State initialized with {len(state)} entry(ies). Ready for the next run!")
     else:
-        print(f"[done] {notif_count} notification(s) Telegram envoyée(s).")
+        print(f"[done] {notif_count} Telegram notification(s) sent.")
 
 
 if __name__ == "__main__":

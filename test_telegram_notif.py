@@ -31,7 +31,7 @@ jm_double = {
     "date_mise_en_vente": "27/05/2026",
     "prix": "5,90 €",
     "cover_url": "https://fleuruspresse-disney.twic.pics/media/image/3b/16/da33e210938dbe092400db628bf7.jpg",
-    "url": "https://direct-editeurs.fr/magazine/14067_le-journal-de-mickey_3858-3859",
+    "url": "https://direct-editeurs.fr/magazine/14067_le-journal-de-mickey_3858",
     "slug": "le-journal-de-mickey",
     "site_name": "LE JOURNAL DE MICKEY"
 }
@@ -91,7 +91,8 @@ test_album = {
     "title": "Picsou et les bit-coincoins - Collector",
     "date": "08/10/2025",
     "url": "https://www.glenat.com/glenat-disney/disney-glenat-picsou-et-les-bit-coincoins-collector-9782344062081",
-    "cover_url": "https://www.images.hachette-livre.fr/media/imgArticle/GLENAT/2025/9782344062081-001-X.jpeg"
+    "cover_url": "https://www.images.hachette-livre.fr/media/imgArticle/GLENAT/2025/9782344062081-001-X.jpeg",
+    "collection_label": "Créations originales"
 }
 
 # 7. Test Glénat Album - Les Âges d'or de Picsou (Tome 03)
@@ -141,9 +142,9 @@ for name, album in glenat_albums:
     print(f"\nSending test notification for Glénat album: {album['title']}...")
     try:
         details = fetch_glenat_details(album["url"])
-        album["price"] = details.get("price") or album.get("price")
-        album["summary"] = details.get("summary") or album.get("summary")
-        album["cover_url"] = details.get("cover_url") or album.get("cover_url")
+        for k, v in details.items():
+            if v is not None:
+                album[k] = v
         notify_glenat_release(album)
         print(f"Success for {name}!")
     except Exception as e:

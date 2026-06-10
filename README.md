@@ -51,7 +51,7 @@ Go to the **Actions** tab of your repository. If disabled, click on
 
 ### 6. Manual Test
 
-**Actions → Disney Comics Watcher 🦆 → Run workflow**
+**Actions → Disney Comics Watcher → Run workflow**
 
 The first run initializes the state silently (no flooding).
 Subsequent runs will only notify you of new issues.
@@ -102,9 +102,8 @@ Each generated skeleton index contains:
 ```
 ^^ Pre-index genere automatiquement par DisneyComicsWatcher
 ^^ Source : magazine
-^^ A completer et soumettre sur https://inducks.org/bolderbast/
-fr/PM  580   h3 [issdate:2026-06-10] [price:6.50 EUR] [inx:-]
-fr/PM  580a ?              1 c                      
+PM  580      h3 [issdate:2026-06-10] [price:6.50 EUR] [inx:-]
+PM  580a    ?              1 c                      
 ```
 
 ### How to Use It

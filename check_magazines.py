@@ -1,3 +1,4 @@
+import base64
 import html as html_lib
 import json
 import os
@@ -134,6 +135,211 @@ def format_price_fr(prix_str: str | None) -> str | None:
         return f"{clean_str} €"
         
     return prix_str
+
+
+CHARACTER_CODE_MAP = {
+    "picsou": "US",
+    "oncle picsou": "US",
+    "donald": "DD",
+    "donald duck": "DD",
+    "mickey": "MM",
+    "mickey mouse": "MM",
+    "dingo": "GO",
+    "pluto": "PL",
+    "riri": "HDL",
+    "fifi": "HDL",
+    "loulou": "HDL",
+    "riri/fifi/loulou": "HDL",
+    "riri, fifi et loulou": "HDL",
+    "riri, fifi, loulou": "HDL",
+    "géo trouvetou": "GP",
+    "geo trouvetou": "GP",
+    "gontran": "GL",
+    "gontran bonheur": "GL",
+    "daisy": "DA",
+    "daisy duck": "DA",
+    "minnie": "MI",
+    "minnie mouse": "MI",
+    "rapetou": "BB",
+    "les rapetou": "BB",
+    "miss tick": "MDS",
+    "misstick": "MDS",
+    "gripsou": "FLG",
+    "archibald gripsou": "FLG",
+    "flairsou": "RK",
+    "fantomiald": "PK",
+    "popop": "FE",
+    "gaston": "FE",
+    "fantôme noir": "PB",
+    "fantome noir": "PB",
+    "le fantôme noir": "PB",
+    "le fantome noir": "PB",
+    "gus": "GG",
+    "grand-mère donald": "GD",
+    "grand-mere donald": "GD",
+    "clarabelle": "CC",
+    "horace": "HH",
+    "jojo et michou": "MF",
+    "commissaire finot": "CO",
+    "inspecteur duflair": "DC",
+    "gamma": "EB",
+    "fergus mcpicsou": "FMc",
+    "downy mcpicsou": "DOD",
+    "hortense mcpicsou": "HM",
+    "matilda mcpicsou": "MMc",
+    "goldie": "Go",
+    "pat hibulaire": "PE",
+}
+
+
+VALID_CHARACTER_CODES = set(CHARACTER_CODE_MAP.values())
+
+
+def analyze_cover_with_gemini(cover_url: str, api_key: str) -> dict:
+    """Uses the free Gemini API (gemini-3.1-flash-lite) to extract the main cover story/title
+    and detect the Disney characters present on the cover image in a single call.
+    
+    Returns a dictionary:
+      {
+        "title": str | None,
+        "characters": list[dict]  # list of {"name_fr": str, "code": str | None}
+      }
+    """
+    fallback_res = {"title": None, "characters": []}
+    if not cover_url or not api_key:
+        return fallback_res
+    try:
+        # Download the image
+        resp = requests.get(cover_url, timeout=15)
+        resp.raise_for_status()
+        img_bytes = resp.content
+        
+        # Determine MIME type
+        mime_type = resp.headers.get("Content-Type", "image/jpeg")
+        if not mime_type or not mime_type.startswith("image/"):
+            mime_type = "image/jpeg"
+            
+        img_b64 = base64.b64encode(img_bytes).decode("utf-8")
+        
+        # Call Gemini API
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key={api_key}"
+        payload = {
+            "contents": [
+                {
+                    "parts": [
+                        {
+                            "text": (
+                                "You are an assistant specialized in Disney comics and the Inducks database.\n"
+                                "Analyze the cover image of a French Disney magazine or comic book.\n"
+                                "Perform two tasks:\n"
+                                "1. Identify and extract the main headline, featured story title, or major theme of this specific issue "
+                                "(usually written in large, prominent, stylized letters at the bottom or middle of the cover, "
+                                "like 'Escape game dans le coffre de Picsou' or 'Destination aventure !'). "
+                                "Do NOT extract secondary sidebar text, barcode numbers, prices, or the main magazine name (e.g. 'Picsou Magazine', 'Le Journal de Mickey'). "
+                                "Return it under the 'title' key (sentence casing, without quotes, in French). If no major feature title is visible, set it to null.\n\n"
+                                "2. Identify all main Disney characters visible on the cover. For each, return their French name "
+                                "and their official standard Inducks character code if known. Use the following exact mappings for reference:\n"
+                                "- Picsou (US)\n"
+                                "- Donald Duck (DD)\n"
+                                "- Mickey Mouse (MM)\n"
+                                "- Dingo (GO)\n"
+                                "- Pluto (PL)\n"
+                                "- Riri, Fifi, Loulou (HDL)\n"
+                                "- Géo Trouvetou (GP)\n"
+                                "- Gontran (GL)\n"
+                                "- Daisy Duck (DA)\n"
+                                "- Minnie Mouse (MI)\n"
+                                "- Les Rapetou (BB)\n"
+                                "- Miss Tick (MDS)\n"
+                                "- Gripsou (FLG)\n"
+                                "- Flairsou (RK)\n"
+                                "- Fantomiald (PK)\n"
+                                "- Popop (FE)\n"
+                                "- Le Fantôme Noir (PB)\n"
+                                "- Gus (GG)\n"
+                                "- Grand-Mère Donald (GD)\n"
+                                "- Clarabelle (CC)\n"
+                                "- Horace (HH)\n"
+                                "- Jojo et Michou (MF)\n"
+                                "- Commissaire Finot (CO)\n"
+                                "- Inspecteur Duflair (DC)\n"
+                                "- Gamma (EB)\n"
+                                "- Fergus McPicsou (FMc)\n"
+                                "- Downy McPicsou (DOD)\n"
+                                "- Hortense McPicsou (HM)\n"
+                                "- Matilda McPicsou (MMc)\n"
+                                "- Goldie (Go)\n"
+                                "- Pat Hibulaire (PE)\n\n"
+                                "If a character is not in this list, return their French name and set 'code' to null. "
+                                "Do NOT invent character codes. Return this list under the 'characters' key, where each item is an object with 'name_fr' and 'code'.\n\n"
+                                "Format the output as a JSON object with keys 'title' and 'characters'. Example:\n"
+                                '{\n  "title": "Escape game chez Picsou",\n  "characters": [\n    {"name_fr": "Picsou", "code": "US"},\n    {"name_fr": "Donald Duck", "code": "DD"}\n  ]\n}'
+                            )
+                        },
+                        {
+                            "inlineData": {
+                                "mimeType": mime_type,
+                                "data": img_b64
+                            }
+                        }
+                    ]
+                }
+            ],
+            "generationConfig": {
+                "temperature": 0.1,
+                "responseMimeType": "application/json",
+                "maxOutputTokens": 300
+            }
+        }
+        
+        r = requests.post(url, json=payload, timeout=20)
+        r.raise_for_status()
+        result = r.json()
+        
+        text = result["candidates"][0]["content"]["parts"][0]["text"].strip()
+        data = json.loads(text)
+        
+        title = data.get("title")
+        if title:
+            title = re.sub(r'^["\'\-\*#`\s]+', '', title)
+            title = re.sub(r'["\'\-\*#`\s]+$', '', title)
+            if not title.strip():
+                title = None
+            else:
+                title = title.strip()
+        
+        characters = data.get("characters", [])
+        cleaned_chars = []
+        if isinstance(characters, list):
+            for char in characters:
+                if isinstance(char, dict) and "name_fr" in char:
+                    name_fr = char["name_fr"].strip()
+                    norm_name = name_fr.lower()
+                    
+                    # 1. First search in our mapping
+                    code = CHARACTER_CODE_MAP.get(norm_name)
+                    if not code:
+                        for k, v in CHARACTER_CODE_MAP.items():
+                            if k == norm_name or norm_name.startswith(k) or k.startswith(norm_name):
+                                code = v
+                                break
+                                
+                    # 2. Strict whitelist fallback: only allow the code if it's explicitly in the map's values
+                    if not code and char.get("code"):
+                        provided_code = char["code"].strip()
+                        if provided_code in VALID_CHARACTER_CODES:
+                            code = provided_code
+                    
+                    cleaned_chars.append({
+                        "name_fr": name_fr,
+                        "code": code
+                    })
+                    
+        return {"title": title, "characters": cleaned_chars}
+        
+    except Exception as e:
+        print(f"  [warn] Failed to analyze cover with Gemini: {e}")
+        return fallback_res
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -572,7 +778,16 @@ def discover_glenat():
 def fetch_glenat_details(url: str) -> dict:
     """Retrieves on-demand price, summary, page count, size, and translator from the Glénat product page."""
     s = get_session()
-    details = {"price": None, "summary": None, "pages": None, "size": None, "isstrans": None}
+    details = {
+        "price": None,
+        "summary": None,
+        "pages": None,
+        "size": None,
+        "isstrans": None,
+        "numero_de_tome": None,
+        "collection_label": None,
+        "serie_label": None
+    }
     try:
         r = s.get(url, timeout=10)
         r.raise_for_status()
@@ -614,7 +829,9 @@ def fetch_glenat_details(url: str) -> dict:
                     details["summary"] = "\n".join(cleaned_lines).strip()
 
                 # Page count
-                nb_pages = product_data.get('nb_pages') or product_data.get('pages')
+                nb_pages = (product_data.get('nb_pages')
+                            or product_data.get('pages')
+                            or product_data.get('page'))
                 if nb_pages:
                     try:
                         details["pages"] = int(nb_pages)
@@ -627,6 +844,11 @@ def fetch_glenat_details(url: str) -> dict:
                               or product_data.get('dimensions'))
                 if format_val and isinstance(format_val, str):
                     details["size"] = format_val.strip()
+                else:
+                    largeur = product_data.get('largeur')
+                    hauteur = product_data.get('hauteur')
+                    if largeur and hauteur:
+                        details["size"] = f"{largeur} x {hauteur} mm"
 
                 # Translator
                 for contributor in product_data.get('contribuants', []) or []:
@@ -635,6 +857,23 @@ def fetch_glenat_details(url: str) -> dict:
                         name = contributor.get('prenom', "").strip() + " " + contributor.get('nom', "").strip()
                         details["isstrans"] = name.strip() or None
                         break
+                # Tome number
+                tome_num = product_data.get('numero_de_tome')
+                if tome_num is not None:
+                    try:
+                        details["numero_de_tome"] = int(tome_num)
+                    except (ValueError, TypeError):
+                        pass
+
+                # Collection label
+                collection_label = product_data.get('collection_label')
+                if collection_label and isinstance(collection_label, str):
+                    details["collection_label"] = collection_label.strip()
+
+                # Serie label
+                serie_label = product_data.get('serie_label')
+                if serie_label and isinstance(serie_label, str):
+                    details["serie_label"] = serie_label.strip()
 
             except Exception as e:
                 print(f"  [warn] Unable to decode JSON details for {url}: {e}")
@@ -642,6 +881,72 @@ def fetch_glenat_details(url: str) -> dict:
     except Exception as e:
         print(f"  [warn] Unable to fetch details for {url}: {e}")
     return details
+
+
+def get_latest_inducks_issue_number(publication_code: str) -> int:
+    """Streams the official Inducks issue database to find the highest numeric issue number for a publication."""
+    url = "https://inducks.org/inducks/isv/inducks_issue.isv"
+    max_num = 0
+    try:
+        r = requests.get(url, stream=True, timeout=30)
+        r.raise_for_status()
+        for line_bytes in r.iter_lines():
+            if not line_bytes:
+                continue
+            line = line_bytes.decode('utf-8', errors='ignore')
+            parts = line.split('^')
+            if len(parts) >= 4:
+                pubcode = parts[2]
+                if pubcode == publication_code:
+                    issue_num_str = parts[3].strip()
+                    if issue_num_str.isdigit():
+                        num = int(issue_num_str)
+                        if num > max_num:
+                            max_num = num
+    except Exception as e:
+        print(f"  [warn] Failed to fetch latest Inducks issue number for {publication_code}: {e}")
+    return max_num
+
+
+def resolve_dbg_tome_number(album: dict, state: dict | None = None):
+    """Resolves and extrapolates the next issue number for Disney By Glénat (DBG) albums."""
+    if album.get("numero_de_tome") is None:
+        coll = album.get("collection_label")
+        ser = album.get("serie_label")
+        
+        def clean_str(s):
+            if not s:
+                return ""
+            s = s.lower()
+            import unicodedata
+            s = unicodedata.normalize('NFKD', s)
+            return "".join(c for c in s if not unicodedata.combining(c))
+        
+        coll_clean = clean_str(coll)
+        ser_clean = clean_str(ser)
+        
+        if "creations originales" in coll_clean or "creations originales" in ser_clean:
+            local_state = state if state is not None else load_state()
+            last_dbg = local_state.get("dbg_last_num")
+            if not last_dbg:
+                last_dbg = get_latest_inducks_issue_number("fr/DBG")
+                if last_dbg == 0:
+                    last_dbg = 20
+            next_dbg = last_dbg + 1
+            album["numero_de_tome"] = next_dbg
+            local_state["dbg_last_num"] = next_dbg
+            
+            # Save local state if not passed from main
+            if state is None:
+                save_state(local_state)
+            
+            # Append tome number to the title if not already present
+            tome_str = f"Tome {str(next_dbg).zfill(2)}"
+            title = album.get("title", "")
+            if tome_str.lower() not in title.lower() and f"tome {next_dbg}" not in title.lower():
+                album["title"] = f"{title} - {tome_str}"
+            
+            print(f"  [DBG] Extrapolated tome number: {next_dbg}")
 
 
 def truncate_summary(text: str, max_len: int = 400) -> str:
@@ -819,6 +1124,21 @@ def notify_magazine(info: dict, releve_date: str | None = None):
     send_telegram(cover_url, "\n".join(lines), buttons=buttons)
     time.sleep(1)  # throttle
 
+    # Try to analyze cover with Gemini if API key is present
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if api_key and cover_url:
+        print(f"  [Gemini] Analyzing cover for {name} N° {num}...")
+        analysis = analyze_cover_with_gemini(cover_url, api_key)
+        cover_title = analysis.get("title")
+        characters = analysis.get("characters", [])
+        if cover_title:
+            print(f"  [Gemini] Extracted title: '{cover_title}'")
+            info["cover_title"] = cover_title
+        if characters:
+            char_list = ", ".join(f"{c['name_fr']} ({c['code']})" if c.get('code') else c['name_fr'] for c in characters)
+            print(f"  [Gemini] Detected characters: {char_list}")
+            info["characters"] = characters
+
     # Generation of the Inducks pre-index skeleton
     generate_dbi_skeleton(info, publication_type="magazine", overrides=OVERRIDES)
 
@@ -846,8 +1166,9 @@ def build_glenat_inducks_url(title: str) -> str:
     return f"https://inducks.org/search.php?search={quote(title)}"
 
 
-def notify_glenat_announce(album: dict):
+def notify_glenat_announce(album: dict, state: dict | None = None):
     """Glénat announcement notification (upcoming album)."""
+    resolve_dbg_tome_number(album, state)
     title = html_lib.escape(album.get("title", "Album Disney"))
     raw_title = album.get("title", "Album Disney")
 
@@ -880,12 +1201,25 @@ def notify_glenat_announce(album: dict):
     send_telegram(album.get("cover_url"), caption, buttons=buttons)
     time.sleep(1)
 
+    # Try to analyze cover with Gemini if API key is present
+    cover_url = album.get("cover_url")
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if api_key and cover_url:
+        print(f"  [Gemini] Analyzing cover for Glénat album '{raw_title}'...")
+        analysis = analyze_cover_with_gemini(cover_url, api_key)
+        characters = analysis.get("characters", [])
+        if characters:
+            char_list = ", ".join(f"{c['name_fr']} ({c['code']})" if c.get('code') else c['name_fr'] for c in characters)
+            print(f"  [Gemini] Detected characters: {char_list}")
+            album["characters"] = characters
+
     # Generation of the Inducks pre-index skeleton
     generate_dbi_skeleton(album, publication_type="glenat", overrides=OVERRIDES)
 
 
-def notify_glenat_release(album: dict):
+def notify_glenat_release(album: dict, state: dict | None = None):
     """Glénat release notification (album available in bookstores)."""
+    resolve_dbg_tome_number(album, state)
     title = html_lib.escape(album.get("title", "Album Disney"))
     raw_title = album.get("title", "Album Disney")
 
@@ -917,6 +1251,18 @@ def notify_glenat_release(album: dict):
 
     send_telegram(album.get("cover_url"), caption, buttons=buttons)
     time.sleep(1)
+
+    # Try to analyze cover with Gemini if API key is present
+    cover_url = album.get("cover_url")
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if api_key and cover_url:
+        print(f"  [Gemini] Analyzing cover for Glénat album '{raw_title}'...")
+        analysis = analyze_cover_with_gemini(cover_url, api_key)
+        characters = analysis.get("characters", [])
+        if characters:
+            char_list = ", ".join(f"{c['name_fr']} ({c['code']})" if c.get('code') else c['name_fr'] for c in characters)
+            print(f"  [Gemini] Detected characters: {char_list}")
+            album["characters"] = characters
 
     # Generation of the Inducks pre-index skeleton
     generate_dbi_skeleton(album, publication_type="glenat", overrides=OVERRIDES)
@@ -1013,10 +1359,9 @@ def main():
                 if not first_run:
                     # Retrieve details on-demand before sending the notification
                     details = fetch_glenat_details(album["url"])
-                    album["price"] = details.get("price")
-                    album["summary"] = details.get("summary")
+                    album.update(details)
                     print(f"  [ANNOUNCEMENT] {album.get('title', ean)} — Price: {album.get('price') or 'not specified'}")
-                    notify_glenat_announce(album)
+                    notify_glenat_announce(album, state=state)
                     notif_count += 1
                 else:
                     print(f"  [ANNOUNCEMENT-SILENT] {album.get('title', ean)}")
@@ -1027,10 +1372,9 @@ def main():
             if not first_run:
                 # Retrieve details on-demand before sending the notification
                 details = fetch_glenat_details(album["url"])
-                album["price"] = details.get("price")
-                album["summary"] = details.get("summary")
+                album.update(details)
                 print(f"  [RELEASE]  {album.get('title', ean)} — Price: {album.get('price') or 'not specified'}")
-                notify_glenat_release(album)
+                notify_glenat_release(album, state=state)
                 notif_count += 1
             else:
                 print(f"  [RELEASE-SILENT] {album.get('title', ean)}")

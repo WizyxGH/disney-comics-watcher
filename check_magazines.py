@@ -109,6 +109,32 @@ HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; DisneyComicsWatcher/1.0)"}
 
 AMAZON_AFFILIATE_TAG = os.environ.get("AMAZON_AFFILIATE_TAG", "")
 
+def format_price_fr(prix_str: str | None) -> str | None:
+    """Harmonise le format de prix en français (ex: '4,9 €' -> '4,90 €')."""
+    if not prix_str:
+        return None
+    prix_str = prix_str.strip()
+    # On enlève le symbole euro et les espaces superflus pour nettoyer la chaîne
+    clean_str = re.sub(r'(?i)\s*e?ur\s*$', '', prix_str)
+    clean_str = re.sub(r'\s*€\s*$', '', clean_str).strip()
+    
+    # On cherche un nombre avec décimales (virgule ou point)
+    m = re.search(r'(\d+)[,.](\d+)', clean_str)
+    if m:
+        euros = m.group(1)
+        dec = m.group(2)
+        if len(dec) == 1:
+            dec += "0"
+        elif len(dec) > 2:
+            dec = dec[:2]
+        return f"{euros},{dec} €"
+    
+    # Si c'est un entier
+    if re.match(r'^\d+$', clean_str):
+        return f"{clean_str} €"
+        
+    return prix_str
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  Session HTTP partagée
@@ -761,7 +787,7 @@ def notify_magazine(info: dict, releve_date: str | None = None):
     ov    = OVERRIDES.get(codif, {})
     name  = ov.get("name") or info.get("site_name") or info.get("slug") or codif
     num   = info.get("numero", "?")
-    prix  = info.get("prix")
+    prix  = format_price_fr(info.get("prix"))
     date  = info.get("date_mise_en_vente")
     url   = info.get("url", SITE_BASE)
 
@@ -784,12 +810,14 @@ def notify_magazine(info: dict, releve_date: str | None = None):
         [{"text": "Sommaire sur Inducks", "url": inducks_url}],
     ]
 
-    cover_url = info.get("cover_url")
+    # Essayer de récupérer d'abord une couverture de meilleure qualité sur DisneyMagazines
+    cover_url = None
+    if info.get("slug"):
+        cover_url = fetch_disneymagazines_cover(info.get("slug"))
+        if cover_url:
+            print(f"  [info] Couverture haute qualité trouvée sur DisneyMagazines: {cover_url}")
     if not cover_url:
-        disney_cover = fetch_disneymagazines_cover(info.get("slug"))
-        if disney_cover:
-            print(f"  [info] Couverture trouvée sur DisneyMagazines: {disney_cover}")
-            cover_url = disney_cover
+        cover_url = info.get("cover_url")
 
     send_telegram(cover_url, "\n".join(lines), buttons=buttons)
     time.sleep(1)  # throttle
@@ -808,13 +836,15 @@ def build_glenat_inducks_url(title: str) -> str:
     # 1. La Grande Histoire/Épopée de Picsou (Don Rosa) -> code GHP
     if "grande histoire de picsou" in title_lower or "grande epopee de picsou" in title_lower or "grande épopée de picsou" in title_lower:
         if tome_num is not None:
-            return f"https://inducks.org/issue.php?c=fr/GHP+{tome_num}"
+            code = f"fr/GHP{str(tome_num).rjust(4)}"
+            return f"https://inducks.org/issue.php?c={quote_plus(code)}"
         return "https://inducks.org/publication.php?c=fr/GHP"
 
     # 2. Les Âges d'or (Picsou, Donald, Mickey, etc.) -> code AOD
     if "ages d'or" in title_lower or "âges d'or" in title_lower or "age d'or" in title_lower or "âge d'or" in title_lower:
         if tome_num is not None:
-            return f"https://inducks.org/issue.php?c=fr/AOD+{tome_num}"
+            code = f"fr/AOD{str(tome_num).rjust(4)}"
+            return f"https://inducks.org/issue.php?c={quote_plus(code)}"
         return "https://inducks.org/publication.php?c=fr/AOD"
 
     return f"https://inducks.org/search.php?search={quote(title)}"
@@ -829,8 +859,9 @@ def notify_glenat_announce(album: dict):
     meta_lines = [f"<b>Annonce — {title}</b>", ""]
     if album.get("date"):
         meta_lines.append(f"🗓 Parution prévue : {album['date']}")
-    if album.get("price"):
-        meta_lines.append(f"💶 {html_lib.escape(album['price'])}")
+    prix = format_price_fr(album.get("price"))
+    if prix:
+        meta_lines.append(f"💶 {html_lib.escape(prix)}")
 
     base_caption = "\n".join(meta_lines)
     summary = album.get("summary", "")
@@ -866,8 +897,9 @@ def notify_glenat_release(album: dict):
     meta_lines = [f"<b>{title}</b>", ""]
     if album.get("date"):
         meta_lines.append(f"🗓 Paru le : {album['date']}")
-    if album.get("price"):
-        meta_lines.append(f"💶 {html_lib.escape(album['price'])}")
+    prix = format_price_fr(album.get("price"))
+    if prix:
+        meta_lines.append(f"💶 {html_lib.escape(prix)}")
 
     base_caption = "\n".join(meta_lines)
     summary = album.get("summary", "")

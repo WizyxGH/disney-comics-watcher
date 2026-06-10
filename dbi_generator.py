@@ -118,10 +118,10 @@ def _build_glenat_inducks_path(title: str, ean: str | None = None) -> str:
     tome_num    = int(tome_match.group(1)) if tome_match else None
 
     if any(k in title_lower for k in ("grande histoire de picsou", "grande epopee de picsou", "grande épopée de picsou")):
-        return f"fr/GHP {tome_num}" if tome_num is not None else "fr/GHP"
+        return f"fr/GHP{str(tome_num).rjust(4)}" if tome_num is not None else "fr/GHP"
 
     if any(k in title_lower for k in ("ages d'or", "âges d'or", "age d'or", "âge d'or")):
-        return f"fr/AOD {tome_num}" if tome_num is not None else "fr/AOD"
+        return f"fr/AOD{str(tome_num).rjust(4)}" if tome_num is not None else "fr/AOD"
 
     # Fallback avec les 6 derniers chiffres de l'EAN pour un code provisoire unique
     return f"fr/GL_{ean[-6:]}" if ean else "fr/GL_TODO"

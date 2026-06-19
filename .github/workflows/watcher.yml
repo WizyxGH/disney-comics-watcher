@@ -49,6 +49,19 @@ jobs:
           AMAZON_AFFILIATE_TAG: ${{ secrets.AMAZON_AFFILIATE_TAG }}
         run: python check_magazines.py
 
+      # 5bis. Pousser fr.dbi sur main si modifié
+      - name: Sauvegarder fr.dbi sur main
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add fr.dbi
+          if git diff --cached --quiet; then
+            echo "Aucun changement dans fr.dbi"
+          else
+            git commit -m "Auto-update fr.dbi"
+            git push origin main
+          fi
+
       # 6. Pousser le state mis à jour sur la branche datas
       - name: Sauvegarder state.json
         if: always() # Toujours sauvegarder, même en cas d'erreur partielle

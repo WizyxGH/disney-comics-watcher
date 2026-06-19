@@ -1,144 +1,112 @@
-# Disney Comics Watcher
+<div align="center">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Mickey_Mouse_head_and_ears.svg/1024px-Mickey_Mouse_head_and_ears.svg.png" width="120" alt="Disney Logo"/>
+  <h1>Disney Comics Watcher</h1>
+  <p><strong>The Ultimate Automated Tracker for Disney Magazines & Comic Books in France 🦆🐭</strong></p>
 
-Automatically monitors new releases of Disney magazines and comic books in France, and sends a notification to a Telegram channel for every new issue.
+  [![Python](https://img.shields.io/badge/Python-3.12+-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
+  [![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-Active-success.svg?logo=github-actions)](https://github.com/features/actions)
+  [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+  [![Contributions Welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen.svg)](#-contributing)
+</div>
 
-## Monitored Sources
+<hr/>
+
+**Disney Comics Watcher** is an open-source, automated bot designed to monitor new releases of Disney magazines (Picsou Magazine, Le Journal de Mickey, Super Picsou Géant, Fantomiald) and comic books (Glénat albums, Don Rosa, Carl Barks) in France.
+
+It seamlessly tracks publication dates and automatically sends real-time notifications to a dedicated Telegram channel for every new issue or announcement. Perfect for collectors, Inducks contributors, and Disney comics fans!
+
+### 📱 Join our Telegram Channel
+
+Stay updated with all the latest Disney comics releases directly on your phone!
+👉 **[Join the Disney Comics Watcher Telegram Channel here](#)** *(Replace this `#` with your actual Telegram invite link, e.g., `https://t.me/YourChannelName`)*
+
+---
+
+## 🎯 Features & Notifications
+
+- 🦆 **New kiosk magazine issues** — Complete with cover image, issue number, retail price, and publication dates.
+- 📢 **Glénat album announcements** — Notifies you when an upcoming comic book appears as "to be published" in the official catalog.
+- 📚 **Glénat album releases** — Alerts you on the exact day the publication date is reached in bookstores.
+- 🤖 **Gemini AI Integration** — Automatically analyzes magazine covers to detect featured characters and extract the main story titles!
+- 📝 **Inducks Pre-Indexing** — Automatically generates `.dbi` skeleton files for seamless contributions to the [Inducks database](https://inducks.org/).
+
+---
+
+## 📡 Monitored Sources & Publishers
 
 | Source | What it covers |
 |---|---|
-| [direct-editeurs.fr](https://direct-editeurs.fr) | Active magazines (Picsou, Mickey, Fantomiald…) |
-| [catalogueproduits.mlp.fr](https://catalogueproduits.mlp.fr) | Complementary: issues missing from DE (Picsou Soir, Destin de Picsou…) |
-| [glenat.com/livres-glenat-disney](https://www.glenat.com/livres-glenat-disney/) | Disney comic books/graphic novels (Picsou, Mickey, Don Rosa, Scarpa…) |
+| [direct-editeurs.fr](https://direct-editeurs.fr) | Active kiosk magazines (Picsou, Mickey, Fantomiald, Donald…) |
+| [catalogueproduits.mlp.fr](https://catalogueproduits.mlp.fr) | Complementary kiosk issues missing from Direct Éditeurs (Picsou Soir, Destin de Picsou…) |
+| [glenat.com](https://www.glenat.com/livres-glenat-disney/) | Disney comic books and graphic novels by Glénat (Picsou, Mickey, Don Rosa, Romano Scarpa…) |
 
-## Notification Types
+---
 
-- 🦆 / 💰 / 🐭 … **New magazine issue** — with cover, issue number, price, and dates
-- 📢 **Glénat announcement** — when a book appears as "to be published" in the catalog
-- 📚 **Glénat release** — when the publication date is reached
+## 🚀 Installation & Setup
 
-## Installation
+Want to run your own instance of the Watcher? Follow these simple steps:
 
 ### 1. Create the Telegram Bot
-
-1. Open Telegram → search for **@BotFather**
-2. Send `/newbot` and follow the instructions
+1. Open Telegram and search for **@BotFather**
+2. Send `/newbot` and follow the instructions to create your bot
 3. Copy the **token** (e.g., `123456:ABC-DEF...`)
 
 ### 2. Create the Announcement Channel
-
 1. Create a Telegram channel (public recommended)
-2. Add the bot as an **administrator** with "Post Messages" permission
-3. Note the channel's username (e.g., `@DisneyComicsWatcher`)
+2. Add your new bot as an **administrator** with "Post Messages" permission
+3. Note the channel's username (e.g., `@MyDisneyComics`)
 
-### 3. Create the GitHub Repository
+### 3. Deploy via GitHub Actions
+1. Fork or clone this repository
+2. Go to **Settings → Secrets and variables → Actions → New repository secret** and add:
+   - `TELEGRAM_BOT_TOKEN`: The token obtained via @BotFather
+   - `TELEGRAM_CHAT_ID_FR`: The channel's username (e.g., `@MyDisneyComics`)
+3. Go to the **Actions** tab and enable workflows. The bot will now run hourly automatically!
 
-1. Create a new GitHub repository (public or private)
-2. Push this code to the `main` branch
+---
 
-### 4. Add GitHub Secrets
+## 💻 Local Development & Testing
 
-In your repository → **Settings → Secrets and variables → Actions → New repository secret**:
+You can easily run the monitoring script locally without configuring global system variables.
 
-| Secret Name | Value |
-|---|---|
-| `TELEGRAM_BOT_TOKEN` | The token obtained via @BotFather |
-| `TELEGRAM_CHAT_ID_FR` | The channel's username (e.g., `@DisneyComicsWatcher`) |
+1. Clone the repository and install dependencies:
+   ```bash
+   pip install requests beautifulsoup4
+   ```
+2. Create a `.env` file at the root of the project:
+   ```env
+   TELEGRAM_BOT_TOKEN=your_test_token
+   TELEGRAM_CHAT_ID_FR=your_test_chat_id
+   # Optional: Add GEMINI_API_KEY for AI cover analysis
+   ```
+3. Run the test suite:
+   ```powershell
+   python test_telegram_notif.py
+   ```
 
-### 5. Enable GitHub Actions
+---
 
-Go to the **Actions** tab of your repository. If disabled, click on
-*"I understand my workflows, go ahead and enable them"*.
+## 🤝 Contributing
 
-### 6. Manual Test
+We would absolutely love your help to make **Disney Comics Watcher** even better! 
 
-**Actions → Disney Comics Watcher → Run workflow**
+Whether you want to add support for a new country, improve the Gemini AI prompts, fix bugs, or refine the Inducks `.dbi` generator, all contributions are highly appreciated!
 
-The first run initializes the state silently (no flooding).
-Subsequent runs will only notify you of new issues.
+### How to contribute:
+1. **Fork** the repository
+2. **Create a branch** for your feature (`git checkout -b feature/amazing-feature`)
+3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
+4. **Push** to the branch (`git push origin feature/amazing-feature`)
+5. **Open a Pull Request** 🚀
 
-### 7. Development and Local Testing
+### Ideas for future contributions:
+- 🌍 Adding support for other countries (Germany, Italy, Brazil, USA...)
+- 🎨 Improving the Telegram message formatting
+- 🧠 Enhancing the Gemini AI character detection
+- 🕷️ Adding new comic book publishers
 
-You can run the monitoring script and its tests on your machine without configuring global system variables.
-To do this, simply create a `.env` file at the root of the project (this file is already configured in `.gitignore`):
+---
 
-```env
-TELEGRAM_BOT_TOKEN=your_test_token
-TELEGRAM_CHAT_ID_FR=your_test_chat_id
-```
-
-Then run the test suite with:
-```powershell
-python test_telegram_notif.py
-```
-
-## How It Works
-
-1. The script runs **hourly** (at minute 0) via GitHub Actions.
-2. It queries Direct Éditeurs and MLP to discover all active Disney magazines.
-3. It compares them with the last known issue (stored in `state.json` on the `datas` branch).
-4. For each new issue → Telegram notification with cover, price, and dates.
-5. In parallel, it monitors Glénat albums (announcements + releases).
-6. `state.json` is committed to the `datas` branch (keeping the code clean on `main`).
-7. For each detected new release, an **Inducks pre-index skeleton** (in `.dbi` format) is appended to the local `fr.dbi` file at the project root.
-
-## Inducks Pre-index (`fr.dbi`)
-
-For every new notified release, the script automatically generates a pre-index skeleton in the [Inducks Bolderbast DBI format](https://inducks.org/bolderbast/xh7111_DBIReader.html) and appends it to the `fr.dbi` file at the root.
-
-### What the File Contains
-
-Each generated skeleton index contains:
-
-- A properly formatted **`h3` header line** (fixed positions according to the Bolderbast spec) with:
-  - The publication's Inducks code (e.g., `fr/PM  580` or `->` if the code exceeds 12 characters, such as `fr/JM 3858-59`)
-  - The publication date `[issdate:YYYY-MM-DD]`
-  - The price `[price:X.XX EUR]`
-  - For Glénat albums: book title, page count `[pages:XX]`, size `[size:...]`, translator name `[isstrans:...]`, and EAN `[EAN:...]` (if available)
-  - `[inx:-]` indicating the index needs to be completed
-- A **pre-filled entry line for the cover** (pages = `1`, brokpg = empty, pagel = `c`)
-
-### Example of a Generated File (magazine)
-
-```
-^^ Pre-index genere automatiquement par DisneyComicsWatcher
-^^ Source : magazine
-PM  580      h3 [issdate:2026-06-10] [price:6.50 EUR] [inx:-]
-PM  580a    ?              1 c                      
-```
-
-### How to Use It
-
-1. Retrieve the `fr.dbi` file at the project root (available in the run artifacts of the GitHub Action).
-2. Complete the cover line and add entries for the issue's stories (storycode, pages, credits…).
-3. Submit the completed index on [Inducks Bolderbast](https://inducks.org/bolderbast/).
-
-### Pre-configured Inducks Codes
-
-Publications with known Inducks codes (configured in `OVERRIDES`) directly generate the correct code (e.g., `fr/PM`, `fr/JM`, `fr/CF`). For others, a temporary code `fr/TODO_<codif>` is used — to be corrected before submission.
-
-For Glénat albums, known series are automatically recognized:
-
-| Series | Inducks Code |
-|---|---|
-| La Grande Histoire de Picsou (Don Rosa) | `fr/GHP` |
-| Les Âges d'or de Disney | `fr/AOD` |
-
-## Customizing a Magazine
-
-To add an emoji or a dedicated name for an automatically discovered magazine, add its `codif` to `OVERRIDES` in `check_magazines.py`:
-
-```python
-OVERRIDES = {
-    "13159": {"name": "Picsou Magazine", "inducks": ("PM", 5)},
-    ...
-}
-```
-
-The codif is visible in the URL on direct-editeurs.fr.
-
-## Adding a New Country (future extension)
-
-1. Create a new Telegram channel for the country.
-2. Add a secret `TELEGRAM_CHAT_ID_XX` (e.g., `TELEGRAM_CHAT_ID_DE` for Germany).
-3. Duplicate the job in `watcher.yml` with `TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID_XX }}`.
-4. Adapt the sources and keywords for the new country.
+<div align="center">
+  <i>Built with ❤️ for the Disney Comics community and Inducks contributors.</i>
+</div>

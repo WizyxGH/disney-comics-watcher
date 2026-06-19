@@ -22,7 +22,8 @@ if not telegram_token or not telegram_chat:
     print('  $env:TELEGRAM_BOT_TOKEN="your_token"; $env:TELEGRAM_CHAT_ID="your_chat_id"; $env:AMAZON_AFFILIATE_TAG="your_tag"; python test_telegram_notif.py')
     sys.exit(1)
 
-from check_magazines import notify_magazine, notify_glenat_release, fetch_glenat_details
+from src.notifications import notify_magazine, notify_glenat_release
+from src.scrapers import fetch_glenat_details
 
 # 1. Test Journal de Mickey (double issue)
 jm_double = {

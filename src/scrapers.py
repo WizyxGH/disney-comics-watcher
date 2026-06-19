@@ -4,7 +4,7 @@ import json
 import requests
 from datetime import datetime
 from bs4 import BeautifulSoup
-from src.config import KEYWORDS, SKIP_CODIFS, BI_ISSUE_CODIFS, OVERRIDES, SEARCH_URL, SITE_BASE, MLP_FAMILIES, MLP_FAMILY_URL, GLENAT_BASE, GLENAT_COLLECTION_URL
+from src.config import KEYWORDS, SKIP_CODIFS, BI_ISSUE_CODIFS, OVERRIDES, SEARCH_URL, SITE_BASE, MLP_FAMILIES, MLP_FAMILY_URL, MLP_URL, GLENAT_BASE, GLENAT_COLLECTION_URL
 from src.utils import get_session, parse_date_fr, truncate_summary, format_price_fr
 
 # ─────────────────────────────────────────────────────────────────────────────

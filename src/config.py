@@ -77,6 +77,15 @@ GLENAT_COLLECTION_URL = "https://www.glenat.com/livres-glenat-disney/"
 GLENAT_BASE           = "https://www.glenat.com"
 GLENAT_KEY_PREFIX     = "glenat:"
 
+FANTAGRAPHICS_DISNEY_URL = "https://www.fantagraphics.com/collections/disney/products.json"
+FANTAGRAPHICS_BASE       = "https://www.fantagraphics.com/products/"
+FANTAGRAPHICS_KEY_PREFIX = "fanta:"
+
+MARVEL_SERIES_URLS = [
+    "https://www.marvel.com/comics/series/42808/uncle_scrooge_earths_mightiest_duck_2025_present"
+]
+MARVEL_KEY_PREFIX = "marvel:"
+
 STATE_FILE    = "state.json"
 
 # Load local .env file if it exists
@@ -93,6 +102,8 @@ TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID   = (
     os.environ.get("TELEGRAM_CHAT_ID_FR") or os.environ.get("TELEGRAM_CHAT_ID", "")
 )
+TELEGRAM_THREAD_ID_FR = os.environ.get("TELEGRAM_THREAD_ID_FR", "")
+TELEGRAM_THREAD_ID_US = os.environ.get("TELEGRAM_THREAD_ID_US", "")
 TELEGRAM_API = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; DisneyComicsWatcher/1.0)"}

@@ -4,7 +4,7 @@ import html as html_lib
 import time
 import requests
 from urllib.parse import quote, quote_plus
-from src.config import TELEGRAM_API, TELEGRAM_CHAT_ID, OVERRIDES, AMAZON_AFFILIATE_TAG, SITE_BASE
+from src.config import TELEGRAM_API, TELEGRAM_CHAT_ID, TELEGRAM_THREAD_ID_FR, TELEGRAM_THREAD_ID_US, OVERRIDES, AMAZON_AFFILIATE_TAG, SITE_BASE
 from src.utils import format_price_fr, get_session, load_state, save_state
 from src.scrapers import get_latest_inducks_issue_number
 from src.dbi_generator import generate_dbi_skeleton, build_inducks_path
@@ -54,7 +54,7 @@ def download_cover(url: str | None, filename: str):
         print(f"  [warn] Impossible de télécharger la couverture {url}: {e}")
 
 
-def send_telegram(photo_url: str | None, caption: str, buttons: list | None = None, retries: int = 5):
+def send_telegram(photo_url: str | None, caption: str, buttons: list | None = None, retries: int = 5, chat_id: str = TELEGRAM_CHAT_ID, message_thread_id: str | None = None):
     """Sends a Telegram message with a photo (sendPhoto) or text only (sendMessage).
     Automatically handles rate limits (429) and inaccessible photos.
     buttons: list of button rows, e.g. [[{"text": "Voir", "url": "..."}]]
@@ -65,11 +65,13 @@ def send_telegram(photo_url: str | None, caption: str, buttons: list | None = No
         try:
             if photo_url:
                 payload = {
-                    "chat_id":    TELEGRAM_CHAT_ID,
+                    "chat_id":    chat_id,
                     "photo":      photo_url,
                     "caption":    caption,
                     "parse_mode": "HTML",
                 }
+                if message_thread_id:
+                    payload["message_thread_id"] = int(message_thread_id)
                 if reply_markup:
                     payload["reply_markup"] = reply_markup
                 resp = requests.post(f"{TELEGRAM_API}/sendPhoto", json=payload, timeout=15)
@@ -83,11 +85,13 @@ def send_telegram(photo_url: str | None, caption: str, buttons: list | None = No
                         continue
             else:
                 payload = {
-                    "chat_id":                  TELEGRAM_CHAT_ID,
+                    "chat_id":                  chat_id,
                     "text":                     caption[:4096],
                     "parse_mode":               "HTML",
                     "disable_web_page_preview": True,
                 }
+                if message_thread_id:
+                    payload["message_thread_id"] = int(message_thread_id)
                 if reply_markup:
                     payload["reply_markup"] = reply_markup
                 resp = requests.post(f"{TELEGRAM_API}/sendMessage", json=payload, timeout=15)
@@ -156,22 +160,89 @@ def fetch_disneymagazines_cover(slug: str) -> str | None:
             timeout=10
         )
         if r.status_code == 200:
-            # 1st choice: twic.pics URL (native CDN, higher quality) — remove query parameters
             m = re.search(r'"(https://fleuruspresse-disney\.twic\.pics/media/[^"]+\.jpg)[^"]*"', r.text)
-            if m:
-                return m.group(1)
-            # 2nd choice: Google Merchant cache URL on disneymagazines.fr
+            if m: return m.group(1)
             m = re.search(r'"(https://www\.disneymagazines\.fr/media/cache/[^"]+\.jpg)"', r.text)
-            if m:
-                return m.group(1)
-            # 3rd choice: relative src
+            if m: return m.group(1)
             m = re.search(r'src="(/media/image/[^"]+\.jpg)"', r.text)
-            if m:
-                return f"https://www.disneymagazines.fr{m.group(1)}"
+            if m: return f"https://www.disneymagazines.fr{m.group(1)}"
     except Exception as e:
         print(f"  [warn] Unable to retrieve cover from DisneyMagazines for {slug}: {e}")
     return None
 
+def build_glenat_inducks_url(title: str) -> str:
+    """Builds the Inducks URL for a Glénat album (direct page if possible, otherwise search)."""
+    title_lower = title.lower()
+    tome_match = re.search(r'(?:tome|t\.)\s*(\d+)', title_lower)
+    tome_num = int(tome_match.group(1)) if tome_match else None
+
+    if "grande histoire de picsou" in title_lower or "grande epopee de picsou" in title_lower or "grande épopée de picsou" in title_lower:
+        if tome_num is not None:
+            return f"https://inducks.org/issue.php?c={quote_plus(f'fr/GHP{str(tome_num).rjust(4)}')}"
+        return "https://inducks.org/publication.php?c=fr/GHP"
+
+    if "ages d'or" in title_lower or "âges d'or" in title_lower or "age d'or" in title_lower or "âge d'or" in title_lower:
+        if tome_num is not None:
+            return f"https://inducks.org/issue.php?c={quote_plus(f'fr/AOD{str(tome_num).rjust(4)}')}"
+        return "https://inducks.org/publication.php?c=fr/AOD"
+
+    return f"https://inducks.org/search.php?search={quote(title)}"
+
+# ── COMMON DISPATCH HELPER ──────────────────────────────────────────────────────
+
+def _dispatch_notification(
+    info: dict,
+    base_caption: str,
+    summary: str,
+    buttons: list,
+    cover_url: str | None,
+    cover_filename: str,
+    message_thread_id: str | None,
+    publication_type: str,
+    raw_title: str
+):
+    """Internal helper to dispatch Telegram notification, download cover, and analyze with Gemini."""
+    # 1. Truncate summary if necessary
+    if summary:
+        available = 1024 - len(base_caption) - 40
+        truncated = truncate_summary(summary, max_len=max(50, available))
+        caption = base_caption + f"\n\n<i>{html_lib.escape(truncated)}</i>"
+    else:
+        caption = base_caption
+
+    # 2. Download cover
+    if cover_url:
+        download_cover(cover_url, cover_filename)
+
+    # 3. Send via Telegram
+    if TELEGRAM_CHAT_ID:
+        send_telegram(cover_url, caption, buttons=buttons, message_thread_id=message_thread_id)
+        time.sleep(1)
+    else:
+        print("  [warn] No TELEGRAM_CHAT_ID configured.")
+
+    # 4. Gemini Cover Analysis
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if api_key and cover_url:
+        print(f"  [Gemini] Analyzing cover for '{raw_title}'...")
+        analysis = analyze_cover_with_gemini(cover_url, api_key)
+        
+        if publication_type == "magazine":
+            cover_title = analysis.get("title")
+            if cover_title:
+                print(f"  [Gemini] Extracted title: '{cover_title}'")
+                info["cover_title"] = cover_title
+        
+        characters = analysis.get("characters", [])
+        if characters:
+            char_list = ", ".join(f"{c['name_fr']} ({c['code']})" if c.get('code') else c['name_fr'] for c in characters)
+            print(f"  [Gemini] Detected characters: {char_list}")
+            info["characters"] = characters
+
+    # 5. Generate DBI skeleton
+    generate_dbi_skeleton(info, publication_type=publication_type, overrides=OVERRIDES)
+
+# ── PUBLIC NOTIFICATION FUNCTIONS ───────────────────────────────────────────────
 
 def notify_magazine(info: dict, releve_date: str | None = None):
     """Sends the Telegram notification for a new magazine issue."""
@@ -185,80 +256,39 @@ def notify_magazine(info: dict, releve_date: str | None = None):
 
     title_line = f"<b>{html_lib.escape(name)} {num}</b>"
     lines = [title_line, ""]
-    if prix:
-        lines.append(f"💶 {html_lib.escape(prix)}")
-    if date:
-        lines.append(f"📅 Paru le : {date}")
-    if releve_date:
-        lines.append(f"📅 En kiosque jusqu'au : {releve_date}")
-
-    # Boutons inline keyboard
-    inducks_url = build_inducks_url(ov.get("inducks"), num)
-    if not inducks_url:
-        inducks_url = f"https://inducks.org/search.php?search={quote(f'{name} {num}')}"
+    if prix: lines.append(f"💶 {html_lib.escape(prix)}")
+    if date: lines.append(f"📅 Paru le : {date}")
+    if releve_date: lines.append(f"📅 En kiosque jusqu'au : {releve_date}")
+    
+    inducks_url = build_inducks_url(ov.get("inducks"), num) or f"https://inducks.org/search.php?search={quote(f'{name} {num}')}"
     btn_text = "Voir sur MLP" if "mlp.fr" in url.lower() else "Voir sur Direct-éditeurs"
-    buttons = [
-        [{"text": btn_text, "url": url}],
-        [{"text": "Sommaire sur Inducks", "url": inducks_url}],
-    ]
+    buttons = [[{"text": btn_text, "url": url}], [{"text": "Sommaire sur Inducks", "url": inducks_url}]]
 
-    # Try to retrieve a better quality cover from DisneyMagazines first
     cover_url = None
     if info.get("slug"):
         cover_url = fetch_disneymagazines_cover(info.get("slug"))
-        if cover_url:
-            print(f"  [info] High quality cover found on DisneyMagazines: {cover_url}")
+        if cover_url: print(f"  [info] High quality cover found on DisneyMagazines: {cover_url}")
     if not cover_url:
         cover_url = info.get("cover_url")
 
-    # Download cover
-    if cover_url:
-        download_cover(cover_url, f"{codif}_{name}_{num}")
+    _dispatch_notification(
+        info=info,
+        base_caption="\n".join(lines),
+        summary="",
+        buttons=buttons,
+        cover_url=cover_url,
+        cover_filename=f"{codif}_{name}_{num}",
+        message_thread_id=TELEGRAM_THREAD_ID_FR,
+        publication_type="magazine",
+        raw_title=f"{name} N° {num}"
+    )
 
-    send_telegram(cover_url, "\n".join(lines), buttons=buttons)
-    time.sleep(1)  # throttle
-
-    # Try to analyze cover with Gemini if API key is present
-    api_key = os.environ.get("GEMINI_API_KEY")
-    if api_key and cover_url:
-        print(f"  [Gemini] Analyzing cover for {name} N° {num}...")
-        analysis = analyze_cover_with_gemini(cover_url, api_key)
-        cover_title = analysis.get("title")
-        characters = analysis.get("characters", [])
-        if cover_title:
-            print(f"  [Gemini] Extracted title: '{cover_title}'")
-            info["cover_title"] = cover_title
-        if characters:
-            char_list = ", ".join(f"{c['name_fr']} ({c['code']})" if c.get('code') else c['name_fr'] for c in characters)
-            print(f"  [Gemini] Detected characters: {char_list}")
-            info["characters"] = characters
-
-    # Generation of the Inducks pre-index skeleton
-    generate_dbi_skeleton(info, publication_type="magazine", overrides=OVERRIDES)
-
-
-def build_glenat_inducks_url(title: str) -> str:
-    """Builds the Inducks URL for a Glénat album (direct page if possible, otherwise search)."""
-    title_lower = title.lower()
-    tome_match = re.search(r'(?:tome|t\.)\s*(\d+)', title_lower)
-    tome_num = int(tome_match.group(1)) if tome_match else None
-
-    # 1. La Grande Histoire/Épopée de Picsou (Don Rosa) -> GHP code
-    if "grande histoire de picsou" in title_lower or "grande epopee de picsou" in title_lower or "grande épopée de picsou" in title_lower:
-        if tome_num is not None:
-            code = f"fr/GHP{str(tome_num).rjust(4)}"
-            return f"https://inducks.org/issue.php?c={quote_plus(code)}"
-        return "https://inducks.org/publication.php?c=fr/GHP"
-
-    # 2. Les Âges d'or (Picsou, Donald, Mickey, etc.) -> AOD code
-    if "ages d'or" in title_lower or "âges d'or" in title_lower or "age d'or" in title_lower or "âge d'or" in title_lower:
-        if tome_num is not None:
-            code = f"fr/AOD{str(tome_num).rjust(4)}"
-            return f"https://inducks.org/issue.php?c={quote_plus(code)}"
-        return "https://inducks.org/publication.php?c=fr/AOD"
-
-    return f"https://inducks.org/search.php?search={quote(title)}"
-
+def _build_glenat_buttons(album: dict, raw_title: str) -> list:
+    row1 = [{"text": "Voir sur Glénat", "url": album["url"]}]
+    if AMAZON_AFFILIATE_TAG:
+        asin = isbn13_to_isbn10(album.get("ean", ""))
+        if asin: row1.append({"text": "Acheter sur Amazon", "url": f"https://www.amazon.fr/dp/{asin}/?tag={AMAZON_AFFILIATE_TAG}"})
+    return [row1, [{"text": "Sommaire sur Inducks", "url": build_glenat_inducks_url(raw_title)}]]
 
 def notify_glenat_announce(album: dict, state: dict | None = None):
     """Glénat announcement notification (upcoming album)."""
@@ -266,54 +296,22 @@ def notify_glenat_announce(album: dict, state: dict | None = None):
     title = html_lib.escape(album.get("title", "Album Disney"))
     raw_title = album.get("title", "Album Disney")
 
-    # 1. Caption: metadata + truncated summary
-    meta_lines = [f"<b>Annonce — {title}</b>", ""]
-    if album.get("date"):
-        meta_lines.append(f"🗓 Parution prévue : {album['date']}")
+    lines = [f"<b>Annonce — {title}</b>", ""]
+    if album.get("date"): lines.append(f"🗓 Parution prévue : {album['date']}")
     prix = format_price_fr(album.get("price"))
-    if prix:
-        meta_lines.append(f"💶 {html_lib.escape(prix)}")
+    if prix: lines.append(f"💶 {html_lib.escape(prix)}")
 
-    base_caption = "\n".join(meta_lines)
-    summary = album.get("summary", "")
-    if summary:
-        available = 1024 - len(base_caption) - 40
-        truncated = truncate_summary(summary, max_len=max(50, available))
-        caption = base_caption + f"\n\n<i>{html_lib.escape(truncated)}</i>"
-    else:
-        caption = base_caption
-
-    # 2. Inline keyboard buttons
-    row1 = [{"text": "Voir sur Glénat", "url": album["url"]}]
-    if AMAZON_AFFILIATE_TAG:
-        asin = isbn13_to_isbn10(album.get("ean", ""))
-        if asin:
-            row1.append({"text": "Acheter sur Amazon", "url": f"https://www.amazon.fr/dp/{asin}/?tag={AMAZON_AFFILIATE_TAG}"})
-    row2 = [{"text": "Sommaire sur Inducks", "url": build_glenat_inducks_url(raw_title)}]
-    buttons = [row1, row2]
-
-    cover_url = album.get("cover_url")
-    if cover_url:
-        download_cover(cover_url, f"{album.get('ean', 'glenat')}_{raw_title}")
-
-    send_telegram(cover_url, caption, buttons=buttons)
-    time.sleep(1)
-
-    # Try to analyze cover with Gemini if API key is present
-    cover_url = album.get("cover_url")
-    api_key = os.environ.get("GEMINI_API_KEY")
-    if api_key and cover_url:
-        print(f"  [Gemini] Analyzing cover for Glénat album '{raw_title}'...")
-        analysis = analyze_cover_with_gemini(cover_url, api_key)
-        characters = analysis.get("characters", [])
-        if characters:
-            char_list = ", ".join(f"{c['name_fr']} ({c['code']})" if c.get('code') else c['name_fr'] for c in characters)
-            print(f"  [Gemini] Detected characters: {char_list}")
-            album["characters"] = characters
-
-    # Generation of the Inducks pre-index skeleton
-    generate_dbi_skeleton(album, publication_type="glenat", overrides=OVERRIDES)
-
+    _dispatch_notification(
+        info=album,
+        base_caption="\n".join(lines),
+        summary=album.get("summary", ""),
+        buttons=_build_glenat_buttons(album, raw_title),
+        cover_url=album.get("cover_url"),
+        cover_filename=f"{album.get('ean', 'glenat')}_{raw_title}",
+        message_thread_id=TELEGRAM_THREAD_ID_FR,
+        publication_type="glenat",
+        raw_title=raw_title
+    )
 
 def notify_glenat_release(album: dict, state: dict | None = None):
     """Glénat release notification (album available in bookstores)."""
@@ -321,52 +319,48 @@ def notify_glenat_release(album: dict, state: dict | None = None):
     title = html_lib.escape(album.get("title", "Album Disney"))
     raw_title = album.get("title", "Album Disney")
 
-    # 1. Caption: metadata + truncated summary
-    meta_lines = [f"<b>{title}</b>", ""]
-    if album.get("date"):
-        meta_lines.append(f"🗓 Paru le : {album['date']}")
+    lines = [f"<b>{title}</b>", ""]
+    if album.get("date"): lines.append(f"🗓 Paru le : {album['date']}")
     prix = format_price_fr(album.get("price"))
-    if prix:
-        meta_lines.append(f"💶 {html_lib.escape(prix)}")
+    if prix: lines.append(f"💶 {html_lib.escape(prix)}")
 
-    base_caption = "\n".join(meta_lines)
-    summary = album.get("summary", "")
-    if summary:
-        available = 1024 - len(base_caption) - 40
-        truncated = truncate_summary(summary, max_len=max(50, available))
-        caption = base_caption + f"\n\n<i>{html_lib.escape(truncated)}</i>"
-    else:
-        caption = base_caption
+    _dispatch_notification(
+        info=album,
+        base_caption="\n".join(lines),
+        summary=album.get("summary", ""),
+        buttons=_build_glenat_buttons(album, raw_title),
+        cover_url=album.get("cover_url"),
+        cover_filename=f"{album.get('ean', 'glenat')}_{raw_title}",
+        message_thread_id=TELEGRAM_THREAD_ID_FR,
+        publication_type="glenat",
+        raw_title=raw_title
+    )
 
-    # 2. Inline keyboard buttons
-    row1 = [{"text": "Voir sur Glénat", "url": album["url"]}]
-    if AMAZON_AFFILIATE_TAG:
-        asin = isbn13_to_isbn10(album.get("ean", ""))
-        if asin:
-            row1.append({"text": "Acheter sur Amazon", "url": f"https://www.amazon.fr/dp/{asin}/?tag={AMAZON_AFFILIATE_TAG}"})
-    row2 = [{"text": "Sommaire sur Inducks", "url": build_glenat_inducks_url(raw_title)}]
-    buttons = [row1, row2]
+def notify_us_release(album: dict, state: dict | None = None):
+    """US release notification (e.g., Fantagraphics)."""
+    title = html_lib.escape(album.get("title", "US Disney Comic"))
+    raw_title = album.get("title", "US Disney Comic")
 
-    cover_url = album.get("cover_url")
-    if cover_url:
-        download_cover(cover_url, f"{album.get('ean', 'glenat')}_{raw_title}")
+    lines = [f"🇺🇸 <b>{title}</b>", ""]
+    if album.get("date"): lines.append(f"🗓 Published on: {album['date']}")
+    if album.get("price"): lines.append(f"💵 Price: {html_lib.escape(album['price'])}")
 
-    send_telegram(cover_url, caption, buttons=buttons)
-    time.sleep(1)
+    source_name = "Marvel" if album.get("source") == "marvel" else "Fantagraphics"
+    row1 = [{"text": f"View on {source_name}", "url": album["url"]}]
+    if AMAZON_AFFILIATE_TAG and album.get("sku"):
+        asin = isbn13_to_isbn10(album.get("sku", ""))
+        if asin: row1.append({"text": "Buy on Amazon", "url": f"https://www.amazon.fr/dp/{asin}/?tag={AMAZON_AFFILIATE_TAG}"})
+    
+    buttons = [row1, [{"text": "Search on Inducks", "url": f"https://inducks.org/search.php?search={quote(raw_title)}"}]]
 
-    # Try to analyze cover with Gemini if API key is present
-    cover_url = album.get("cover_url")
-    api_key = os.environ.get("GEMINI_API_KEY")
-    if api_key and cover_url:
-        print(f"  [Gemini] Analyzing cover for Glénat album '{raw_title}'...")
-        analysis = analyze_cover_with_gemini(cover_url, api_key)
-        characters = analysis.get("characters", [])
-        if characters:
-            char_list = ", ".join(f"{c['name_fr']} ({c['code']})" if c.get('code') else c['name_fr'] for c in characters)
-            print(f"  [Gemini] Detected characters: {char_list}")
-            album["characters"] = characters
-
-    # Generation of the Inducks pre-index skeleton
-    generate_dbi_skeleton(album, publication_type="glenat", overrides=OVERRIDES)
-
-
+    _dispatch_notification(
+        info=album,
+        base_caption="\n".join(lines),
+        summary=album.get("summary", ""),
+        buttons=buttons,
+        cover_url=album.get("cover_url"),
+        cover_filename=f"us_{album.get('sku', 'fanta')}_{raw_title}",
+        message_thread_id=TELEGRAM_THREAD_ID_US,
+        publication_type="us",
+        raw_title=raw_title
+    )

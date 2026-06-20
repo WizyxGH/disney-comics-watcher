@@ -61,12 +61,17 @@ def format_price_fr(prix_str: str | None) -> str | None:
     return prix_str
 
 def parse_date_fr(s):
-    """DD/MM/YYYY -> date object, or None if invalid."""
+    """DD/MM/YYYY or YYYY-MM-DD -> date object, or None if invalid."""
     if not s:
         return None
+    s = str(s).strip()
     try:
-        d, m, y = str(s).strip().split("/")
-        return datetime(int(y), int(m), int(d)).date()
+        if "-" in s:
+            y, m, d = s.split("-")
+            return datetime(int(y), int(m), int(d)).date()
+        else:
+            d, m, y = s.split("/")
+            return datetime(int(y), int(m), int(d)).date()
     except (ValueError, AttributeError):
         return None
 

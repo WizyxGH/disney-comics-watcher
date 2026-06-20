@@ -1,7 +1,7 @@
 <div align="center">
   <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Mickey_Mouse_head_and_ears.svg/1024px-Mickey_Mouse_head_and_ears.svg.png" width="120" alt="Disney Logo"/>
   <h1>Disney Comics Watcher</h1>
-  <p><strong>The Ultimate Automated Tracker for Disney Magazines & Comic Books in France 🦆🐭</strong></p>
+  <p><strong>The Ultimate Automated Tracker for Disney Magazines & Comic Books in France & the US</strong></p>
 
   [![Python](https://img.shields.io/badge/Python-3.12+-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
   [![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-Active-success.svg?logo=github-actions)](https://github.com/features/actions)
@@ -11,14 +11,14 @@
 
 <hr/>
 
-**Disney Comics Watcher** is an open-source, automated bot designed to monitor new releases of Disney magazines (Picsou Magazine, Le Journal de Mickey, Super Picsou Géant, Fantomiald) and comic books (Glénat albums, Don Rosa, Carl Barks) in France.
+**Disney Comics Watcher** is an open-source, automated bot designed to monitor new releases of Disney magazines (Picsou Magazine, Le Journal de Mickey, Super Picsou Géant, Fantomiald) and comic books (Glénat albums, Don Rosa, Carl Barks) in France and the US.
 
 It seamlessly tracks publication dates and automatically sends real-time notifications to a dedicated Telegram channel for every new issue or announcement. Perfect for collectors, Inducks contributors, and Disney comics fans!
 
 ### 📱 Join our Telegram Channel
 
 Stay updated with all the latest Disney comics releases directly on your phone!
-👉 **[Join the Disney Comics Watcher Telegram Channel here](#)** *(Replace this `#` with your actual Telegram invite link, e.g., `https://t.me/YourChannelName`)*
+👉 **[Join the Disney Comics Watcher Telegram Channel here](https://t.me/infobddisney)**
 
 ---
 
@@ -28,7 +28,8 @@ Stay updated with all the latest Disney comics releases directly on your phone!
 - 📢 **Glénat album announcements** — Notifies you when an upcoming comic book appears as "to be published" in the official catalog.
 - 📚 **Glénat album releases** — Alerts you on the exact day the publication date is reached in bookstores.
 - 🤖 **Gemini AI Integration** — Automatically analyzes magazine covers to detect featured characters and extract the main story titles!
-- 📝 **Inducks Pre-Indexing** — Automatically generates `.dbi` skeleton files for seamless contributions to the [Inducks database](https://inducks.org/).
+- 📝 **Inducks Pre-Indexing** — Automatically generates `.dbi` skeleton files (`fr.dbi` and `us.dbi`) for seamless contributions to the [Inducks database](https://inducks.org/).
+- 🖼️ **Local Cover Archive** — Automatically downloads and saves high-quality cover images to a local `covers/` folder.
 
 ---
 
@@ -39,6 +40,8 @@ Stay updated with all the latest Disney comics releases directly on your phone!
 | [direct-editeurs.fr](https://direct-editeurs.fr) | Active kiosk magazines (Picsou, Mickey, Fantomiald, Donald…) |
 | [catalogueproduits.mlp.fr](https://catalogueproduits.mlp.fr) | Complementary kiosk issues missing from Direct Éditeurs (Picsou Soir, Destin de Picsou…) |
 | [glenat.com](https://www.glenat.com/livres-glenat-disney/) | Disney comic books and graphic novels by Glénat (Picsou, Mickey, Don Rosa, Romano Scarpa…) |
+| [marvel.com](https://www.marvel.com/) | US Disney comic books published by Marvel (Uncle Scrooge...) |
+| [fantagraphics.com](https://www.fantagraphics.com/) | US Disney comic books published by Fantagraphics |
 
 ---
 
@@ -60,7 +63,8 @@ Want to run your own instance of the Watcher? Follow these simple steps:
 1. Fork or clone this repository
 2. Go to **Settings → Secrets and variables → Actions → New repository secret** and add:
    - `TELEGRAM_BOT_TOKEN`: The token obtained via @BotFather
-   - `TELEGRAM_CHAT_ID_FR`: The channel's username (e.g., `@MyDisneyComics`)
+   - `TELEGRAM_CHAT_ID_FR`: The channel's username (e.g., `@MyDisneyComics`) for French releases
+   - `TELEGRAM_CHAT_ID_US`: The channel's username (e.g., `@MyDisneyComicsUS`) for US releases
 3. Go to the **Actions** tab and enable workflows. The bot will now run hourly automatically!
 
 ---
@@ -76,12 +80,13 @@ You can easily run the monitoring script locally without configuring global syst
 2. Create a `.env` file at the root of the project:
    ```env
    TELEGRAM_BOT_TOKEN=your_test_token
-   TELEGRAM_CHAT_ID_FR=your_test_chat_id
+   TELEGRAM_CHAT_ID_FR=your_test_chat_id_fr
+   TELEGRAM_CHAT_ID_US=your_test_chat_id_us
    # Optional: Add GEMINI_API_KEY for AI cover analysis
    ```
 3. Run the test suite:
    ```powershell
-   python test_telegram_notif.py
+   python tests/test_telegram_notif.py
    ```
 
 ---
@@ -100,7 +105,7 @@ Whether you want to add support for a new country, improve the Gemini AI prompts
 5. **Open a Pull Request** 🚀
 
 ### Ideas for future contributions:
-- 🌍 Adding support for other countries (Germany, Italy, Brazil, USA...)
+- 🌍 Adding support for other countries (Germany, Italy, Brazil...)
 - 🎨 Improving the Telegram message formatting
 - 🧠 Enhancing the Gemini AI character detection
 - 🕷️ Adding new comic book publishers

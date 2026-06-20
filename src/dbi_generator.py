@@ -16,8 +16,6 @@ from datetime import datetime
 #  Configuration
 # ─────────────────────────────────────────────────────────────────────────────
 
-DBI_FILE = "fr.dbi"
-
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  Formatting Utilities
@@ -35,14 +33,15 @@ def _parse_date_fr(s: str | None):
 
 
 def _format_price_for_dbi(prix_str: str | None) -> str | None:
-    """Converts a price like '7,50 €' or '7.50€' to the DBI format 'X.XX EUR'."""
+    """Converts a price to the DBI format 'X.XX CUR'."""
     if not prix_str:
         return None
     m = re.search(r'([0-9]+)[,\.]([0-9]{1,2})', prix_str)
     if m:
-        euros    = m.group(1)
-        centimes = m.group(2).ljust(2, '0')
-        return f"{euros}.{centimes} EUR"
+        major = m.group(1)
+        minor = m.group(2).ljust(2, '0')
+        currency = "USD" if "$" in prix_str else "EUR"
+        return f"{major}.{minor} {currency}"
     return None
 
 
@@ -264,6 +263,18 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
             isstrans   = None
             ean_val    = None
 
+        elif publication_type == "us":
+            title      = info.get("title", "US Comic")
+            name       = title
+            sku        = str(info.get("sku") or info.get("id") or "TODO")
+            issue_path = f"us/US_{sku[-6:]}"
+            prix_raw   = info.get("price")
+            date_raw   = info.get("date")
+            pages_val  = info.get("pages")
+            size_val   = info.get("size")
+            isstrans   = info.get("isstrans")
+            ean_val    = None
+            
         else:  # Glenat
             title      = info.get("title", "Album Disney")
             ean_val    = info.get("ean", "")
@@ -289,7 +300,8 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         price   = _format_price_for_dbi(prix_raw)
 
         # ── Output file name ──────────────────────────────────────────────────
-        dbi_path = DBI_FILE
+        os.makedirs("issues", exist_ok=True)
+        dbi_path = os.path.join("issues", "us.dbi" if publication_type == "us" else "fr.dbi")
 
         # ── h3 line with fixed DBI format ────────────────────────────────────
         # Positions (1-indexed, Bolderbast spec):
@@ -306,6 +318,8 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         # Strip "fr/" from issue_path for DBI representation
         dbi_issue_code = issue_path
         if dbi_issue_code.startswith("fr/"):
+            dbi_issue_code = dbi_issue_code[3:]
+        elif dbi_issue_code.startswith("us/"):
             dbi_issue_code = dbi_issue_code[3:]
 
         # Extrapolate for JM (Journal de Mickey)
@@ -351,8 +365,11 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         #    32   ignored
         #  33-52  plot/writ/art/ink/hero (empty)
         cover_ec = dbi_issue_code + "a"
-        storycode = f"FC {dbi_issue_code}"
-        storycode_field = storycode.ljust(14)
+        if publication_type == "us":
+            storycode = f"UC {dbi_issue_code}"
+        else:
+            storycode = f"FC {dbi_issue_code}"
+        storycode_field = storycode[:14].ljust(14)
         pages_field     = " 1"            # 1 page, right-aligned to 2 chars
         brokpg          = " "             # empty
         pagel           = "c "            # "c" in pagel

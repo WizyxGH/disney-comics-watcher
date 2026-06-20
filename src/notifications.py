@@ -28,6 +28,32 @@ def truncate_summary(text: str, max_len: int = 400) -> str:
     return truncated.strip() + "…"
 
 
+def download_cover(url: str | None, filename: str):
+    """Downloads and saves the cover image to the 'covers' directory."""
+    if not url:
+        return
+    os.makedirs("covers", exist_ok=True)
+    
+    # Make filename safe
+    filename = "".join(c for c in filename if c.isalnum() or c in (' ', '.', '_', '-')).strip()
+    filename = filename.replace(' ', '_')
+    if not filename.lower().endswith('.jpg') and not filename.lower().endswith('.jpeg') and not filename.lower().endswith('.png'):
+        filename += ".jpg"
+        
+    filepath = os.path.join("covers", filename)
+    if os.path.exists(filepath):
+        return
+        
+    try:
+        r = requests.get(url, timeout=15)
+        r.raise_for_status()
+        with open(filepath, "wb") as f:
+            f.write(r.content)
+        print(f"  [info] Couverture sauvegardée : {filepath}")
+    except Exception as e:
+        print(f"  [warn] Impossible de télécharger la couverture {url}: {e}")
+
+
 def send_telegram(photo_url: str | None, caption: str, buttons: list | None = None, retries: int = 5):
     """Sends a Telegram message with a photo (sendPhoto) or text only (sendMessage).
     Automatically handles rate limits (429) and inaccessible photos.
@@ -185,6 +211,10 @@ def notify_magazine(info: dict, releve_date: str | None = None):
     if not cover_url:
         cover_url = info.get("cover_url")
 
+    # Download cover
+    if cover_url:
+        download_cover(cover_url, f"{codif}_{name}_{num}")
+
     send_telegram(cover_url, "\n".join(lines), buttons=buttons)
     time.sleep(1)  # throttle
 
@@ -262,7 +292,11 @@ def notify_glenat_announce(album: dict, state: dict | None = None):
     row2 = [{"text": "Sommaire sur Inducks", "url": build_glenat_inducks_url(raw_title)}]
     buttons = [row1, row2]
 
-    send_telegram(album.get("cover_url"), caption, buttons=buttons)
+    cover_url = album.get("cover_url")
+    if cover_url:
+        download_cover(cover_url, f"{album.get('ean', 'glenat')}_{raw_title}")
+
+    send_telegram(cover_url, caption, buttons=buttons)
     time.sleep(1)
 
     # Try to analyze cover with Gemini if API key is present
@@ -313,7 +347,11 @@ def notify_glenat_release(album: dict, state: dict | None = None):
     row2 = [{"text": "Sommaire sur Inducks", "url": build_glenat_inducks_url(raw_title)}]
     buttons = [row1, row2]
 
-    send_telegram(album.get("cover_url"), caption, buttons=buttons)
+    cover_url = album.get("cover_url")
+    if cover_url:
+        download_cover(cover_url, f"{album.get('ean', 'glenat')}_{raw_title}")
+
+    send_telegram(cover_url, caption, buttons=buttons)
     time.sleep(1)
 
     # Try to analyze cover with Gemini if API key is present

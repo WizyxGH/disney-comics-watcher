@@ -3,7 +3,7 @@ from datetime import datetime
 from src.config import PARIS_TZ, SKIP_CODIFS, OVERRIDES, GLENAT_KEY_PREFIX, FANTAGRAPHICS_KEY_PREFIX, MARVEL_KEY_PREFIX
 from src.utils import load_state, save_state, parse_date_fr
 from src.scrapers import discover_de, discover_mlp_families, discover_glenat, fetch_glenat_details, get_mlp_releve, discover_fantagraphics, discover_marvel
-from src.notifications import notify_magazine, notify_glenat_announce, notify_glenat_release, notify_us_release
+from src.notifications import notify_magazine, notify_glenat_announce, notify_glenat_release, notify_us_announce, notify_us_release
 
 def process_magazines(state: dict, first_run: bool) -> int:
     notif_count = 0
@@ -121,22 +121,29 @@ def process_fantagraphics(state: dict, first_run: bool) -> int:
             continue
         key = f"{FANTAGRAPHICS_KEY_PREFIX}{book_id}"
         current = state.get(key)
+        pub_date_str = book.get("date")
+        pub_date = parse_date_fr(pub_date_str) if pub_date_str else None
         
         if current is None:
-            pub_date_str = book.get("date")
-            pub_date = parse_date_fr(pub_date_str) if pub_date_str else None
-            
             if pub_date and pub_date <= today:
                 print(f"  [US-RELEASE-SILENT-INIT] {book.get('title')}")
                 state[key] = "released"
             else:
                 if first_run:
-                    print(f"  [US-RELEASE-SILENT-INIT] {book.get('title')}")
+                    print(f"  [US-ANNOUNCEMENT-SILENT] {book.get('title')}")
                 else:
-                    print(f"  [US-RELEASE] {book.get('title')} — Price: {book.get('price') or 'not specified'}")
-                    notify_us_release(book, state=state)
+                    print(f"  [US-ANNOUNCEMENT] {book.get('title')} — Price: {book.get('price') or 'not specified'}")
+                    notify_us_announce(book, state=state)
                     notif_count += 1
-                state[key] = "released"
+                state[key] = "announced"
+        elif current == "announced" and pub_date and pub_date <= today:
+            if not first_run:
+                print(f"  [US-RELEASE] {book.get('title')} — Price: {book.get('price') or 'not specified'}")
+                notify_us_release(book, state=state)
+                notif_count += 1
+            else:
+                print(f"  [US-RELEASE-SILENT] {book.get('title')}")
+            state[key] = "released"
     return notif_count
 
 def process_marvel(state: dict, first_run: bool) -> int:
@@ -157,22 +164,29 @@ def process_marvel(state: dict, first_run: bool) -> int:
             continue
         key = f"{MARVEL_KEY_PREFIX}{book_id}"
         current = state.get(key)
+        pub_date_str = book.get("date")
+        pub_date = parse_date_fr(pub_date_str) if pub_date_str else None
         
         if current is None:
-            pub_date_str = book.get("date")
-            pub_date = parse_date_fr(pub_date_str) if pub_date_str else None
-            
             if pub_date and pub_date <= today:
                 print(f"  [US-RELEASE-SILENT-INIT] {book.get('title')}")
                 state[key] = "released"
             else:
                 if first_run:
-                    print(f"  [US-RELEASE-SILENT-INIT] {book.get('title')}")
+                    print(f"  [US-ANNOUNCEMENT-SILENT] {book.get('title')}")
                 else:
-                    print(f"  [US-RELEASE] {book.get('title')} — Price: {book.get('price') or 'not specified'}")
-                    notify_us_release(book, state=state)
+                    print(f"  [US-ANNOUNCEMENT] {book.get('title')} — Price: {book.get('price') or 'not specified'}")
+                    notify_us_announce(book, state=state)
                     notif_count += 1
-                state[key] = "released"
+                state[key] = "announced"
+        elif current == "announced" and pub_date and pub_date <= today:
+            if not first_run:
+                print(f"  [US-RELEASE] {book.get('title')} — Price: {book.get('price') or 'not specified'}")
+                notify_us_release(book, state=state)
+                notif_count += 1
+            else:
+                print(f"  [US-RELEASE-SILENT] {book.get('title')}")
+            state[key] = "released"
     return notif_count
 
 def main():

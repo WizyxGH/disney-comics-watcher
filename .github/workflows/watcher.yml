@@ -24,11 +24,13 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
-      # 2. Récupérer le state.json depuis la branche datas
-      - name: Récupérer state.json
+      # 2. Récupérer le state.json, issues/ et covers/ depuis la branche datas
+      - name: Récupérer state, issues et covers
         run: |
           git fetch origin datas 2>/dev/null || true
           git checkout origin/datas -- state.json 2>/dev/null || echo '{}' > state.json
+          git checkout origin/datas -- issues/ 2>/dev/null || true
+          git checkout origin/datas -- covers/ 2>/dev/null || true
           echo "State chargé : $(wc -c < state.json) octets"
 
       # 3. Python
@@ -49,32 +51,20 @@ jobs:
           AMAZON_AFFILIATE_TAG: ${{ secrets.AMAZON_AFFILIATE_TAG }}
         run: python check_magazines.py
 
-      # 5bis. Pousser fr.dbi sur main si modifié
-      - name: Sauvegarder fr.dbi sur main
-        continue-on-error: true
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add fr.dbi
-          if git diff --cached --quiet; then
-            echo "Aucun changement dans fr.dbi"
-          else
-            git commit -m "Auto-update fr.dbi"
-            git pull --rebase origin main || true
-            git push origin main
-          fi
 
-      # 6. Pousser le state mis à jour sur la branche datas
-      - name: Sauvegarder state.json
+      # 6. Pousser le state et les données mis à jour sur la branche datas
+      - name: Sauvegarder state, issues et covers
         if: always() # Toujours sauvegarder, même en cas d'erreur partielle
         run: |
-          # Sauvegarder le state dans /tmp avant de changer de branche
+          # Sauvegarder les données dans /tmp avant de changer de branche
           cp state.json /tmp/state_updated.json
+          cp -r issues /tmp/issues_updated 2>/dev/null || true
+          cp -r covers /tmp/covers_updated 2>/dev/null || true
 
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # Stash any local modifications (like fr.dbi if it failed to commit) to prevent checkout conflicts
+          # Stash any local modifications to prevent checkout conflicts
           git stash push -m "stashing before branch change" || true
 
           # Basculer sur la branche datas (ou la créer si elle n'existe pas encore)
@@ -86,12 +76,20 @@ jobs:
             git rm -rf . --quiet 2>/dev/null || true
           fi
 
-          # Écrire le state et commiter s'il y a des changements
+          # Restaurer les fichiers
           cp /tmp/state_updated.json state.json
-          git add state.json
+          cp -r /tmp/issues_updated issues 2>/dev/null || true
+          cp -r /tmp/covers_updated covers 2>/dev/null || true
+          
+          # Écrire le state et le cache, et commiter s'il y a des changements
+          # On utilise -f au cas où le .gitignore empêcherait l'ajout des dossiers
+          git add -f state.json
+          if [ -d "issues" ]; then git add -f issues/; fi
+          if [ -d "covers" ]; then git add -f covers/; fi
+          
           if git diff --cached --quiet; then
-            echo "Aucun changement dans le state — rien à commiter."
+            echo "Aucun changement dans le state, issues ou covers — rien à commiter."
           else
-            git commit -m "state: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            git commit -m "update datas: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
             git push origin datas --force
           fi

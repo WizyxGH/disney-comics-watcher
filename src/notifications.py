@@ -336,6 +336,35 @@ def notify_glenat_release(album: dict, state: dict | None = None):
         raw_title=raw_title
     )
 
+def notify_us_announce(album: dict, state: dict | None = None):
+    """US announcement notification (e.g., Fantagraphics/Marvel future release)."""
+    title = html_lib.escape(album.get("title", "US Disney Comic"))
+    raw_title = album.get("title", "US Disney Comic")
+
+    lines = [f"🇺🇸 <b>Announcement — {title}</b>", ""]
+    if album.get("date"): lines.append(f"🗓 Expected publication: {album['date']}")
+    if album.get("price"): lines.append(f"💵 Price: {html_lib.escape(album['price'])}")
+
+    source_name = "Marvel" if album.get("source") == "marvel" else "Fantagraphics"
+    row1 = [{"text": f"View on {source_name}", "url": album["url"]}]
+    if AMAZON_AFFILIATE_TAG and album.get("sku"):
+        asin = isbn13_to_isbn10(album.get("sku", ""))
+        if asin: row1.append({"text": "Buy on Amazon", "url": f"https://www.amazon.fr/dp/{asin}/?tag={AMAZON_AFFILIATE_TAG}"})
+    
+    buttons = [row1, [{"text": "Search on Inducks", "url": f"https://inducks.org/search.php?search={quote(raw_title)}"}]]
+
+    _dispatch_notification(
+        info=album,
+        base_caption="\n".join(lines),
+        summary=album.get("summary", ""),
+        buttons=buttons,
+        cover_url=album.get("cover_url"),
+        cover_filename=f"us_{album.get('sku', 'fanta')}_{raw_title}",
+        message_thread_id=TELEGRAM_THREAD_ID_US,
+        publication_type="us",
+        raw_title=raw_title
+    )
+
 def notify_us_release(album: dict, state: dict | None = None):
     """US release notification (e.g., Fantagraphics)."""
     title = html_lib.escape(album.get("title", "US Disney Comic"))

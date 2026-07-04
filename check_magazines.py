@@ -210,5 +210,9 @@ def main():
     else:
         print(f"[done] {notif_count} Telegram notification(s) sent.")
 
+    # Cleanup temporary .dbi files by removing issues that are already indexed in Inducks
+    from src.dbi_generator import cleanup_indexed_issues
+    cleanup_indexed_issues(["issues/fr.dbi", "issues/us.dbi"])
+
 if __name__ == "__main__":
     main()

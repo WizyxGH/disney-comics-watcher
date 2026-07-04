@@ -1,5 +1,4 @@
 <div align="center">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Mickey_Mouse_head_and_ears.svg/1024px-Mickey_Mouse_head_and_ears.svg.png" width="120" alt="Disney Logo"/>
   <h1>Disney Comics Watcher</h1>
   <p><strong>The Ultimate Automated Tracker for Disney Magazines & Comic Books in France & the US</strong></p>
 
@@ -24,12 +23,12 @@ Stay updated with all the latest Disney comics releases directly on your phone!
 
 ## 🎯 Features & Notifications
 
-- 🦆 **New kiosk magazine issues** — Complete with cover image, issue number, retail price, and publication dates.
-- 📢 **Glénat album announcements** — Notifies you when an upcoming comic book appears as "to be published" in the official catalog.
-- 📚 **Glénat album releases** — Alerts you on the exact day the publication date is reached in bookstores.
-- 🤖 **Gemini AI Integration** — Automatically analyzes magazine covers to detect featured characters and extract the main story titles!
-- 📝 **Inducks Pre-Indexing** — Automatically generates `.dbi` skeleton files (`fr.dbi` and `us.dbi`) for seamless contributions to the [Inducks database](https://inducks.org/).
-- 🖼️ **Local Cover Archive** — Automatically downloads and saves high-quality cover images to a local `covers/` folder.
+- **New kiosk magazine issues** — Complete with cover image, issue number, retail price, and publication dates.
+- **Glénat album announcements** — Notifies you when an upcoming comic book appears as "to be published" in the official catalog.
+- **Glénat album releases** — Alerts you on the exact day the publication date is reached in bookstores.
+- **Gemini AI integration** — Automatically analyzes magazine covers to detect featured characters and extract the main story titles!
+- **Inducks pre-indexing** — Automatically generates `.dbi` skeleton files (`fr.dbi` and `us.dbi`) for seamless contributions to the [Inducks database](https://inducks.org/). It also automatically cleans up these files by removing issues once they are indexed and available in the Inducks database.
+- **Local cover archive** — Automatically downloads and saves high-quality cover images to a local `covers/` folder.
 
 ---
 
@@ -105,10 +104,10 @@ Whether you want to add support for a new country, improve the Gemini AI prompts
 5. **Open a Pull Request** 🚀
 
 ### Ideas for future contributions:
-- 🌍 Adding support for other countries (Germany, Italy, Brazil...)
-- 🎨 Improving the Telegram message formatting
-- 🧠 Enhancing the Gemini AI character detection
-- 🕷️ Adding new comic book publishers
+- Adding support for other countries (Germany, Italy, Brazil...)
+- Improving the Telegram message formatting
+- Enhancing the Gemini AI character detection
+- Adding new comic book publishers
 
 ---
 

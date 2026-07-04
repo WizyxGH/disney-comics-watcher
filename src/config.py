@@ -52,7 +52,7 @@ OVERRIDES = {
     "14108": {"name": "Journal de Mickey HS",                   "inducks": ("JMHSN", 3)},
     "13588": {"name": "JdM HS Spécial Aventures (REV)"},
     "16096": {"name": "Journal de Mickey + Produit"},
-    "15935": {"name": "Le Meilleur du Journal de Mickey"},
+    "15935": {"name": "Le Meilleur du Journal de Mickey",       "inducks": "JMC"},
     "15970": {"name": "Le Meilleur du JdM HS"},
     "18914": {"name": "Le Meilleur du JdM HS Spécial Enquêtes"},
     # ── Mickey Parade ────────────────────────────────────────────────────────

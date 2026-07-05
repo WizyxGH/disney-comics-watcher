@@ -4,10 +4,11 @@ import html as html_lib
 import time
 import requests
 from urllib.parse import quote, quote_plus
-from src.config import TELEGRAM_API, TELEGRAM_CHAT_ID, TELEGRAM_THREAD_ID_FR, TELEGRAM_THREAD_ID_US, OVERRIDES, AMAZON_AFFILIATE_TAG, SITE_BASE
-from src.utils import format_price_fr, get_session, load_state, save_state
-from src.scrapers import get_latest_inducks_issue_number
-from src.dbi_generator import generate_dbi_skeleton, build_inducks_path
+from src.config import TELEGRAM_API, TELEGRAM_CHAT_ID, TELEGRAM_THREAD_ID_FR, TELEGRAM_THREAD_ID_US, TELEGRAM_THREAD_ID_DE, TELEGRAM_THREAD_ID_GR, OVERRIDES, AMAZON_AFFILIATE_TAG, SITE_BASE
+from src.utils import format_price_fr, get_session, load_state, save_state, truncate_summary, isbn13_to_isbn10
+from src.scrapers.__init__ import get_latest_inducks_issue_number
+from src.dbi.generator import generate_dbi_skeleton
+from src.dbi.mappers import build_inducks_path
 from src.gemini_analyzer import analyze_cover_with_gemini
 
 def resolve_dbg_tome_number(album: dict, state: dict | None = None):
@@ -16,16 +17,6 @@ def resolve_dbg_tome_number(album: dict, state: dict | None = None):
         coll = album.get("collection_label")
         ser = album.get("serie_label")
 
-
-def truncate_summary(text: str, max_len: int = 400) -> str:
-    """Cleanly truncates the summary to avoid cutting a word in half."""
-    if not text or len(text) <= max_len:
-        return text or ""
-    truncated = text[:max_len]
-    last_space = truncated.rfind(' ')
-    if last_space > 0:
-        truncated = truncated[:last_space]
-    return truncated.strip() + "…"
 
 
 def download_cover(url: str | None, filename: str):
@@ -49,9 +40,9 @@ def download_cover(url: str | None, filename: str):
         r.raise_for_status()
         with open(filepath, "wb") as f:
             f.write(r.content)
-        print(f"  [info] Couverture sauvegardée : {filepath}")
+        print(f"  [info] Cover saved: {filepath}")
     except Exception as e:
-        print(f"  [warn] Impossible de télécharger la couverture {url}: {e}")
+        print(f"  [warn] Failed to download cover {url}: {e}")
 
 
 def send_telegram(photo_url: str | None, caption: str, buttons: list | None = None, retries: int = 5, chat_id: str = TELEGRAM_CHAT_ID, message_thread_id: str | None = None):
@@ -80,7 +71,7 @@ def send_telegram(photo_url: str | None, caption: str, buttons: list | None = No
                      print(f"  [debug] Telegram 400 error: {resp.text}")
                      desc = resp.json().get("description", "").lower()
                      if any(k in desc for k in ("photo", "wrong url", "failed to get", "url")):
-                        print(f"  [warn] Photo inaccessible → fallback to text")
+                        print(f"  [warn] Photo inaccessible -> fallback to text")
                         photo_url = None
                         continue
             else:
@@ -124,25 +115,6 @@ def build_inducks_url(inducks, numero: str) -> str | None:
     return f"https://inducks.org/issue.php?c={quote_plus(path)}"
 
 
-def isbn13_to_isbn10(isbn13: str) -> str | None:
-    """Converts an ISBN-13 (starting with 978) to an ISBN-10 (Amazon ASIN)."""
-    clean = "".join(filter(str.isdigit, isbn13))
-    if len(clean) != 13 or not clean.startswith("978"):
-        return None
-    
-    digits = clean[3:12]
-    
-    total = sum(int(digit) * (10 - i) for i, digit in enumerate(digits))
-    rem = total % 11
-    check = 11 - rem
-    if check == 10:
-        check_char = "X"
-    elif check == 11:
-        check_char = "0"
-    else:
-        check_char = str(check)
-        
-    return digits + check_char
 
 
 def fetch_disneymagazines_cover(slug: str) -> str | None:
@@ -190,18 +162,48 @@ def build_glenat_inducks_url(title: str) -> str:
 
 # ── COMMON DISPATCH HELPER ──────────────────────────────────────────────────────
 
+from src.dbi.generator import _RESOLVERS
+
+def get_issue_code_from_info(info: dict, pub_type: str) -> str:
+    try:
+        from src.config import OVERRIDES
+        from src.dbi.mappers import resolve_magazine_metadata, resolve_glenat_metadata
+        if pub_type == "magazine":
+            data = resolve_magazine_metadata(info, OVERRIDES)
+        else:
+            resolver = _RESOLVERS.get(pub_type, resolve_glenat_metadata)
+            data = resolver(info)
+        
+        issue_code = data.get("issue_path") or ""
+        return issue_code.split("/", 1)[-1] if "/" in issue_code else issue_code
+    except Exception:
+        return "unknown"
+
 def _dispatch_notification(
     info: dict,
     base_caption: str,
     summary: str,
     buttons: list,
     cover_url: str | None,
-    cover_filename: str,
     message_thread_id: str | None,
     publication_type: str,
     raw_title: str
 ):
     """Internal helper to dispatch Telegram notification, download cover, and analyze with Gemini."""
+# Calculate the official cover_filename
+    issue_code = get_issue_code_from_info(info, publication_type)
+    
+    m = re.match(r'^([a-zA-Z]+)(\s+)(.*)$', issue_code)
+    if m:
+        pub_code = m.group(1).lower()
+        number = re.sub(r'[^a-zA-Z0-9]', '_', m.group(3)).lower()
+        safe_code = f"{pub_code}_{number.zfill(4)}"
+    else:
+        safe_code = re.sub(r'[^a-zA-Z0-9]', '_', issue_code).lower()
+    
+    country_prefix = publication_type if publication_type in ("us", "de", "gr") else "fr"
+    cover_filename = f"{country_prefix}_{safe_code}a_001"
+
     # 1. Truncate summary if necessary
     if summary:
         available = 1024 - len(base_caption) - 40
@@ -227,7 +229,7 @@ def _dispatch_notification(
         print(f"  [Gemini] Analyzing cover for '{raw_title}'...")
         analysis = analyze_cover_with_gemini(cover_url, api_key)
         
-        if publication_type == "magazine":
+        if publication_type in ("magazine", "de"):
             cover_title = analysis.get("title")
             if cover_title:
                 print(f"  [Gemini] Extracted title: '{cover_title}'")
@@ -240,7 +242,14 @@ def _dispatch_notification(
             info["characters"] = characters
 
     # 5. Generate DBI skeleton
-    generate_dbi_skeleton(info, publication_type=publication_type, overrides=OVERRIDES)
+    dbi_content = generate_dbi_skeleton(info, publication_type=publication_type, overrides=OVERRIDES)
+
+    # 6. Send DBI to Admin DM
+    admin_id = os.environ.get("TELEGRAM_ADMIN_ID")
+    if admin_id and dbi_content:
+        clean_dbi = html_lib.escape(dbi_content.strip())
+        dm_text = f"New DBI generated for <b>{html_lib.escape(raw_title)}</b>:\n<pre>{clean_dbi}</pre>"
+        send_telegram(photo_url=None, caption=dm_text, chat_id=admin_id)
 
 # ── PUBLIC NOTIFICATION FUNCTIONS ───────────────────────────────────────────────
 
@@ -257,12 +266,12 @@ def notify_magazine(info: dict, releve_date: str | None = None):
     title_line = f"<b>{html_lib.escape(name)} {num}</b>"
     lines = [title_line, ""]
     if prix: lines.append(f"💶 {html_lib.escape(prix)}")
-    if date: lines.append(f"📅 Paru le : {date}")
-    if releve_date: lines.append(f"📅 En kiosque jusqu'au : {releve_date}")
+    if date: lines.append(f"📅 Published: {date}")
+    if releve_date: lines.append(f"📅 On newsstands until: {releve_date}")
     
     inducks_url = build_inducks_url(ov.get("inducks"), num) or f"https://inducks.org/search.php?search={quote(f'{name} {num}')}"
-    btn_text = "Voir sur MLP" if "mlp.fr" in url.lower() else "Voir sur Direct-éditeurs"
-    buttons = [[{"text": btn_text, "url": url}], [{"text": "Sommaire sur Inducks", "url": inducks_url}]]
+    btn_text = "View on MLP" if "mlp.fr" in url.lower() else "View on Direct-éditeurs"
+    buttons = [[{"text": btn_text, "url": url}], [{"text": "Contents on Inducks", "url": inducks_url}]]
 
     cover_url = None
     if info.get("slug"):
@@ -271,24 +280,35 @@ def notify_magazine(info: dict, releve_date: str | None = None):
     if not cover_url:
         cover_url = info.get("cover_url")
 
+    inducks_val = ov.get("inducks")
+    pub_code = codif
+    if isinstance(inducks_val, str):
+        pub_code = inducks_val
+    elif isinstance(inducks_val, tuple) and len(inducks_val) > 0:
+        pub_code = inducks_val[0]
+        if pub_code == "JMHSN": pub_code = "JMHS"
+    
+    import re
+    clean_num = re.sub(r'[^0-9A-Za-z]', '', str(num))
+    cover_fn = f"fr_{pub_code}_{clean_num}"
+
     _dispatch_notification(
         info=info,
         base_caption="\n".join(lines),
         summary="",
         buttons=buttons,
         cover_url=cover_url,
-        cover_filename=f"{codif}_{name}_{num}",
         message_thread_id=TELEGRAM_THREAD_ID_FR,
         publication_type="magazine",
-        raw_title=f"{name} N° {num}"
+        raw_title=f"{name} {num}"
     )
 
 def _build_glenat_buttons(album: dict, raw_title: str) -> list:
-    row1 = [{"text": "Voir sur Glénat", "url": album["url"]}]
+    row1 = [{"text": "View on Glénat", "url": album["url"]}]
     if AMAZON_AFFILIATE_TAG:
         asin = isbn13_to_isbn10(album.get("ean", ""))
-        if asin: row1.append({"text": "Acheter sur Amazon", "url": f"https://www.amazon.fr/dp/{asin}/?tag={AMAZON_AFFILIATE_TAG}"})
-    return [row1, [{"text": "Sommaire sur Inducks", "url": build_glenat_inducks_url(raw_title)}]]
+        if asin: row1.append({"text": "Buy on Amazon", "url": f"https://www.amazon.fr/dp/{asin}/?tag={AMAZON_AFFILIATE_TAG}"})
+    return [row1, [{"text": "Contents on Inducks", "url": build_glenat_inducks_url(raw_title)}]]
 
 def notify_glenat_announce(album: dict, state: dict | None = None):
     """Glénat announcement notification (upcoming album)."""
@@ -296,8 +316,8 @@ def notify_glenat_announce(album: dict, state: dict | None = None):
     title = html_lib.escape(album.get("title", "Album Disney"))
     raw_title = album.get("title", "Album Disney")
 
-    lines = [f"<b>Annonce — {title}</b>", ""]
-    if album.get("date"): lines.append(f"🗓 Parution prévue : {album['date']}")
+    lines = [f"<b>Announcement — {title}</b>", ""]
+    if album.get("date"): lines.append(f"🗓 Expected release: {album['date']}")
     prix = format_price_fr(album.get("price"))
     if prix: lines.append(f"💶 {html_lib.escape(prix)}")
 
@@ -307,7 +327,6 @@ def notify_glenat_announce(album: dict, state: dict | None = None):
         summary=album.get("summary", ""),
         buttons=_build_glenat_buttons(album, raw_title),
         cover_url=album.get("cover_url"),
-        cover_filename=f"{album.get('ean', 'glenat')}_{raw_title}",
         message_thread_id=TELEGRAM_THREAD_ID_FR,
         publication_type="glenat",
         raw_title=raw_title
@@ -320,7 +339,7 @@ def notify_glenat_release(album: dict, state: dict | None = None):
     raw_title = album.get("title", "Album Disney")
 
     lines = [f"<b>{title}</b>", ""]
-    if album.get("date"): lines.append(f"🗓 Paru le : {album['date']}")
+    if album.get("date"): lines.append(f"🗓 Released: {album['date']}")
     prix = format_price_fr(album.get("price"))
     if prix: lines.append(f"💶 {html_lib.escape(prix)}")
 
@@ -330,28 +349,88 @@ def notify_glenat_release(album: dict, state: dict | None = None):
         summary=album.get("summary", ""),
         buttons=_build_glenat_buttons(album, raw_title),
         cover_url=album.get("cover_url"),
-        cover_filename=f"{album.get('ean', 'glenat')}_{raw_title}",
         message_thread_id=TELEGRAM_THREAD_ID_FR,
         publication_type="glenat",
         raw_title=raw_title
     )
 
-def notify_us_announce(album: dict, state: dict | None = None):
-    """US announcement notification (e.g., Fantagraphics/Marvel future release)."""
-    title = html_lib.escape(album.get("title", "US Disney Comic"))
-    raw_title = album.get("title", "US Disney Comic")
+def notify_international_comic(album: dict, state: dict | None = None, country: str = "us", event_type: str = "announce"):
+    """Generic notification function for international releases (US, DE, GR)."""
+    title = html_lib.escape(album.get("title", f"{country.upper()} Disney Comic"))
+    raw_title = album.get("title", f"{country.upper()} Disney Comic")
 
-    lines = [f"🇺🇸 <b>Announcement — {title}</b>", ""]
-    if album.get("date"): lines.append(f"🗓 Expected publication: {album['date']}")
-    if album.get("price"): lines.append(f"💵 Price: {html_lib.escape(album['price'])}")
+    # Format strings based on country and event type
+    config = {
+        "us": {
+            "flag": "🇺🇸",
+            "announce_title": f"🇺🇸 <b>Announcement — {title}</b>",
+            "release_title": f"<b>{title}</b>",
+            "date_prefix": "🗓 Expected publication:" if event_type == "announce" else "🗓 Published on:",
+            "price_prefix": "💵 Price:",
+            "inducks_btn": "Search on Inducks",
+            "thread_id": TELEGRAM_THREAD_ID_US,
+        },
+        "de": {
+            "flag": "🇩🇪",
+            "announce_title": f"🇩🇪 <b>Ankündigung — {title}</b>",
+            "release_title": f"<b>{title}</b>",
+            "date_prefix": "🗓 Geplante Veröffentlichung:" if event_type == "announce" else "🗓 Erschienen am:",
+            "price_prefix": "💶 Preis:",
+            "inducks_btn": "Auf Inducks suchen",
+            "thread_id": TELEGRAM_THREAD_ID_DE,
+        },
+        "gr": {
+            "flag": "🇬🇷",
+            "announce_title": f"🇬🇷 <b>Ανακοίνωση — {title}</b>",
+            "release_title": f"<b>{title}</b>",
+            "date_prefix": "🗓 Αναμενόμενη κυκλοφορία:" if event_type == "announce" else "🗓 Κυκλοφόρησε:",
+            "price_prefix": "💶 Τιμή:",
+            "inducks_btn": "Στο Inducks",
+            "thread_id": TELEGRAM_THREAD_ID_GR,
+        }
+    }
 
-    source_name = "Marvel" if album.get("source") == "marvel" else "Fantagraphics"
-    row1 = [{"text": f"View on {source_name}", "url": album["url"]}]
-    if AMAZON_AFFILIATE_TAG and album.get("sku"):
-        asin = isbn13_to_isbn10(album.get("sku", ""))
-        if asin: row1.append({"text": "Buy on Amazon", "url": f"https://www.amazon.fr/dp/{asin}/?tag={AMAZON_AFFILIATE_TAG}"})
+    cfg = config.get(country, config["us"])
     
-    buttons = [row1, [{"text": "Search on Inducks", "url": f"https://inducks.org/search.php?search={quote(raw_title)}"}]]
+    lines = [cfg["announce_title"] if event_type == "announce" else cfg["release_title"], ""]
+    if album.get("date"): lines.append(f"{cfg['date_prefix']} {album['date']}")
+    if album.get("price"): lines.append(f"{cfg['price_prefix']} {html_lib.escape(album['price'])}")
+
+    row1 = []
+    inducks_url = f"https://inducks.org/search.php?search={quote(raw_title)}"
+
+    if country == "us":
+        source_name = "Marvel" if album.get("source") == "marvel" else "Fantagraphics"
+        row1.append({"text": f"View on {source_name}", "url": album.get("url", "")})
+        if AMAZON_AFFILIATE_TAG and album.get("sku"):
+            asin = isbn13_to_isbn10(album.get("sku", ""))
+            if asin: row1.append({"text": "Buy on Amazon", "url": f"https://www.amazon.fr/dp/{asin}/?tag={AMAZON_AFFILIATE_TAG}"})
+    elif country == "de":
+        row1.append({"text": "Auf Egmont-Shop ansehen", "url": album.get("url", "")})
+    elif country == "gr":
+        row1.append({"text": "Διαβάστε στην Καθημερινή", "url": album.get("url", "")})
+        # Try to parse Greek title to Inducks code
+        inducks_code = None
+        search_query = quote(raw_title)
+        if "Μίκυ Μάους" in raw_title:
+            m = re.search(r'#(\d+)', raw_title)
+            if m: inducks_code = f"gr/MM {m.group(1)}"
+        elif "Ντόναλντ" in raw_title:
+            m = re.search(r'#(\d+)', raw_title)
+            if m: inducks_code = f"gr/DD {m.group(1)}"
+        elif "Super MIKY" in raw_title:
+            m = re.search(r'#(\d+)', raw_title)
+            if m: inducks_code = f"gr/SM {m.group(1)}"
+        elif "Κόμιξ" in raw_title or "ΚΟΜΙΞ" in raw_title:
+            m = re.search(r'#(\d+)', raw_title)
+            if m: inducks_code = f"gr/KX {m.group(1)}"
+        
+        if inducks_code:
+            inducks_url = f"https://inducks.org/issue.php?c={quote_plus(inducks_code)}"
+        else:
+            inducks_url = f"https://inducks.org/search.php?search={search_query}"
+
+    buttons = [row1, [{"text": cfg["inducks_btn"], "url": inducks_url}]] if row1 else [[{"text": cfg["inducks_btn"], "url": inducks_url}]]
 
     _dispatch_notification(
         info=album,
@@ -359,37 +438,9 @@ def notify_us_announce(album: dict, state: dict | None = None):
         summary=album.get("summary", ""),
         buttons=buttons,
         cover_url=album.get("cover_url"),
-        cover_filename=f"us_{album.get('sku', 'fanta')}_{raw_title}",
-        message_thread_id=TELEGRAM_THREAD_ID_US,
-        publication_type="us",
+        message_thread_id=cfg["thread_id"],
+        publication_type=country,
         raw_title=raw_title
     )
 
-def notify_us_release(album: dict, state: dict | None = None):
-    """US release notification (e.g., Fantagraphics)."""
-    title = html_lib.escape(album.get("title", "US Disney Comic"))
-    raw_title = album.get("title", "US Disney Comic")
 
-    lines = [f"🇺🇸 <b>{title}</b>", ""]
-    if album.get("date"): lines.append(f"🗓 Published on: {album['date']}")
-    if album.get("price"): lines.append(f"💵 Price: {html_lib.escape(album['price'])}")
-
-    source_name = "Marvel" if album.get("source") == "marvel" else "Fantagraphics"
-    row1 = [{"text": f"View on {source_name}", "url": album["url"]}]
-    if AMAZON_AFFILIATE_TAG and album.get("sku"):
-        asin = isbn13_to_isbn10(album.get("sku", ""))
-        if asin: row1.append({"text": "Buy on Amazon", "url": f"https://www.amazon.fr/dp/{asin}/?tag={AMAZON_AFFILIATE_TAG}"})
-    
-    buttons = [row1, [{"text": "Search on Inducks", "url": f"https://inducks.org/search.php?search={quote(raw_title)}"}]]
-
-    _dispatch_notification(
-        info=album,
-        base_caption="\n".join(lines),
-        summary=album.get("summary", ""),
-        buttons=buttons,
-        cover_url=album.get("cover_url"),
-        cover_filename=f"us_{album.get('sku', 'fanta')}_{raw_title}",
-        message_thread_id=TELEGRAM_THREAD_ID_US,
-        publication_type="us",
-        raw_title=raw_title
-    )

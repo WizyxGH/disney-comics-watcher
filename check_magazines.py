@@ -1,26 +1,31 @@
 import os
 from datetime import datetime
-from src.config import PARIS_TZ, SKIP_CODIFS, OVERRIDES, GLENAT_KEY_PREFIX, FANTAGRAPHICS_KEY_PREFIX, MARVEL_KEY_PREFIX
+from src.config import PARIS_TZ, SKIP_CODIFS, OVERRIDES, GLENAT_KEY_PREFIX, FANTAGRAPHICS_KEY_PREFIX, MARVEL_KEY_PREFIX, EGMONT_DE_KEY_PREFIX, KATHIMERINI_KEY_PREFIX
 from src.utils import load_state, save_state, parse_date_fr
-from src.scrapers import discover_de, discover_mlp_families, discover_glenat, fetch_glenat_details, get_mlp_releve, discover_fantagraphics, discover_marvel
-from src.notifications import notify_magazine, notify_glenat_announce, notify_glenat_release, notify_us_announce, notify_us_release
+from src.notifications import notify_magazine, notify_glenat_announce, notify_glenat_release, notify_international_comic
+
+# Explicit imports
+from src.scrapers.fr import discover_de, discover_mlp_families, get_mlp_releve, discover_glenat, fetch_glenat_details
+from src.scrapers.us import discover_fantagraphics, discover_marvel
+from src.scrapers.de import discover_egmont_de
+from src.scrapers.gr import discover_kathimerini
 
 def process_magazines(state: dict, first_run: bool) -> int:
     notif_count = 0
-    print("[DE] Discovering magazines…")
+    print("[DE] Discovering magazines...")
     try:
         magazines = discover_de()
     except Exception as e:
         print(f"  [error] discover_de: {e}")
         magazines = {}
-    print(f"  → {len(magazines)} active magazine(s).")
+    print(f"  -> {len(magazines)} active magazine(s).")
 
-    print("[MLP] Complementary discovery…")
+    print("[MLP] Complementary discovery...")
     try:
         mlp_extra = discover_mlp_families(known_codifs=set(magazines), state=state)
         added = {c: v for c, v in mlp_extra.items() if c not in magazines}
         magazines.update(added)
-        print(f"  → +{len(added)} unique MLP codif(s).")
+        print(f"  -> +{len(added)} unique MLP codif(s).")
     except Exception as e:
         print(f"  [error] discover_mlp: {e}")
 
@@ -31,7 +36,7 @@ def process_magazines(state: dict, first_run: bool) -> int:
         if not numero:
             continue
 
-        last = state.get(codif)
+        last = state.get(f'magazine:{codif}')
         if last and last.upper().endswith("H"):
             last = last[:-1].strip()
         if numero == last:
@@ -39,7 +44,7 @@ def process_magazines(state: dict, first_run: bool) -> int:
 
         ov   = OVERRIDES.get(codif, {})
         name = ov.get("name") or info.get("site_name") or codif
-        print(f"  [NEW] {name} — N°{numero}  (previous: {last or '—'})")
+        print(f"  [NEW] {name} - N°{numero}  (previous: {last or '-'})")
 
         if not first_run:
             releve = info.get("releve_date")
@@ -51,157 +56,119 @@ def process_magazines(state: dict, first_run: bool) -> int:
             notify_magazine(info, releve_date=releve)
             notif_count += 1
 
-        state[codif] = numero
+        state[f'magazine:{codif}'] = numero
     return notif_count
 
-def process_glenat(state: dict, first_run: bool, today) -> int:
+def process_provider(
+    state: dict, 
+    first_run: bool, 
+    provider_name: str, 
+    key_prefix: str, 
+    discover_func, 
+    country: str,
+    default_status: str = "announced",
+    fetch_details_func = None,
+    is_glenat: bool = False
+) -> int:
     notif_count = 0
-    print("[Glénat] Discovering Disney comic books…")
+    print(f"[{provider_name}] Discovering comics...")
     try:
-        glenat_albums = discover_glenat()
-        print(f"  → {len(glenat_albums)} album(s) found.")
+        books = discover_func()
     except Exception as e:
-        print(f"  [error] discover_glenat: {e}")
-        glenat_albums = []
-
-    for album in glenat_albums:
-        ean = album.get("ean")
-        if not ean:
-            continue
-        key     = f"{GLENAT_KEY_PREFIX}{ean}"
-        current = state.get(key)
-        pub_date = album.get("pub_date")
-
-        if current is None:
-            # New album detected
-            if pub_date and pub_date <= today:
-                # Already released in the past -> we record it directly as released without notifying
-                print(f"  [RELEASE-SILENT-INIT] {album.get('title', ean)}")
-                state[key] = "released"
-            else:
-                # Upcoming album -> announcement notification
-                if not first_run:
-                    details = fetch_glenat_details(album["url"])
-                    album.update(details)
-                    print(f"  [ANNOUNCEMENT] {album.get('title', ean)} — Price: {album.get('price') or 'not specified'}")
-                    notify_glenat_announce(album, state=state)
-                    notif_count += 1
-                else:
-                    print(f"  [ANNOUNCEMENT-SILENT] {album.get('title', ean)}")
-                state[key] = "announced"
-
-        elif current == "announced" and pub_date and pub_date <= today:
-            # Announced album whose publication date is reached → release in bookstores
-            if not first_run:
-                details = fetch_glenat_details(album["url"])
-                album.update(details)
-                print(f"  [RELEASE]  {album.get('title', ean)} — Price: {album.get('price') or 'not specified'}")
-                notify_glenat_release(album, state=state)
-                notif_count += 1
-            else:
-                print(f"  [RELEASE-SILENT] {album.get('title', ean)}")
-            state[key] = "released"
-    return notif_count
-
-def process_fantagraphics(state: dict, first_run: bool) -> int:
-    notif_count = 0
-    print("[Fantagraphics] Discovering US Disney comic books…")
-    try:
-        fanta_books = discover_fantagraphics()
-        print(f"  → {len(fanta_books)} US book(s) found.")
-    except Exception as e:
-        print(f"  [error] discover_fantagraphics: {e}")
-        fanta_books = []
-
+        print(f"  [error] discover_{provider_name.lower()}: {e}")
+        books = []
+        
     today = datetime.now(PARIS_TZ).date()
 
-    for book in fanta_books:
-        book_id = book.get("id")
-        if not book_id:
-            continue
-        key = f"{FANTAGRAPHICS_KEY_PREFIX}{book_id}"
-        current = state.get(key)
-        pub_date_str = book.get("date")
-        pub_date = parse_date_fr(pub_date_str) if pub_date_str else None
+    for book in books:
+        book_id = book.get("id") or book.get("sku") or book.get("ean")
+        if not book_id: continue
         
+        key = f"{key_prefix}{book_id}"
+        current = state.get(key)
+        
+        pub_date = parse_date_fr(book.get("date")) if not book.get("pub_date") else book.get("pub_date")
+        is_released = book.get("released", False)
+        if pub_date and pub_date <= today:
+            is_released = True
+        if default_status == "released":
+            is_released = True
+            
+        target_status = "released" if is_released else "announced"
+
         if current is None:
-            if pub_date and pub_date <= today:
-                print(f"  [US-RELEASE-SILENT-INIT] {book.get('title')}")
+            if target_status == "released":
+                if not first_run and default_status == "released":
+                    print(f"  [{provider_name}-RELEASE] {book.get('title')}")
+                    if fetch_details_func:
+                        book.update(fetch_details_func(book["url"]))
+                    if is_glenat:
+                        notify_glenat_release(book, state=state)
+                    else:
+                        notify_international_comic(book, state=state, country=country, event_type="release")
+                    notif_count += 1
+                else:
+                    print(f"  [{provider_name}-RELEASE-SILENT] {book.get('title')}")
                 state[key] = "released"
             else:
                 if first_run:
-                    print(f"  [US-ANNOUNCEMENT-SILENT] {book.get('title')}")
+                    print(f"  [{provider_name}-ANNOUNCE-SILENT] {book.get('title')}")
                 else:
-                    print(f"  [US-ANNOUNCEMENT] {book.get('title')} — Price: {book.get('price') or 'not specified'}")
-                    notify_us_announce(book, state=state)
+                    print(f"  [{provider_name}-ANNOUNCE] {book.get('title')}")
+                    if fetch_details_func:
+                        book.update(fetch_details_func(book["url"]))
+                    if is_glenat:
+                        notify_glenat_announce(book, state=state)
+                    else:
+                        notify_international_comic(book, state=state, country=country, event_type="announce")
                     notif_count += 1
                 state[key] = "announced"
-        elif current == "announced" and pub_date and pub_date <= today:
+                
+        elif current == "announced" and target_status == "released":
             if not first_run:
-                print(f"  [US-RELEASE] {book.get('title')} — Price: {book.get('price') or 'not specified'}")
-                notify_us_release(book, state=state)
-                notif_count += 1
-            else:
-                print(f"  [US-RELEASE-SILENT] {book.get('title')}")
-            state[key] = "released"
-    return notif_count
-
-def process_marvel(state: dict, first_run: bool) -> int:
-    notif_count = 0
-    print("[Marvel] Discovering US Disney comic books…")
-    try:
-        marvel_books = discover_marvel()
-        print(f"  → {len(marvel_books)} US book(s) found.")
-    except Exception as e:
-        print(f"  [error] discover_marvel: {e}")
-        marvel_books = []
-
-    today = datetime.now(PARIS_TZ).date()
-
-    for book in marvel_books:
-        book_id = book.get("id")
-        if not book_id:
-            continue
-        key = f"{MARVEL_KEY_PREFIX}{book_id}"
-        current = state.get(key)
-        pub_date_str = book.get("date")
-        pub_date = parse_date_fr(pub_date_str) if pub_date_str else None
-        
-        if current is None:
-            if pub_date and pub_date <= today:
-                print(f"  [US-RELEASE-SILENT-INIT] {book.get('title')}")
-                state[key] = "released"
-            else:
-                if first_run:
-                    print(f"  [US-ANNOUNCEMENT-SILENT] {book.get('title')}")
+                print(f"  [{provider_name}-RELEASE] {book.get('title')}")
+                if fetch_details_func:
+                    book.update(fetch_details_func(book["url"]))
+                if is_glenat:
+                    notify_glenat_release(book, state=state)
                 else:
-                    print(f"  [US-ANNOUNCEMENT] {book.get('title')} — Price: {book.get('price') or 'not specified'}")
-                    notify_us_announce(book, state=state)
-                    notif_count += 1
-                state[key] = "announced"
-        elif current == "announced" and pub_date and pub_date <= today:
-            if not first_run:
-                print(f"  [US-RELEASE] {book.get('title')} — Price: {book.get('price') or 'not specified'}")
-                notify_us_release(book, state=state)
+                    notify_international_comic(book, state=state, country=country, event_type="release")
                 notif_count += 1
             else:
-                print(f"  [US-RELEASE-SILENT] {book.get('title')}")
+                print(f"  [{provider_name}-RELEASE-SILENT] {book.get('title')}")
             state[key] = "released"
+
     return notif_count
 
 def main():
     state = load_state()
     first_run = not state
-    if first_run:
-        print("[init] First run — silent initialization (no notifications).")
 
     today = datetime.now(PARIS_TZ).date()
     notif_count = 0
 
     notif_count += process_magazines(state, first_run)
-    notif_count += process_glenat(state, first_run, today)
-    notif_count += process_fantagraphics(state, first_run)
-    notif_count += process_marvel(state, first_run)
+    
+    PROVIDERS = [
+        ("Glénat", GLENAT_KEY_PREFIX, discover_glenat, "fr", "announced", fetch_glenat_details, True),
+        ("Fantagraphics", FANTAGRAPHICS_KEY_PREFIX, discover_fantagraphics, "us", "announced", None, False),
+        ("Marvel", MARVEL_KEY_PREFIX, discover_marvel, "us", "announced", None, False),
+        ("Egmont DE", EGMONT_DE_KEY_PREFIX, discover_egmont_de, "de", "announced", None, False),
+        ("Kathimerini GR", KATHIMERINI_KEY_PREFIX, discover_kathimerini, "gr", "released", None, False),
+    ]
+    
+    for name, prefix, func, country, default_status, fetch_details, is_glenat in PROVIDERS:
+        notif_count += process_provider(
+            state=state, 
+            first_run=first_run, 
+            provider_name=name, 
+            key_prefix=prefix, 
+            discover_func=func, 
+            country=country,
+            default_status=default_status,
+            fetch_details_func=fetch_details,
+            is_glenat=is_glenat
+        )
 
     save_state(state)
 
@@ -210,9 +177,8 @@ def main():
     else:
         print(f"[done] {notif_count} Telegram notification(s) sent.")
 
-    # Cleanup temporary .dbi files by removing issues that are already indexed in Inducks
-    from src.dbi_generator import cleanup_indexed_issues
-    cleanup_indexed_issues(["issues/fr.dbi", "issues/us.dbi"])
+    from src.dbi.cleanup import cleanup_indexed_issues
+    cleanup_indexed_issues(["issues/fr.dbi", "issues/us.dbi", "issues/de.dbi", "issues/gr.dbi"])
 
 if __name__ == "__main__":
     main()

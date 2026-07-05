@@ -20,10 +20,26 @@ if not telegram_token or not telegram_chat:
     print("Error: TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID must be set in your environment.")
     print("You can run it like this in PowerShell:")
     print('  $env:TELEGRAM_BOT_TOKEN="your_token"; $env:TELEGRAM_CHAT_ID="your_chat_id"; $env:AMAZON_AFFILIATE_TAG="your_tag"; python test_telegram_notif.py')
-    sys.exit(1)
+    # sys.exit(1)
 
-from src.notifications import notify_magazine, notify_glenat_release
-from src.scrapers import fetch_glenat_details
+from src.notifications import notify_international_comic, notify_magazine, notify_glenat_release
+from src.scrapers.fr import fetch_glenat_details
+
+print('\nSending test notification for US Comic...')
+us_comic = {'id': '123456', 'title': 'Uncle Scrooge #1', 'date': '15/07/2026', 'price': '.99', 'url': 'https://marvel.com', 'cover_url': 'https://i.annihil.us/u/prod/marvel/i/mg/3/40/4bc63b9278bd1/detail.jpg'}
+notify_international_comic(us_comic, country="us", event_type="release")
+
+print('\nSending test notification for DE Comic...')
+de_comic = {'id': 'MM26-15', 'title': 'Micky Maus Magazin Nr. 15', 'date': '20/07/2026', 'price': '4,50 ', 'url': 'https://egmont.de', 'cover_url': 'https://www.egmont-shop.de/globalassets/egmont/produkte/micky-maus-magazin-15-2024.png'}
+notify_international_comic(de_comic, country="de", event_type="release")
+
+print('\nSending test notification for DE LTB Comic...')
+de_ltb = {'id': 'LTB-613', 'title': 'Lustiges Taschenbuch Nr. 613', 'date': '20/07/2026', 'price': '7,99 ', 'url': 'https://lustiges-taschenbuch.de', 'cover_url': 'https://www.lustiges-taschenbuch.de/sites/default/files/styles/ltb_cover_medium/public/cover/ltb-613.jpg'}
+notify_international_comic(de_ltb, country="de", event_type="release")
+
+print('\nSending test notification for GR Comic...')
+gr_comic = {'id': 'MM629', 'title': 'Μίκυ Μάους #629', 'date': '15/07/2026', 'price': '1,90 ', 'url': 'https://kathimerini.gr', 'cover_url': 'https://i.prcdn.co/img?cid=464B&page=1&height=1000'}
+notify_international_comic(gr_comic, country="gr", event_type="release")
 
 # 1. Test Journal de Mickey (double issue)
 jm_double = {

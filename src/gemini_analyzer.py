@@ -103,20 +103,21 @@ def analyze_cover_with_gemini(cover_url: str, api_key: str) -> dict:
                         {
                             "text": (
                                 "You are an assistant specialized in Disney comics and the Inducks database.\n"
-                                "Analyze the cover image of a French Disney magazine or comic book.\n"
+                                "Analyze the cover image of a Disney magazine or comic book.\n"
                                 "Perform two tasks:\n"
                                 "1. Identify and extract the main headline, featured story title, or major theme of this specific issue "
-                                "(usually written in large, prominent, stylized letters at the bottom or middle of the cover, "
-                                "like 'Escape game dans le coffre de Picsou' or 'Destination aventure !'). "
-                                "Do NOT extract secondary sidebar text, barcode numbers, prices, or the main magazine name (e.g. 'Picsou Magazine', 'Le Journal de Mickey'). "
-                                "Return it under the 'title' key (sentence casing, without quotes, in French). If no major feature title is visible, set it to null.\n\n"
+                                "(usually written in large, prominent, stylized letters on the cover, "
+                                "like a story title or special edition theme). "
+                                "Return the title exactly as it appears on the cover, in its original language (French, German, Greek, etc.). "
+                                "Do NOT extract secondary sidebar text, barcode numbers, prices, issue numbers, or the main series name (e.g. 'Lustiges Taschenbuch', 'Picsou Magazine'). "
+                                "Return it under the 'title' key (without quotes). If no major feature title is visible, set it to null.\n\n"
                                 "2. Identify all main Disney characters visible on the cover. For each, return their French name "
                                 "and their official standard Inducks character code if known. Use the following exact mappings for reference:\n"
                                 f"{PROMPT_CHAR_LIST}\n\n"
                                 "If a character is not in this list, return their French name and set 'code' to null. "
                                 "Do NOT invent character codes. Return this list under the 'characters' key, where each item is an object with 'name_fr' and 'code'.\n\n"
                                 "Format the output as a JSON object with keys 'title' and 'characters'. Example:\n"
-                                '{\n  "title": "Escape game chez Picsou",\n  "characters": [\n    {"name_fr": "Picsou", "code": "US"},\n    {"name_fr": "Donald Duck", "code": "DD"}\n  ]\n}'
+                                '{\n  "title": "Das All-Inclusive-Urlaubs-Abenteuer",\n  "characters": [\n    {"name_fr": "Donald Duck", "code": "DD"},\n    {"name_fr": "Picsou", "code": "US"}\n  ]\n}'
                             )
                         },
                         {

@@ -47,7 +47,12 @@ jobs:
       - name: Lancer le watcher
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID_FR: ${{ secrets.TELEGRAM_CHAT_ID_FR }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_THREAD_ID_FR: ${{ secrets.TELEGRAM_THREAD_ID_FR }}
+          TELEGRAM_THREAD_ID_US: ${{ secrets.TELEGRAM_THREAD_ID_US }}
+          TELEGRAM_THREAD_ID_DE: ${{ secrets.TELEGRAM_THREAD_ID_DE }}
+          TELEGRAM_THREAD_ID_GR: ${{ secrets.TELEGRAM_THREAD_ID_GR }}
+          TELEGRAM_ADMIN_ID: ${{ secrets.TELEGRAM_ADMIN_ID }}
           AMAZON_AFFILIATE_TAG: ${{ secrets.AMAZON_AFFILIATE_TAG }}
         run: python check_magazines.py
 
@@ -58,8 +63,11 @@ jobs:
         run: |
           # Sauvegarder les données dans /tmp avant de changer de branche
           cp state.json /tmp/state_updated.json
-          cp -r issues /tmp/issues_updated 2>/dev/null || true
-          cp -r covers /tmp/covers_updated 2>/dev/null || true
+          mkdir -p /tmp/issues_updated /tmp/covers_updated
+          cp -r issues/* /tmp/issues_updated/ 2>/dev/null || true
+          
+          # Exclude covers_updated to prevent infinite nesting
+          rsync -a --exclude='covers_updated' covers/ /tmp/covers_updated/ 2>/dev/null || true
 
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -78,8 +86,9 @@ jobs:
 
           # Restaurer les fichiers
           cp /tmp/state_updated.json state.json
-          cp -r /tmp/issues_updated issues 2>/dev/null || true
-          cp -r /tmp/covers_updated covers 2>/dev/null || true
+          mkdir -p issues covers
+          cp -r /tmp/issues_updated/* issues/ 2>/dev/null || true
+          cp -r /tmp/covers_updated/* covers/ 2>/dev/null || true
           
           # Écrire le state et le cache, et commiter s'il y a des changements
           # On utilise -f au cas où le .gitignore empêcherait l'ajout des dossiers

@@ -1,6 +1,6 @@
 <div align="center">
   <h1>Disney Comics Watcher</h1>
-  <p><strong>The Ultimate Automated Tracker for Disney Magazines & Comic Books in France & the US</strong></p>
+  <p><strong>The Ultimate Automated Tracker for Disney Magazines & Comic Books in France, US, Germany & Greece</strong></p>
 
   [![Python](https://img.shields.io/badge/Python-3.12+-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
   [![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-Active-success.svg?logo=github-actions)](https://github.com/features/actions)
@@ -10,7 +10,10 @@
 
 <hr/>
 
-**Disney Comics Watcher** is an open-source, automated bot designed to monitor new releases of Disney magazines (Picsou Magazine, Le Journal de Mickey, Super Picsou Géant, Fantomiald) and comic books (Glénat albums, Don Rosa, Carl Barks) in France and the US.
+**Disney Comics Watcher** is an open-source, automated bot designed to monitor new releases of Disney magazines (Picsou Magazine, Le Journal de Mickey, Super Picsou Géant, Fantomiald) and comic books (Glénat albums, Don Rosa, Carl Barks) in France, the US, Germany, and Greece.
+
+> ⭐️ **If you like this project, please consider giving it a star on GitHub! It helps a lot!** ⭐️
+
 
 It seamlessly tracks publication dates and automatically sends real-time notifications to a dedicated Telegram channel for every new issue or announcement. Perfect for collectors, Inducks contributors, and Disney comics fans!
 
@@ -41,6 +44,9 @@ Stay updated with all the latest Disney comics releases directly on your phone!
 | [glenat.com](https://www.glenat.com/livres-glenat-disney/) | Disney comic books and graphic novels by Glénat (Picsou, Mickey, Don Rosa, Romano Scarpa…) |
 | [marvel.com](https://www.marvel.com/) | US Disney comic books published by Marvel (Uncle Scrooge...) |
 | [fantagraphics.com](https://www.fantagraphics.com/) | US Disney comic books published by Fantagraphics |
+| [egmont-shop.de](https://www.egmont-shop.de/) | German Disney comic books and magazines published by Egmont Ehapa |
+| [lustiges-taschenbuch.de](https://www.lustiges-taschenbuch.de/) | Story data enricher for German LTB series |
+| [kathimerini.gr](https://www.kathimerini.gr/k/disney/) | Greek Disney comic books and magazines published by Kathimerini |
 
 ---
 
@@ -64,6 +70,8 @@ Want to run your own instance of the Watcher? Follow these simple steps:
    - `TELEGRAM_BOT_TOKEN`: The token obtained via @BotFather
    - `TELEGRAM_CHAT_ID_FR`: The channel's username (e.g., `@MyDisneyComics`) for French releases
    - `TELEGRAM_CHAT_ID_US`: The channel's username (e.g., `@MyDisneyComicsUS`) for US releases
+   - `TELEGRAM_THREAD_ID_DE`: The thread ID for German releases (if using topics)
+   - `TELEGRAM_THREAD_ID_GR`: The thread ID for Greek releases (if using topics)
 3. Go to the **Actions** tab and enable workflows. The bot will now run hourly automatically!
 
 ---
@@ -81,6 +89,8 @@ You can easily run the monitoring script locally without configuring global syst
    TELEGRAM_BOT_TOKEN=your_test_token
    TELEGRAM_CHAT_ID_FR=your_test_chat_id_fr
    TELEGRAM_CHAT_ID_US=your_test_chat_id_us
+   TELEGRAM_THREAD_ID_DE=your_test_thread_id_de
+   TELEGRAM_THREAD_ID_GR=your_test_thread_id_gr
    # Optional: Add GEMINI_API_KEY for AI cover analysis
    ```
 3. Run the test suite:
@@ -104,7 +114,7 @@ Whether you want to add support for a new country, improve the Gemini AI prompts
 5. **Open a Pull Request** 🚀
 
 ### Ideas for future contributions:
-- Adding support for other countries (Germany, Italy, Brazil...)
+- Adding support for other countries (Italy, Brazil...)
 - Improving the Telegram message formatting
 - Enhancing the Gemini AI character detection
 - Adding new comic book publishers

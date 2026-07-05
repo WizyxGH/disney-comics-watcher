@@ -1,31 +1,25 @@
 import os
 from zoneinfo import ZoneInfo
 
-# ─────────────────────────────────────────────────────────────────────────────
-#  Configuration Constants
-# ─────────────────────────────────────────────────────────────────────────────
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
-# Keywords for automatic discovery on Direct Éditeurs + MLP
+
+# Keywords for automatic discovery on Direct Editeurs + MLP
 KEYWORDS = ["picsou", "mickey", "mickey hs", "mickey parade", "fantomiald", "donald"]
 
-# Codifs to explicitly ignore (misclassified on MLP)
 SKIP_CODIFS = {
-    "11560",  # ANIME CULT (incorrectly classified under Disney D23 sub-family)
+    "11560",  # ANIME CULT
 }
 
-# Magazines published as double issues (e.g. JdM 3856-3857).
-# If DE/MLP only publishes the single issue N, we synthesize N-(N+1).
 BI_ISSUE_CODIFS = {
     "14067",  # Journal de Mickey
 }
 
-# Overrides: displayed name and Inducks code (optional).
-# Inducks format:
-#   - simple str   : code -> fr/<code> <num>
-#   - (code, w)    : number zfill(w)
-#   - (code, w, s) : number zfill(w) + suffix s
 OVERRIDES = {
-    # ── Picsou Magazine and spin-offs ────────────────────────────────────────
     "13159": {"name": "Picsou Magazine",                        "inducks": ("PM", 5)},
     "15681": {"name": "Picsou Magazine HS Collection Deluxe",   "inducks": ("CD", 5)},
     "15930": {"name": "Picsou Mag HS Collection Deluxe vol.2",  "inducks": ("CD", 5)},
@@ -36,7 +30,6 @@ OVERRIDES = {
     "18360": {"name": "Nouvelle Jeunesse de Picsou"},
     "19607": {"name": "Le Destin de Picsou"},
     "19052": {"name": "Pochette Picsou Magazine"},
-    # ── Super Picsou Géant and spin-offs ─────────────────────────────────────
     "14016": {"name": "Super Picsou Géant",                     "inducks": "SPG"},
     "12651": {"name": "SPG HS Dynastie de Picsou",              "inducks": ("SPGHS", 3, "H")},
     "15599": {"name": "SPG HS Dynastie de Picsou (REV)",        "inducks": ("SPGHS", 3, "H")},
@@ -45,9 +38,7 @@ OVERRIDES = {
     "18268": {"name": "SPG HS Donald Double Duck (REV)",        "inducks": ("DON", 4)},
     "13459": {"name": "SPG HS Jeux",                            "inducks": ("SPGHS", 3, "J")},
     "11065": {"name": "Les grands méchants",                    "inducks": ("SPGHS", 3, "M")},
-    # ── Trésors de Picsou ────────────────────────────────────────────────────
     "14068": {"name": "Les Trésors de Picsou",                  "inducks": "TP"},
-    # ── Journal de Mickey and spin-offs ──────────────────────────────────────
     "14067": {"name": "Journal de Mickey",                      "inducks": "JM"},
     "14108": {"name": "Journal de Mickey HS",                   "inducks": ("JMHSN", 3)},
     "13588": {"name": "JdM HS Spécial Aventures (REV)"},
@@ -55,16 +46,12 @@ OVERRIDES = {
     "15935": {"name": "Le Meilleur du Journal de Mickey",       "inducks": "JMC"},
     "15970": {"name": "Le Meilleur du JdM HS"},
     "18914": {"name": "Le Meilleur du JdM HS Spécial Enquêtes"},
-    # ── Mickey Parade ────────────────────────────────────────────────────────
     "11068": {"name": "Pochette Mickey Parade"},
-    # ── Fantomiald ───────────────────────────────────────────────────────────
     "15190": {"name": "Les Chroniques de Fantomiald",           "inducks": ("CF", 5)},
-    # ── Miscellaneous Disney ─────────────────────────────────────────────────
     "14268": {"name": "Les Incontournables de Disney",          "inducks": ("LI", 4)},
     "19064": {"name": "Les Incontournables (REV)",              "inducks": ("LI", 4)},
 }
 
-# Time zones and core URLs
 PARIS_TZ = ZoneInfo("Europe/Paris")
 
 SEARCH_URL     = "https://direct-editeurs.fr/nos-magazines"
@@ -86,9 +73,18 @@ MARVEL_SERIES_URLS = [
 ]
 MARVEL_KEY_PREFIX = "marvel:"
 
+EGMONT_DE_URLS = [
+    "https://www.egmont-shop.de/comics/disney/",
+    "https://www.egmont-shop.de/magazine/"
+]
+EGMONT_DE_KEY_PREFIX = "egmont-de:"
+EGMONT_BASE = "https://www.egmont-shop.de"
+
+KATHIMERINI_URL = "https://www.kathimerini.gr/k/disney/"
+KATHIMERINI_KEY_PREFIX = "kathi-gr:"
+
 STATE_FILE    = "state.json"
 
-# Load local .env file if it exists
 if os.path.exists(".env"):
     with open(".env", "r", encoding="utf-8") as f:
         for line in f:
@@ -97,13 +93,14 @@ if os.path.exists(".env"):
                 key, val = line.split("=", 1)
                 os.environ[key.strip()] = val.strip().strip('"').strip("'")
 
-# Telegram credentials — injected via GitHub Actions secrets or .env
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID   = (
     os.environ.get("TELEGRAM_CHAT_ID_FR") or os.environ.get("TELEGRAM_CHAT_ID", "")
 )
 TELEGRAM_THREAD_ID_FR = os.environ.get("TELEGRAM_THREAD_ID_FR", "")
 TELEGRAM_THREAD_ID_US = os.environ.get("TELEGRAM_THREAD_ID_US", "")
+TELEGRAM_THREAD_ID_DE = os.environ.get("TELEGRAM_THREAD_ID_DE", "")
+TELEGRAM_THREAD_ID_GR = os.environ.get("TELEGRAM_THREAD_ID_GR", "")
 TELEGRAM_API = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; DisneyComicsWatcher/1.0)"}

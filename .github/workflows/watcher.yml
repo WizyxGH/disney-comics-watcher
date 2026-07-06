@@ -2,20 +2,18 @@ name: Disney Comics Watcher
 
 on:
   schedule:
-    # Toutes les heures, à la minute 0
+    # Every hour, at minute 0
     - cron: "0 * * * *"
-  workflow_dispatch: # Lancement manuel depuis l'onglet Actions
-
-
+  workflow_dispatch: # Manual trigger from the Actions tab
 
 jobs:
   check:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Nécessaire pour pusher sur la branche datas
+      contents: write # Required to push to the datas branch
 
     steps:
-      # 1. Checkout du code (branche main)
+      # 1. Checkout code (main branch)
       - name: Checkout main
         uses: actions/checkout@v4
         with:
@@ -23,14 +21,14 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
-      # 2. Récupérer le state.json, issues/ et covers/ depuis la branche datas
-      - name: Récupérer state, issues et covers
+      # 2. Retrieve state.json, issues/, and covers/ from the datas branch
+      - name: Retrieve state, issues and covers
         run: |
           git fetch origin datas 2>/dev/null || true
           git checkout origin/datas -- state.json 2>/dev/null || echo '{}' > state.json
           git checkout origin/datas -- issues/ 2>/dev/null || true
           git checkout origin/datas -- covers/ 2>/dev/null || true
-          echo "State chargé : $(wc -c < state.json) octets"
+          echo "State loaded: $(wc -c < state.json) bytes"
 
       # 3. Python
       - name: Set up Python 3.12
@@ -38,12 +36,12 @@ jobs:
         with:
           python-version: "3.12"
 
-      # 4. Dépendances
-      - name: Installer les dépendances
+      # 4. Dependencies
+      - name: Install dependencies
         run: pip install requests beautifulsoup4
 
-      # 5. Lancer le watcher
-      - name: Lancer le watcher
+      # 5. Run the watcher
+      - name: Run the watcher
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -56,11 +54,11 @@ jobs:
         run: python check_magazines.py
 
 
-      # 6. Pousser le state et les données mis à jour sur la branche datas
-      - name: Sauvegarder state, issues et covers
-        if: always() # Toujours sauvegarder, même en cas d'erreur partielle
+      # 6. Push updated state and data to the datas branch
+      - name: Save state, issues and covers
+        if: always() # Always save, even on partial error
         run: |
-          # Sauvegarder les données dans /tmp avant de changer de branche
+          # Save data to /tmp before switching branches
           cp state.json /tmp/state_updated.json
           mkdir -p /tmp/issues_updated /tmp/covers_updated
           cp -r issues/* /tmp/issues_updated/ 2>/dev/null || true
@@ -74,7 +72,7 @@ jobs:
           # Stash any local modifications to prevent checkout conflicts
           git stash push -m "stashing before branch change" || true
 
-          # Basculer sur la branche datas (ou la créer si elle n'existe pas encore)
+          # Switch to the datas branch (or create it if it doesn't exist)
           if git ls-remote --exit-code --heads origin datas > /dev/null 2>&1; then
             git fetch origin datas
             git checkout -B datas origin/datas
@@ -83,20 +81,20 @@ jobs:
             git rm -rf . --quiet 2>/dev/null || true
           fi
 
-          # Restaurer les fichiers
+          # Restore files
           cp /tmp/state_updated.json state.json
           mkdir -p issues covers
           cp -r /tmp/issues_updated/* issues/ 2>/dev/null || true
           cp -r /tmp/covers_updated/* covers/ 2>/dev/null || true
           
-          # Écrire le state et le cache, et commiter s'il y a des changements
-          # On utilise -f au cas où le .gitignore empêcherait l'ajout des dossiers
+          # Write state and cache, and commit if there are changes
+          # Use -f in case .gitignore prevents adding the folders
           git add -f state.json
           if [ -d "issues" ]; then git add -f issues/; fi
           if [ -d "covers" ]; then git add -f covers/; fi
           
           if git diff --cached --quiet; then
-            echo "Aucun changement dans le state, issues ou covers — rien à commiter."
+            echo "No changes in state, issues, or covers — nothing to commit."
           else
             git commit -m "update datas: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
             git push origin datas --force

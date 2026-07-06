@@ -7,7 +7,7 @@ on:
   workflow_dispatch: # Lancement manuel depuis l'onglet Actions
 
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  # Removed FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 as it causes a forced node 24 warning
 
 jobs:
   check:

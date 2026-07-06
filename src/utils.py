@@ -23,9 +23,9 @@ def load_state():
     """Loads the state dictionary from the state JSON file."""
     if os.path.exists(STATE_FILE):
         try:
-            with open(STATE_FILE, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except (json.JSONDecodeError, OSError):
+            with open(STATE_FILE, "rb") as f:
+                return json.loads(f.read())
+        except Exception:
             pass
     return {}
 

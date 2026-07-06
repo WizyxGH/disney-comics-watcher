@@ -6,8 +6,7 @@ on:
     - cron: "0 * * * *"
   workflow_dispatch: # Lancement manuel depuis l'onglet Actions
 
-env:
-  # Removed FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 as it causes a forced node 24 warning
+
 
 jobs:
   check:

@@ -7,8 +7,7 @@ from bs4 import BeautifulSoup
 import http.client
 http.client._MAXHEADERS = 1000
 
-from src.config import KEYWORDS, SKIP_CODIFS, BI_ISSUE_CODIFS, OVERRIDES, SEARCH_URL, SITE_BASE, MLP_FAMILIES, MLP_FAMILY_URL, MLP_URL, GLENAT_BASE, GLENAT_COLLECTION_URL, FANTAGRAPHICS_DISNEY_URL, FANTAGRAPHICS_BASE, EGMONT_DE_URLS
-from src.utils import get_session, parse_date_fr, truncate_summary, format_price_fr
+from src.utils import get_session
 
 
 def discover_kathimerini() -> list[dict]:
@@ -40,33 +39,35 @@ def discover_kathimerini() -> list[dict]:
                         
                     # 1. Try PressReader high-res cover
                     img_url = None
-                    title_lower = title_text.lower()
-                    cid = None
-                    if "μίκυ μάους" in title_lower:
-                        cid = "464B"
-                    elif "κόμιξ" in title_lower:
-                        cid = "464D"
-                    elif "ντόναλντ" in title_lower:
-                        cid = "464A"
-                    elif "super miky" in title_lower:
-                        cid = "464C"
-                        
-                    if cid:
-                        img_url = f"https://i.prcdn.co/img?cid={cid}&page=1&height=1000"
-                        
-                    # 2. Fallback to Kathimerini article image
+
+                    # 1. Fetch cover from the Kathimerini article itself (most reliable)
+                    try:
+                        r_art = s.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
+                        if r_art.status_code == 200:
+                            art_soup = BeautifulSoup(r_art.text, 'html.parser')
+                            for img in art_soup.find_all('img'):
+                                src = img.get('src', '')
+                                if src and ('uploads' in src or 'img' in src) and src.startswith('http'):
+                                    img_url = src
+                                    break
+                    except Exception as e:
+                        print(f"  [warn] Failed to fetch Kathimerini article {url}: {e}")
+
+                    # 2. Fallback: PressReader CID-based cover (often blocked)
                     if not img_url:
-                        try:
-                            r_art = s.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
-                            if r_art.status_code == 200:
-                                art_soup = BeautifulSoup(r_art.text, 'html.parser')
-                                for img in art_soup.find_all('img'):
-                                    src = img.get('src', '')
-                                    if 'wp-content/uploads' in src:
-                                        img_url = src
-                                        break
-                        except Exception as e:
-                            print(f"  [warn] Failed to fetch Kathimerini article {url}: {e}")
+                        title_lower = title_text.lower()
+                        cid = None
+                        if "μίκυ μάους" in title_lower:
+                            cid = "464B"
+                        elif "κόμιξ" in title_lower:
+                            cid = "464D"
+                        elif "ντόναλντ" in title_lower:
+                            cid = "464A"
+                        elif "super miky" in title_lower:
+                            cid = "464C"
+                        if cid:
+                            img_url = f"https://i.prcdn.co/img?cid={cid}&page=1&height=1000"
+
                         
                     # Extract a unique ID from the URL (e.g. 564262477)
                     m = re.search(r'/(\d+)/', url)

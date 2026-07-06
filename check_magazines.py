@@ -1,4 +1,5 @@
-import os
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
 from datetime import datetime
 from src.config import PARIS_TZ, SKIP_CODIFS, OVERRIDES, GLENAT_KEY_PREFIX, FANTAGRAPHICS_KEY_PREFIX, MARVEL_KEY_PREFIX, EGMONT_DE_KEY_PREFIX, KATHIMERINI_KEY_PREFIX
 from src.utils import load_state, save_state, parse_date_fr
@@ -144,7 +145,6 @@ def main():
     state = load_state()
     first_run = not state
 
-    today = datetime.now(PARIS_TZ).date()
     notif_count = 0
 
     notif_count += process_magazines(state, first_run)

@@ -3,12 +3,11 @@ import html as html_lib
 import json
 import requests
 from datetime import datetime
-from bs4 import BeautifulSoup
 import http.client
 http.client._MAXHEADERS = 1000
 
-from src.config import KEYWORDS, SKIP_CODIFS, BI_ISSUE_CODIFS, OVERRIDES, SEARCH_URL, SITE_BASE, MLP_FAMILIES, MLP_FAMILY_URL, MLP_URL, GLENAT_BASE, GLENAT_COLLECTION_URL, FANTAGRAPHICS_DISNEY_URL, FANTAGRAPHICS_BASE, EGMONT_DE_URLS
-from src.utils import get_session, parse_date_fr, truncate_summary, format_price_fr
+from src.config import KEYWORDS, SKIP_CODIFS, BI_ISSUE_CODIFS, OVERRIDES, SEARCH_URL, SITE_BASE, MLP_FAMILIES, MLP_FAMILY_URL, MLP_URL, GLENAT_BASE, GLENAT_COLLECTION_URL
+from src.utils import get_session, parse_date_fr
 
 
 def parse_block(block):

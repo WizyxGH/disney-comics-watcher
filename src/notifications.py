@@ -5,8 +5,7 @@ import time
 import requests
 from urllib.parse import quote, quote_plus
 from src.config import TELEGRAM_API, TELEGRAM_CHAT_ID, TELEGRAM_THREAD_ID_FR, TELEGRAM_THREAD_ID_US, TELEGRAM_THREAD_ID_DE, TELEGRAM_THREAD_ID_GR, OVERRIDES, AMAZON_AFFILIATE_TAG, SITE_BASE
-from src.utils import format_price_fr, get_session, load_state, save_state, truncate_summary, isbn13_to_isbn10
-from src.scrapers.__init__ import get_latest_inducks_issue_number
+from src.utils import format_price_fr, get_session, truncate_summary, isbn13_to_isbn10
 from src.dbi.generator import generate_dbi_skeleton
 from src.dbi.mappers import build_inducks_path
 from src.gemini_analyzer import analyze_cover_with_gemini
@@ -14,8 +13,7 @@ from src.gemini_analyzer import analyze_cover_with_gemini
 def resolve_dbg_tome_number(album: dict, state: dict | None = None):
     """Resolves and extrapolates the next issue number for Disney By Glénat (DBG) albums."""
     if album.get("numero_de_tome") is None:
-        coll = album.get("collection_label")
-        ser = album.get("serie_label")
+        pass
 
 
 

@@ -59,36 +59,38 @@ def resolve_de_metadata(info):
     title = info.get("title", "DE Comic")
     book_id = str(info.get("id") or "TODO")
     clean_id = book_id.split('/')[-1]
-    
-    mappings = [
-        (r'Lustiges Taschenbuch Young Comics (?:Nr\.\s*)?(\d+)', r'de/LTBYC \1'),
-        (r'Lustiges Taschenbuch Weihnachtsgeschichten (?:Nr\.\s*)?(\d+)', r'de/LTBWE \1'),
-        (r'Micky Maus Magazin (?:Nr\.\s*)?(\d+)', r'de/MM \1'),
-        (r'Micky Maus Legacy Collection (?:Nr\.\s*)?(\d+)', r'de/MMLC \1'),
-        (r'Lustiges Taschenbuch (?:Nr\.\s*)?(\d+)', r'de/LTB \1'),
-        (r'Entenhausener Ikonen (?:0*)?(\d+)', r'de/EIB \1'),
-        (r'Enthologien (?:0*)?(\d+)', r'de/ENT \1'),
-    ]
-    
-    issue_path = None
-    for pattern, repl in mappings:
-        m = re.search(pattern, title, re.IGNORECASE)
-        if m:
-            issue_path = m.expand(repl)
-            break
-            
+
+    # 1. DB lookup first (exact / contains / fuzzy)
+    issue_path = search_publication_code(title, "de")
+
+    # 2. Regex fallback for very well-known series (faster, no DB needed)
     if not issue_path:
-        issue_path = search_publication_code(title, "de")
-        
+        mappings = [
+            (r'Lustiges Taschenbuch Young Comics (?:Nr\.\s*)?(\d+)', r'de/LTBYC \1'),
+            (r'Lustiges Taschenbuch Weihnachtsgeschichten (?:Nr\.\s*)?(\d+)', r'de/LTBWE \1'),
+            (r'Micky Maus Magazin (?:Nr\.\s*)?(\d+)', r'de/MM \1'),
+            (r'Micky Maus Legacy Collection (?:Nr\.\s*)?(\d+)', r'de/MMLC \1'),
+            (r'Lustiges Taschenbuch (?:Nr\.\s*)?(\d+)', r'de/LTB \1'),
+            (r'Entenhausener Ikonen (?:0*)?(\d+)', r'de/EIB \1'),
+            (r'Enthologien (?:0*)?(\d+)', r'de/ENT \1'),
+        ]
+        for pattern, repl in mappings:
+            m = re.search(pattern, title, re.IGNORECASE)
+            if m:
+                issue_path = m.expand(repl)
+                break
+
+    # 3. Generic acronym fallback
     if not issue_path:
-        issue_path = f"de/DE_{clean_id[-6:]}" # Default fallback
         m = re.search(r'([A-Za-z\s\.]+)(?:Nr\.\s*|0*)?(\d+)', title)
         if m:
             text_part, num_part = m.group(1).strip(), m.group(2)
-            acronym = "".join([w[0].upper() for w in text_part.split() if w[0].isalpha()])
+            acronym = "".join([w[0].upper() for w in text_part.split() if w and w[0].isalpha()])
             if acronym:
                 issue_path = f"de/{acronym} {num_part}"
-                
+        if not issue_path:
+            issue_path = f"de/DE_{clean_id[-6:]}"
+
     return {
         "issue_path": issue_path,
         "name": title,
@@ -103,24 +105,28 @@ def resolve_de_metadata(info):
 def resolve_gr_metadata(info):
     title = info.get("title", "GR Comic")
     book_id = str(info.get("id") or "TODO")
-    
-    mappings = [
-        (r'Super MIKY\s*(?:#|Nr\.\s*)?(\d+)', r'gr/SM \1'),
-    ]
-    
-    issue_path = None
-    for pattern, repl in mappings:
-        m = re.search(pattern, title, re.IGNORECASE)
-        if m:
-            issue_path = m.expand(repl)
-            break
-            
+
+    # 1. DB lookup first
+    issue_path = search_publication_code(title, "gr")
+
+    # 2. Regex fallback
     if not issue_path:
-        issue_path = search_publication_code(title, "gr")
-        
+        mappings = [
+            (r'Super MIKY\s*(?:#|Nr\.\s*)?(\d+)', r'gr/SM \1'),
+            (r'M[ií]k[yu]\s+M[aá]ous\s*#(\d+)', r'gr/GR \1'),
+            (r'K[oó]mix\s*#(\d+)', r'gr/GRC \1'),
+            (r'Nt[oó]nalnt\s*#(\d+)', r'gr/GRD \1'),
+        ]
+        for pattern, repl in mappings:
+            m = re.search(pattern, title, re.IGNORECASE)
+            if m:
+                issue_path = m.expand(repl)
+                break
+
+    # 3. Generic fallback using the article ID
     if not issue_path:
         issue_path = f"gr/GR_{book_id[-6:]}"
-        
+
     return {
         "issue_path": issue_path,
         "name": title,

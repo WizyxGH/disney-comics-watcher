@@ -104,3 +104,18 @@ def isbn13_to_isbn10(isbn13: str) -> str | None:
         check_char = str(check)
         
     return digits + check_char
+
+def is_fully_indexed_in_inducks(issue_code: str) -> bool:
+    """Check if an issue is fully indexed in Inducks by querying the Turso DB."""
+    if not issue_code:
+        return False
+        
+    try:
+        from src.db import query_db
+        res = query_db("SELECT fullyindexed FROM inducks_issue WHERE issuecode = ?", (issue_code,))
+        if res and len(res) > 0:
+            return res[0][0] == 'Y'
+    except Exception as e:
+        print(f"  [warn] Failed to query fully indexed status from DB for {issue_code}: {e}")
+        
+    return False

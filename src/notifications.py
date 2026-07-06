@@ -5,7 +5,7 @@ import time
 import requests
 from urllib.parse import quote, quote_plus
 from src.config import TELEGRAM_API, TELEGRAM_CHAT_ID, TELEGRAM_THREAD_ID_FR, TELEGRAM_THREAD_ID_US, TELEGRAM_THREAD_ID_DE, TELEGRAM_THREAD_ID_GR, OVERRIDES, AMAZON_AFFILIATE_TAG, SITE_BASE
-from src.utils import format_price_fr, get_session, truncate_summary, isbn13_to_isbn10
+from src.utils import format_price_fr, get_session, truncate_summary, isbn13_to_isbn10, is_fully_indexed_in_inducks
 from src.dbi.generator import generate_dbi_skeleton
 from src.dbi.mappers import build_inducks_path
 from src.gemini_analyzer import analyze_cover_with_gemini
@@ -68,7 +68,7 @@ def send_telegram(photo_url: str | None, caption: str, buttons: list | None = No
                 if resp.status_code == 400:
                      print(f"  [debug] Telegram 400 error: {resp.text}")
                      desc = resp.json().get("description", "").lower()
-                     if any(k in desc for k in ("photo", "wrong url", "failed to get", "url")):
+                     if any(k in desc for k in ("photo", "wrong url", "failed to get", "url", "web page content")):
                         print(f"  [warn] Photo inaccessible -> fallback to text")
                         photo_url = None
                         continue
@@ -210,20 +210,26 @@ def _dispatch_notification(
     else:
         caption = base_caption
 
-    # 2. Download cover
-    if cover_url:
+    # 2. Check if fully indexed
+    is_fully_indexed = is_fully_indexed_in_inducks(issue_code)
+    
+    if is_fully_indexed:
+        print(f"  [info] Issue {issue_code} is completely indexed on Inducks. Skipping cover download and DBI generation.")
+
+    # 3. Download cover (only if not fully indexed)
+    if cover_url and not is_fully_indexed:
         download_cover(cover_url, cover_filename)
 
-    # 3. Send via Telegram
+    # 4. Send via Telegram
     if TELEGRAM_CHAT_ID:
         send_telegram(cover_url, caption, buttons=buttons, message_thread_id=message_thread_id)
         time.sleep(1)
     else:
         print("  [warn] No TELEGRAM_CHAT_ID configured.")
 
-    # 4. Gemini Cover Analysis
+    # 5. Gemini Cover Analysis (only if not fully indexed)
     api_key = os.environ.get("GEMINI_API_KEY")
-    if api_key and cover_url:
+    if api_key and cover_url and not is_fully_indexed:
         print(f"  [Gemini] Analyzing cover for '{raw_title}'...")
         analysis = analyze_cover_with_gemini(cover_url, api_key)
         
@@ -239,15 +245,17 @@ def _dispatch_notification(
             print(f"  [Gemini] Detected characters: {char_list}")
             info["characters"] = characters
 
-    # 5. Generate DBI skeleton
-    dbi_content = generate_dbi_skeleton(info, publication_type=publication_type, overrides=OVERRIDES)
+    # 6. Generate DBI skeleton (only if not fully indexed)
+    if not is_fully_indexed:
+        dbi_content = generate_dbi_skeleton(info, publication_type=publication_type, overrides=OVERRIDES)
 
-    # 6. Send DBI to Admin DM
-    admin_id = os.environ.get("TELEGRAM_ADMIN_ID")
-    if admin_id and dbi_content:
-        clean_dbi = html_lib.escape(dbi_content.strip())
-        dm_text = f"New DBI generated for <b>{html_lib.escape(raw_title)}</b>:\n<pre>{clean_dbi}</pre>"
-        send_telegram(photo_url=None, caption=dm_text, chat_id=admin_id)
+        # 7. Send DBI to Admin DM
+        admin_id = os.environ.get("TELEGRAM_ADMIN_ID")
+        if admin_id and dbi_content:
+            clean_dbi = html_lib.escape(dbi_content.strip())
+            dm_text = f"New DBI generated for <b>{html_lib.escape(raw_title)}</b>:\n<pre>{clean_dbi}</pre>"
+            send_telegram(photo_url=None, caption=dm_text, chat_id=admin_id)
+
 
 # ── PUBLIC NOTIFICATION FUNCTIONS ───────────────────────────────────────────────
 

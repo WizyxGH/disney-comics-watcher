@@ -40,10 +40,11 @@ ISV_TABLES = {
             issuecode       TEXT PRIMARY KEY,
             publicationcode TEXT NOT NULL,
             issuenumber     TEXT,
-            title           TEXT
+            title           TEXT,
+            fullyindexed    TEXT
         )""",
-        "insert_cols": ["issuecode", "publicationcode", "issuenumber", "title"],
-        "insert_idx": [0, 2, 3, 4],   # positions in the ISV row
+        "insert_cols": ["issuecode", "publicationcode", "issuenumber", "title", "fullyindexed"],
+        "insert_idx": [0, 2, 3, 4, 11],   # positions in the ISV row
     },
 }
 
@@ -79,7 +80,7 @@ def batch_insert_rows(table: str, columns: list[str], rows: list[tuple], batch_s
 
     col_str = ", ".join(columns)
     placeholders = ", ".join(["?"] * len(columns))
-    sql = f"INSERT OR IGNORE INTO {table} ({col_str}) VALUES ({placeholders})"
+    sql = f"INSERT OR REPLACE INTO {table} ({col_str}) VALUES ({placeholders})"
 
     inserted = 0
     for i in range(0, total, batch_size):

@@ -10,8 +10,12 @@ Usage:
 """
 
 import sys
+import os
 import time
 import requests
+
+# Add the script's directory to sys.path so IDEs and Python find 'src'
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 sys.stdout.reconfigure(encoding='utf-8')
 

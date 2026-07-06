@@ -162,7 +162,7 @@ def build_glenat_inducks_url(title: str) -> str:
 
 from src.dbi.generator import _RESOLVERS
 
-def get_issue_code_from_info(info: dict, pub_type: str) -> str:
+def get_issue_path_from_info(info: dict, pub_type: str) -> str:
     try:
         from src.config import OVERRIDES
         from src.dbi.mappers import resolve_magazine_metadata, resolve_glenat_metadata
@@ -172,8 +172,7 @@ def get_issue_code_from_info(info: dict, pub_type: str) -> str:
             resolver = _RESOLVERS.get(pub_type, resolve_glenat_metadata)
             data = resolver(info)
         
-        issue_code = data.get("issue_path") or ""
-        return issue_code.split("/", 1)[-1] if "/" in issue_code else issue_code
+        return data.get("issue_path") or ""
     except Exception:
         return "unknown"
 
@@ -189,7 +188,8 @@ def _dispatch_notification(
 ):
     """Internal helper to dispatch Telegram notification, download cover, and analyze with Gemini."""
 # Calculate the official cover_filename
-    issue_code = get_issue_code_from_info(info, publication_type)
+    issue_path = get_issue_path_from_info(info, publication_type)
+    issue_code = issue_path.split("/", 1)[-1] if "/" in issue_path else issue_path
     
     m = re.match(r'^([a-zA-Z]+)(\s+)(.*)$', issue_code)
     if m:
@@ -211,10 +211,10 @@ def _dispatch_notification(
         caption = base_caption
 
     # 2. Check if fully indexed
-    is_fully_indexed = is_fully_indexed_in_inducks(issue_code)
+    is_fully_indexed = is_fully_indexed_in_inducks(issue_path)
     
     if is_fully_indexed:
-        print(f"  [info] Issue {issue_code} is completely indexed on Inducks. Skipping cover download and DBI generation.")
+        print(f"  [info] Issue {issue_path} is completely indexed on Inducks. Skipping cover download and DBI generation.")
 
     # 3. Download cover (only if not fully indexed)
     if cover_url and not is_fully_indexed:

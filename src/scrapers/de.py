@@ -96,7 +96,10 @@ def discover_egmont_de():
                 img = c.find('img')
                 cover = img.get('src') if img else None
                 if cover:
-                    cover = "https://www.egmont-shop.de" + cover.split('?')[0]
+                    if not cover.startswith('http'):
+                        cover = "https://www.egmont-shop.de" + cover.split('?')[0]
+                    else:
+                        cover = cover.split('?')[0]
                     
                 # Egmont cards do not easily expose dates in this view.
                 # If they are on the page, they are available now.

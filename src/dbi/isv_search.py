@@ -14,6 +14,10 @@ from src.db import query_db
 _pub_cache: dict[str, dict[str, str]] = {}
 _cache_loaded: set[str] = set()
 
+# In-memory cache for issues: {country_code: [(issuecode, title)]}
+_issue_cache: dict[str, list[tuple[str, str]]] = {}
+
+
 
 def _normalize(s: str) -> str:
     """Lowercase, strip accents, collapse whitespace and strip punctuation."""
@@ -105,27 +109,106 @@ def _find_publication(base_title: str, country: str) -> str | None:
     return None
 
 
+def _roman_to_int(s: str) -> str | None:
+    rom_val = {'i': 1, 'v': 5, 'x': 10, 'l': 50, 'c': 100, 'd': 500, 'm': 1000}
+    int_val = 0
+    s = s.lower()
+    for i in range(len(s)):
+        if s[i] not in rom_val: return None
+        if i > 0 and rom_val[s[i]] > rom_val[s[i - 1]]:
+            int_val += rom_val[s[i]] - 2 * rom_val[s[i - 1]]
+        else:
+            int_val += rom_val[s[i]]
+    return str(int_val)
+
+
+def _convert_romans(s: str) -> str:
+    words = s.split()
+    for i, w in enumerate(words):
+        val = _roman_to_int(w)
+        if val: words[i] = val
+    return ' '.join(words)
+
+
+def _load_country_issues(country: str):
+    if country in _issue_cache:
+        return
+    rows = query_db(
+        "SELECT issuecode, title FROM inducks_issue WHERE publicationcode LIKE ? AND title IS NOT NULL AND title != ''",
+        (f"{country}/%",)
+    )
+    _issue_cache[country] = rows if rows else []
+
+
+def _find_issue_by_title(raw_title: str, country: str) -> str | None:
+    """Searches the issue cache for an issue whose title words are all contained in the raw_title."""
+    _load_country_issues(country)
+    issues = _issue_cache.get(country, [])
+    if not issues:
+        return None
+
+    norm_raw = _normalize(raw_title)
+    if not norm_raw:
+        return None
+        
+    norm_raw_converted = _convert_romans(norm_raw)
+    raw_words = set(norm_raw_converted.split())
+    if not raw_words:
+        return None
+
+    best_score = 0
+    best_code = None
+
+    for issuecode, title in issues:
+        norm_title = _normalize(title)
+        if not norm_title:
+            continue
+            
+        norm_title_converted = _convert_romans(norm_title)
+        title_words = set(norm_title_converted.split())
+        
+        if not title_words:
+            continue
+            
+        # Check if ALL words in the issue title are present in the raw title
+        if title_words.issubset(raw_words):
+            # Prefer longer titles
+            score = len(title_words)
+            if score > best_score:
+                best_score = score
+                best_code = issuecode
+                
+    if best_score > 0:
+        return " ".join(best_code.split())
+        
+    return None
+
+
 def search_publication_code(raw_title: str, country: str) -> str | None:
     """
     Main entry point: given a raw title and country code, returns the full
     Inducks issue path (e.g. 'de/MM 15') or None if not found.
 
     Search strategy:
-    1. Extract base title + issue number from the raw title
-    2. Look up the publication in the local DB cache (exact → contains → fuzzy)
-    3. Build and return the issue path
+    1. Search issue titles directly (for pre-indexed issues that share a publication code)
+    2. Extract base title + issue number from the raw title
+    3. Look up the publication in the local DB cache (exact → contains → fuzzy)
+    4. Build and return the issue path
     """
+    issue_path = _find_issue_by_title(raw_title, country)
+    if issue_path:
+        return issue_path
+
     base_title, num = _extract_base_and_number(raw_title)
     if not base_title or not num:
         return None
 
     pub_code = _find_publication(base_title, country)
-    if not pub_code:
-        return None
+    if pub_code:
+        # The publicationcode already contains the country prefix
+        return f"{pub_code} {num}"
 
-    # pub_code is like "de/MM" — return full path "de/MM 15"
-    # The publicationcode already contains the country prefix
-    return f"{pub_code} {num}"
+    return None
 
 
 def lookup_issue_code(pub_code: str, issue_number: str) -> str | None:

@@ -90,7 +90,7 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         storycode = "?"
         
         storycode_field = storycode[:14].ljust(14)
-        pages_field     = "1  "
+        pages_field     = " 1 "
         brokpg          = " "
         pagel           = "c "
         
@@ -125,7 +125,8 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         if isslet_val: suffixes.append(f"[isslet:{isslet_val}]")
 
         suffix_str = " ".join(suffixes)
-        cover_line = f"{prefix}  {suffix_str}".rstrip() + "\n"
+        # No extra spaces between prefix and suffix_str
+        cover_line = f"{prefix}{suffix_str}".rstrip() + "\n"
         
         body_parts = []
         
@@ -159,17 +160,24 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
                     story_ec = f"{dbi_issue_code}{chr(97 + i)}"
                 
                 story_code = story.get("story_code", "") or story.get("code", "")
-                st_pages = str(story.get("pages", "")).ljust(3)
+                
+                pages_str = str(story.get("pages", "")).strip()
+                if len(pages_str) == 1:
+                    st_pages = f" {pages_str} "
+                else:
+                    st_pages = pages_str.ljust(3)
+                    
                 brokpg = " "
                 pagel = "  "
                 
                 story_rest = "".ljust(4) + "".ljust(4) + "".ljust(4) + "".ljust(4) + "".ljust(4)
+                
                 if len(story_ec) <= 12:
                     st_prefix = f"{story_ec.ljust(12)}{story_code.ljust(14)}{st_pages}{brokpg}{pagel}{story_rest}"
                 else:
                     st_prefix = f"->          {story_code.ljust(14)}{st_pages}{brokpg}{pagel}{story_rest}"
 
-                st_title = story.get("title", "")
+                st_title = story.get("title", "").strip()
                 st_suffixes = []
                 if len(story_ec) > 12: st_suffixes.append(f"[entrycode:{story_ec}]")
                 if story.get("characters"):
@@ -177,7 +185,8 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
                     if c_codes: st_suffixes.append(f"[xapp:{','.join(c_codes)}]")
 
                 st_suffix_str = " ".join(st_suffixes)
-                st_line = f"{st_prefix}  {st_title} {st_suffix_str}".strip() + "\n"
+                # No extra spaces between st_prefix and st_title
+                st_line = f"{st_prefix}{st_title} {st_suffix_str}".rstrip() + "\n"
                 body_parts.append(st_line)
 
         content = "".join(body_parts)

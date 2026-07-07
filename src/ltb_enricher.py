@@ -25,6 +25,7 @@ LTB_URL_PATTERNS: dict[str, str] = {
     "de/LTBWE":  "nebenreihen/weihnachtsgeschichten/band-{num}",
     "de/LTBYC":  "nebenreihen/ltb-young-comics/band-{num}",
     "de/MMLC":   "nebenreihen/micky-maus-legacy-collection/band-{num}",
+    "de/LTBBA":  "nebenreihen/ltb-camping/band-{num}",
 }
 
 # Regex matching any known Inducks story code prefix:
@@ -44,7 +45,9 @@ _STORY_CODE_RE = re.compile(
 
 def _build_ltb_url(issue_path: str) -> str | None:
     """Return the lustiges-taschenbuch.de URL for a given Inducks issue path, or None."""
-    for pub_prefix, url_tpl in LTB_URL_PATTERNS.items():
+    # Sort prefixes by length descending so "de/LTBBA" matches before "de/LTB"
+    for pub_prefix in sorted(LTB_URL_PATTERNS.keys(), key=len, reverse=True):
+        url_tpl = LTB_URL_PATTERNS[pub_prefix]
         if issue_path.startswith(pub_prefix):
             m = re.search(r'\s+(\d+)$', issue_path)
             if m:
@@ -137,7 +140,9 @@ def enrich_ltb_metadata(info: dict) -> dict:
     info['stories'].  Returns the (mutated) dict unchanged if not applicable.
     """
     issue_path = info.get('issue_path', '')
-    url = _build_ltb_url(issue_path)
+    url = info.get('url')
+    if not url or "lustiges-taschenbuch.de" not in url:
+        url = _build_ltb_url(issue_path)
     if not url:
         return info
 

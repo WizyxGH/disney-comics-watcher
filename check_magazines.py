@@ -97,47 +97,46 @@ def process_provider(
             
         target_status = "released" if is_released else "announced"
 
-        if current is None:
-            if target_status == "released":
-                if not first_run and default_status == "released":
-                    print(f"  [{provider_name}-RELEASE] {book.get('title')}")
-                    if fetch_details_func:
-                        book.update(fetch_details_func(book["url"]))
-                    if is_glenat:
+        if current is None or (current == "announced" and target_status == "released"):
+            is_indexed = False
+            from src.notifications import get_issue_path_from_info
+            from src.utils import is_fully_indexed_in_inducks
+            
+            # Identify path and check indexing to skip heavy fetching
+            issue_path = get_issue_path_from_info(book, country)
+            if issue_path and issue_path != "unknown":
+                is_indexed = is_fully_indexed_in_inducks(issue_path)
+
+            if fetch_details_func and not is_indexed:
+                book.update(fetch_details_func(book["url"]))
+
+            silent = False
+            if current is None:
+                if target_status == "released":
+                    silent = (not first_run and default_status != "released") # Wait, if default_status == "released", not first_run -> notify
+                    # Actual silent condition in original code: if not first_run and default_status == "released" => notify. else silent.
+                    silent = not (not first_run and default_status == "released")
+                else:
+                    silent = first_run
+            else:
+                # current == "announced" and target_status == "released"
+                silent = first_run
+
+            event_str = "RELEASE" if target_status == "released" else "ANNOUNCE"
+            if silent:
+                print(f"  [{provider_name}-{event_str}-SILENT] {book.get('title')}")
+            else:
+                print(f"  [{provider_name}-{event_str}] {book.get('title')}")
+                if is_glenat:
+                    if target_status == "released":
                         notify_glenat_release(book, state=state)
                     else:
-                        notify_international_comic(book, state=state, country=country, event_type="release")
-                    notif_count += 1
-                else:
-                    print(f"  [{provider_name}-RELEASE-SILENT] {book.get('title')}")
-                state[key] = "released"
-            else:
-                if first_run:
-                    print(f"  [{provider_name}-ANNOUNCE-SILENT] {book.get('title')}")
-                else:
-                    print(f"  [{provider_name}-ANNOUNCE] {book.get('title')}")
-                    if fetch_details_func:
-                        book.update(fetch_details_func(book["url"]))
-                    if is_glenat:
                         notify_glenat_announce(book, state=state)
-                    else:
-                        notify_international_comic(book, state=state, country=country, event_type="announce")
-                    notif_count += 1
-                state[key] = "announced"
-                
-        elif current == "announced" and target_status == "released":
-            if not first_run:
-                print(f"  [{provider_name}-RELEASE] {book.get('title')}")
-                if fetch_details_func:
-                    book.update(fetch_details_func(book["url"]))
-                if is_glenat:
-                    notify_glenat_release(book, state=state)
                 else:
-                    notify_international_comic(book, state=state, country=country, event_type="release")
+                    notify_international_comic(book, state=state, country=country, event_type="release" if target_status == "released" else "announce")
                 notif_count += 1
-            else:
-                print(f"  [{provider_name}-RELEASE-SILENT] {book.get('title')}")
-            state[key] = "released"
+                
+            state[key] = target_status
 
     return notif_count
 

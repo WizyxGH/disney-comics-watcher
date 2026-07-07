@@ -271,13 +271,12 @@ def notify_magazine(info: dict, releve_date: str | None = None):
 
     title_line = f"<b>{html_lib.escape(name)} {num}</b>"
     lines = [title_line, ""]
-    if prix: lines.append(f"💶 {html_lib.escape(prix)}")
+    if prix: lines.append(f"💶 Price: {html_lib.escape(prix)}")
     if date: lines.append(f"📅 Published: {date}")
     if releve_date: lines.append(f"📅 On newsstands until: {releve_date}")
     
     inducks_url = build_inducks_url(ov.get("inducks"), num) or f"https://inducks.org/search.php?search={quote(f'{name} {num}')}"
-    btn_text = "View on MLP" if "mlp.fr" in url.lower() else "View on Direct-éditeurs"
-    buttons = [[{"text": btn_text, "url": url}], [{"text": "Contents on Inducks", "url": inducks_url}]]
+    buttons = [[{"text": "View Source", "url": url}], [{"text": "Search on Inducks", "url": inducks_url}]]
 
     cover_url = None
     if info.get("slug"):
@@ -310,11 +309,11 @@ def notify_magazine(info: dict, releve_date: str | None = None):
     )
 
 def _build_glenat_buttons(album: dict, raw_title: str) -> list:
-    row1 = [{"text": "View on Glénat", "url": album["url"]}]
+    row1 = [{"text": "View Source", "url": album["url"]}]
     if AMAZON_AFFILIATE_TAG:
         asin = isbn13_to_isbn10(album.get("ean", ""))
         if asin: row1.append({"text": "Buy on Amazon", "url": f"https://www.amazon.fr/dp/{asin}/?tag={AMAZON_AFFILIATE_TAG}"})
-    return [row1, [{"text": "Contents on Inducks", "url": build_glenat_inducks_url(raw_title)}]]
+    return [row1, [{"text": "Search on Inducks", "url": build_glenat_inducks_url(raw_title)}]]
 
 def notify_glenat_announce(album: dict, state: dict | None = None):
     """Glénat announcement notification (upcoming album)."""
@@ -325,7 +324,7 @@ def notify_glenat_announce(album: dict, state: dict | None = None):
     lines = [f"<b>Announcement — {title}</b>", ""]
     if album.get("date"): lines.append(f"🗓 Expected release: {album['date']}")
     prix = format_price_fr(album.get("price"))
-    if prix: lines.append(f"💶 {html_lib.escape(prix)}")
+    if prix: lines.append(f"💶 Price: {html_lib.escape(prix)}")
 
     _dispatch_notification(
         info=album,
@@ -347,7 +346,7 @@ def notify_glenat_release(album: dict, state: dict | None = None):
     lines = [f"<b>{title}</b>", ""]
     if album.get("date"): lines.append(f"🗓 Released: {album['date']}")
     prix = format_price_fr(album.get("price"))
-    if prix: lines.append(f"💶 {html_lib.escape(prix)}")
+    if prix: lines.append(f"💶 Price: {html_lib.escape(prix)}")
 
     _dispatch_notification(
         info=album,
@@ -368,30 +367,24 @@ def notify_international_comic(album: dict, state: dict | None = None, country: 
     # Format strings based on country and event type
     config = {
         "us": {
-            "flag": "🇺🇸",
-            "announce_title": f"🇺🇸 <b>Announcement — {title}</b>",
+            "announce_title": f"<b>Announcement — {title}</b>",
             "release_title": f"<b>{title}</b>",
-            "date_prefix": "🗓 Expected publication:" if event_type == "announce" else "🗓 Published on:",
+            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
             "price_prefix": "💵 Price:",
-            "inducks_btn": "Search on Inducks",
             "thread_id": TELEGRAM_THREAD_ID_US,
         },
         "de": {
-            "flag": "🇩🇪",
-            "announce_title": f"🇩🇪 <b>Ankündigung — {title}</b>",
+            "announce_title": f"<b>Announcement — {title}</b>",
             "release_title": f"<b>{title}</b>",
-            "date_prefix": "🗓 Geplante Veröffentlichung:" if event_type == "announce" else "🗓 Erschienen am:",
-            "price_prefix": "💶 Preis:",
-            "inducks_btn": "Auf Inducks suchen",
+            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
+            "price_prefix": "💶 Price:",
             "thread_id": TELEGRAM_THREAD_ID_DE,
         },
         "gr": {
-            "flag": "🇬🇷",
-            "announce_title": f"🇬🇷 <b>Ανακοίνωση — {title}</b>",
+            "announce_title": f"<b>Announcement — {title}</b>",
             "release_title": f"<b>{title}</b>",
-            "date_prefix": "🗓 Αναμενόμενη κυκλοφορία:" if event_type == "announce" else "🗓 Κυκλοφόρησε:",
-            "price_prefix": "💶 Τιμή:",
-            "inducks_btn": "Στο Inducks",
+            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
+            "price_prefix": "💶 Price:",
             "thread_id": TELEGRAM_THREAD_ID_GR,
         }
     }
@@ -406,15 +399,14 @@ def notify_international_comic(album: dict, state: dict | None = None, country: 
     inducks_url = f"https://inducks.org/search.php?search={quote(raw_title)}"
 
     if country == "us":
-        source_name = "Marvel" if album.get("source") == "marvel" else "Fantagraphics"
-        row1.append({"text": f"View on {source_name}", "url": album.get("url", "")})
+        row1.append({"text": "View Source", "url": album.get("url", "")})
         if AMAZON_AFFILIATE_TAG and album.get("sku"):
             asin = isbn13_to_isbn10(album.get("sku", ""))
             if asin: row1.append({"text": "Buy on Amazon", "url": f"https://www.amazon.fr/dp/{asin}/?tag={AMAZON_AFFILIATE_TAG}"})
     elif country == "de":
-        row1.append({"text": "Auf Egmont-Shop ansehen", "url": album.get("url", "")})
+        row1.append({"text": "View Source", "url": album.get("url", "")})
     elif country == "gr":
-        row1.append({"text": "Διαβάστε στην Καθημερινή", "url": album.get("url", "")})
+        row1.append({"text": "View Source", "url": album.get("url", "")})
         # Try to parse Greek title to Inducks code
         inducks_code = None
         search_query = quote(raw_title)
@@ -436,7 +428,7 @@ def notify_international_comic(album: dict, state: dict | None = None, country: 
         else:
             inducks_url = f"https://inducks.org/search.php?search={search_query}"
 
-    buttons = [row1, [{"text": cfg["inducks_btn"], "url": inducks_url}]] if row1 else [[{"text": cfg["inducks_btn"], "url": inducks_url}]]
+    buttons = [row1, [{"text": "Search on Inducks", "url": inducks_url}]] if row1 else [[{"text": "Search on Inducks", "url": inducks_url}]]
 
     _dispatch_notification(
         info=album,

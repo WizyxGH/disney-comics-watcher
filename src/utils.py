@@ -115,7 +115,8 @@ def is_fully_indexed_in_inducks(issue_code: str) -> bool:
         
     try:
         from src.db import query_db
-        res = query_db("SELECT fullyindexed FROM inducks_issue WHERE issuecode = ?", (issue_code,))
+        clean_code = issue_code.replace(" ", "").lower()
+        res = query_db("SELECT fullyindexed FROM inducks_issue WHERE LOWER(REPLACE(issuecode, ' ', '')) = ?", (clean_code,))
         if res and len(res) > 0:
             return res[0][0] == 'Y'
     except Exception as e:

@@ -1,6 +1,6 @@
 import re
 import unicodedata
-from src.dbi.isv_search import search_publication_code
+from src.dbi.isv_search import search_publication_code, _find_issue_by_title
 
 def _build_metadata(issue_path: str | None, name: str, info: dict, ean: str | None = None) -> dict:
     return {
@@ -185,13 +185,20 @@ def _build_glenat_inducks_path(title: str, ean: str | None = None, collection_la
         tome_match = re.search(r'(?:tome|t\.)\s*(\d+)', title_lower)
         tome_num = int(tome_match.group(1)) if tome_match else None
 
+    path = None
     if "creations originales" in coll_clean or "creations originales" in serie_clean:
-        return f"fr/DBG{str(tome_num).rjust(4)}" if tome_num is not None else "fr/DBG"
+        path = f"fr/DBG{str(tome_num).rjust(4)}" if tome_num is not None else "fr/DBG"
+    elif any(k in title_clean for k in ("grande histoire de picsou", "grande epopee de picsou")) or "grande histoire de picsou" in serie_clean:
+        path = f"fr/GHP{str(tome_num).rjust(4)}" if tome_num is not None else "fr/GHP"
+    elif any(k in title_clean for k in ("ages d'or", "age d'or")) or "ages d'or" in coll_clean or "ages d'or" in serie_clean:
+        path = f"fr/AOD{str(tome_num).rjust(4)}" if tome_num is not None else "fr/AOD"
 
-    if any(k in title_clean for k in ("grande histoire de picsou", "grande epopee de picsou")) or "grande histoire de picsou" in serie_clean:
-        return f"fr/GHP{str(tome_num).rjust(4)}" if tome_num is not None else "fr/GHP"
+    if path and re.match(r'^fr/[A-Z]+$', path):
+        found = _find_issue_by_title(title, "fr")
+        if found:
+            return found
 
-    if any(k in title_clean for k in ("ages d'or", "age d'or")) or "ages d'or" in coll_clean or "ages d'or" in serie_clean:
-        return f"fr/AOD{str(tome_num).rjust(4)}" if tome_num is not None else "fr/AOD"
+    if path:
+        return path
 
     return f"fr/GL_{ean[-6:]}" if ean else "fr/GL_TODO"

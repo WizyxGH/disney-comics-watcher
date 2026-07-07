@@ -99,6 +99,9 @@ def _parse_stories(html: str) -> tuple[str | None, str | None, list[dict]]:
             m = _STORY_CODE_RE.search(text)
             if m:
                 story['story_code'] = m.group(1).strip()
+            pages_match = re.search(r'Seitenanzahl:\s*(\d+)', text)
+            if pages_match:
+                story['pages'] = int(pages_match.group(1))
 
         # Starting page number (extracted from preview image URL)
         img_link = chapter.find('link', itemprop='image')
@@ -109,8 +112,10 @@ def _parse_stories(html: str) -> tuple[str | None, str | None, list[dict]]:
 
         stories.append(story)
 
-    # Calculate page counts from consecutive start pages
+    # Calculate page counts from consecutive start pages if not already found
     for i, story in enumerate(stories):
+        if 'pages' in story:
+            continue
         if 'start_page' not in story:
             continue
         if i + 1 < len(stories) and 'start_page' in stories[i + 1]:
@@ -143,7 +148,11 @@ def enrich_ltb_metadata(info: dict) -> dict:
         cover_title, issue_date, stories = _parse_stories(r.text)
         if stories:
             info['stories'] = stories
-            info['pages'] = LTB_DEFAULT_PAGES
+            last_story = stories[-1]
+            if 'start_page' in last_story and 'pages' in last_story:
+                info['pages'] = last_story['start_page'] + last_story['pages'] - 1
+            else:
+                info['pages'] = LTB_DEFAULT_PAGES
             if cover_title:
                 info['name'] = cover_title
             if issue_date:

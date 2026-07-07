@@ -159,27 +159,6 @@ LTBSO 16p177I TL 2645-4    24                       Weihnachtskuchen im Sommer
 LTBSO 16p201I TL 2279-2    24                       Wohlverdiente Erholung
 LTBSO 16p225I TL 2649-1    28                       Wirrulente Wirkwut
 
-^^ Source:  https://www.lustiges-taschenbuch.de/ausgaben/nebenreihen/spezial/band-131
-LTBSP 131    h3 Einfach tierisch [issdate:2007-03-13] [pages:256] [inx:FGK,-]
-LTBSP 131a  ?              1 c
-->          I TL 2676-2    20                       Die Herausforderung [entrycode:LTBSP 131p001]
-->          I TL  787-A    32                       Die Panzerknacker-Safari [entrycode:LTBSP 131p021]
-->          I TL 2325-3    12                       Walpurga, der Wuchtwaran [entrycode:LTBSP 131p053]
-->          I TL 1792-A    31                       Wilderer im Dschungel [entrycode:LTBSP 131p065]
-->          D  6126        23                       Die Straußeninsel-Safari [entrycode:LTBSP 131p096]
-->          I TL  917-B    19                       Die Stunde des Assistenten [entrycode:LTBSP 131p119]
-->          I TL 2538-03    1                       Das Leben ist ein Abenteuer: Blinde Passagiere [entrycode:LTBSP 131p138]
-->          I TL 1158-A    34                       Die Jagd nach dem Phönix [entrycode:LTBSP 131p139]
-->          I TL  190-AP   58                       Die Insel der betrübten Affen [entrycode:LTBSP 131p173]
-->          I TL 1175-A    34                       Gorilla mit Heimweh [entrycode:LTBSP 131p231]
-->          D 2004-257     33                       Das geheime Tal der Elefanten [entrycode:LTBSP 131p265]
-->          I TL 2609-02    1                       Dussels Dienste: Der Fernsehtechniker [entrycode:LTBSP 131p298]
-->          I TL 1200-A    37                       Tarzonald und das Molken-Per [entrycode:LTBSP 131p299]
-->          I TL 2839-1P   61                       Tutors Welt [entrycode:LTBSP 131p336]
-->          S 75090        10                       Die Foto-Safari [entrycode:LTBSP 131p397]
-->          S 76121        16                       Ein Bär hat's schwer [entrycode:LTBSP 131p407]
-->          D 96258        31                       Der Herr des Dschungels [entrycode:LTBSP 131p423]
-LTBSP 131s  D 95208        -201                       Heiße Tage in Afrika
 
 ^^ Source:  https://www.lustiges-taschenbuch.de/ausgaben/nebenreihen/ultimate-phantomias/band-44
 LTBUP 44     h3 Phantomias - Die Chronik eines Superhelden [issdate:1997-12-01] [pages:256] [inx:FGK,-]
@@ -210,10 +189,10 @@ LTBW 8p185  S 79115        16                       Der neue Schlittenhund
 LTBW 8p201  D 97627        52                       Ab in den Süden
 
 ^^ Source:  https://www.lustiges-taschenbuch.de/ausgaben/nebenreihen/ltb-young-comics/band-22
-LTBYC 22     h3 Spookyzone 22 [issdate:2026-07-07] [pages:256] [inx:FGK,-]
+LTBYC 22     h3 Spookyzone 22 [issdate:2026-07-07] [pages:176] [inx:FGK,-]
 LTBYC 22a   ?              1 c
 LTBYC 22p001               44                       Geister der Vergangenheit
 LTBYC 22p045               44                       Die größte Angst
 LTBYC 22p089               44                       Die grauenhafte Welt des Grimm
-LTBYC 22p133               118                       Das Mysterium im Maisfeld
+LTBYC 22p133               44                       Das Mysterium im Maisfeld
 

@@ -153,7 +153,7 @@ def main():
         ("Glénat", GLENAT_KEY_PREFIX, discover_glenat, "fr", "announced", fetch_glenat_details, True),
         ("Fantagraphics", FANTAGRAPHICS_KEY_PREFIX, discover_fantagraphics, "us", "announced", None, False),
         ("Marvel", MARVEL_KEY_PREFIX, discover_marvel, "us", "announced", None, False),
-        ("Egmont DE", EGMONT_DE_KEY_PREFIX, discover_egmont_de, "de", "announced", None, False),
+        ("Egmont DE", EGMONT_DE_KEY_PREFIX, discover_egmont_de, "de", "released", None, False),
         ("Kathimerini GR", KATHIMERINI_KEY_PREFIX, discover_kathimerini, "gr", "released", None, False),
     ]
     

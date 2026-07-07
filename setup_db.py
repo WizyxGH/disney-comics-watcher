@@ -65,14 +65,23 @@ def download_isv(table_name: str) -> list[list[str]]:
     """Downloads an ISV file and returns its rows as lists of strings."""
     url = f"{ISV_BASE}/{table_name}.isv"
     print(f"  Downloading {table_name}.isv ...", end=" ", flush=True)
-    r = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=60)
-    r.raise_for_status()
-    r.encoding = "utf-8"
-    lines = r.text.splitlines()
-    # ISV format: tab-separated values, first line is headers
-    rows = [line.split("^") for line in lines if line.strip()]
-    print(f"{len(rows)} rows")
-    return rows
+    
+    for attempt in range(5):
+        try:
+            r = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=60)
+            r.raise_for_status()
+            r.encoding = "utf-8"
+            lines = r.text.splitlines()
+            # ISV format: tab-separated values, first line is headers
+            rows = [line.split("^") for line in lines if line.strip()]
+            print(f"{len(rows)} rows")
+            return rows
+        except requests.exceptions.RequestException as e:
+            if attempt == 4:
+                raise
+            print(f"  [warn] Download failed ({e}), retrying {attempt + 1}/5...")
+            time.sleep(5)
+    return []
 
 
 def batch_insert_rows(table: str, columns: list[str], rows: list[tuple], batch_size: int = 80):

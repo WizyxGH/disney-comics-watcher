@@ -125,3 +125,32 @@ def discover_egmont_de():
             
     return result
 
+
+def fetch_egmont_de_details(url: str) -> dict:
+    if not url: return {}
+    s = get_session()
+    try:
+        r = s.get(url, timeout=15)
+        if r.status_code != 200: return {}
+        from bs4 import BeautifulSoup
+        soup = BeautifulSoup(r.text, 'html.parser')
+        
+        # Look for the script data state
+        script = soup.find('script', attrs={'data-state': 'product-details-product', 'type': 'application/json'})
+        if script:
+            import json
+            data = json.loads(script.text)
+            for spec in data.get('specs', []):
+                if spec.get('key') == 'Erscheinungsdatum':
+                    return {'date': spec.get('value')}
+        
+        # Fallback HTML table
+        th = soup.find(lambda tag: tag.name == 'th' and tag.text and 'Erscheinungsdatum' in tag.text)
+        if th:
+            td = th.find_next_sibling('td')
+            if td:
+                return {'date': td.text.strip()}
+    except Exception as e:
+        print(f"  [warn] fetch_egmont_de_details failed for {url}: {e}")
+    
+    return {}

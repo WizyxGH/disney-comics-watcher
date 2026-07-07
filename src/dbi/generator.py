@@ -90,9 +90,9 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         storycode = "?"
         
         storycode_field = storycode[:14].ljust(14)
-        pages_field     = " 1"            
-        brokpg          = " "             
-        pagel           = "c "            
+        pages_field     = "1  "
+        brokpg          = " "
+        pagel           = "c "
         
         plot_val, writ_val, art_val, ink_val, hero_val = "", "", "", "", ""
 
@@ -104,7 +104,7 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         if dbi_issue_code.startswith("JM "):
             writ_val, art_val = "FPt", "FPt"
 
-        rest = " " + plot_val.ljust(4) + writ_val.ljust(4) + art_val.ljust(4) + ink_val.ljust(4) + hero_val.ljust(4)
+        rest = plot_val.ljust(4) + writ_val.ljust(4) + art_val.ljust(4) + ink_val.ljust(4) + hero_val.ljust(4)
 
         if len(cover_ec) <= 12:
             prefix = f"{cover_ec.ljust(12)}{storycode_field}{pages_field}{brokpg}{pagel}{rest}"
@@ -159,13 +159,15 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
                     story_ec = f"{dbi_issue_code}{chr(97 + i)}"
                 
                 story_code = story.get("story_code", "") or story.get("code", "")
-                st_pages = str(story.get("pages", "")).rjust(2) if story.get("pages") else "  "
+                st_pages = str(story.get("pages", "")).ljust(3)
+                brokpg = " "
+                pagel = "  "
                 
                 story_rest = "".ljust(4) + "".ljust(4) + "".ljust(4) + "".ljust(4) + "".ljust(4)
                 if len(story_ec) <= 12:
-                    st_prefix = f"{story_ec.ljust(12)}{story_code.ljust(14)} {st_pages} {story_rest}"
+                    st_prefix = f"{story_ec.ljust(12)}{story_code.ljust(14)}{st_pages}{brokpg}{pagel}{story_rest}"
                 else:
-                    st_prefix = f"->          {story_code.ljust(14)} {st_pages} {story_rest}"
+                    st_prefix = f"->          {story_code.ljust(14)}{st_pages}{brokpg}{pagel}{story_rest}"
 
                 st_title = story.get("title", "")
                 st_suffixes = []

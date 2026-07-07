@@ -2,6 +2,37 @@ import re
 import unicodedata
 from src.dbi.isv_search import search_publication_code
 
+def _build_metadata(issue_path: str | None, name: str, info: dict, ean: str | None = None) -> dict:
+    return {
+        "issue_path": issue_path,
+        "name": name,
+        "price": info.get("price") or info.get("prix"),
+        "date": info.get("date") or info.get("date_mise_en_vente"),
+        "pages": info.get("pages"),
+        "size": info.get("size"),
+        "isstrans": info.get("isstrans"),
+        "ean": ean
+    }
+
+DE_MAPPINGS = [
+    (re.compile(r'Lustiges Taschenbuch Young Comics (?:Nr\.\s*)?(\d+)', re.IGNORECASE), r'de/LTBYC \1'),
+    (re.compile(r'Lustiges Taschenbuch Weihnachtsgeschichten (?:Nr\.\s*)?(\d+)', re.IGNORECASE), r'de/LTBWE \1'),
+    (re.compile(r'Micky Maus Magazin (?:Nr\.\s*)?(\d+)', re.IGNORECASE), r'de/MM \1'),
+    (re.compile(r'Micky Maus Legacy Collection (?:Nr\.\s*)?(\d+)', re.IGNORECASE), r'de/MMLC \1'),
+    (re.compile(r'Lustiges Taschenbuch (?:Nr\.\s*)?(\d+)', re.IGNORECASE), r'de/LTB \1'),
+    (re.compile(r'Entenhausener Ikonen (?:0*)?(\d+)', re.IGNORECASE), r'de/EIB \1'),
+    (re.compile(r'Enthologien (?:0*)?(\d+)', re.IGNORECASE), r'de/ENT \1'),
+]
+
+GR_MAPPINGS = [
+    (re.compile(r'Super MIKY\s*(?:#|Nr\.\s*)?(\d+)', re.IGNORECASE), r'gr/SM \1'),
+    (re.compile(r'Μίκυ\s+Μάους\s*#(\d+)', re.IGNORECASE), r'gr/MM \1'),
+    (re.compile(r'Κόμιξ\s*#(\d+)', re.IGNORECASE), r'gr/KX \1'),
+    (re.compile(r'Ντόναλντ\s*#(\d+)', re.IGNORECASE), r'gr/DD \1'),
+]
+
+US_MAPPINGS = []
+
 def resolve_magazine_metadata(info, overrides):
     codif   = info.get("codif", "")
     ov      = overrides.get(codif, {})
@@ -12,28 +43,15 @@ def resolve_magazine_metadata(info, overrides):
     issue_path = build_inducks_path(inducks, numero) if inducks and numero else None
     if not issue_path:
         issue_path = f"fr/TODO_{codif} {numero}"
-    return {
-        "issue_path": issue_path,
-        "name": name,
-        "price": info.get("prix"),
-        "date": info.get("date_mise_en_vente"),
-        "pages": None,
-        "size": None,
-        "isstrans": None,
-        "ean": None
-    }
+    return _build_metadata(issue_path, name, info)
 
 def resolve_us_metadata(info):
     title = info.get("title", "US Comic")
     sku   = str(info.get("sku") or info.get("id") or "TODO")
     
-    mappings = [
-        # Example exceptions if needed later
-    ]
-    
     issue_path = None
-    for pattern, repl in mappings:
-        m = re.search(pattern, title, re.IGNORECASE)
+    for pattern, repl in US_MAPPINGS:
+        m = pattern.search(title)
         if m:
             issue_path = m.expand(repl)
             break
@@ -44,16 +62,7 @@ def resolve_us_metadata(info):
     if not issue_path:
         issue_path = f"us/US_{sku[-6:]}"
         
-    return {
-        "issue_path": issue_path,
-        "name": title,
-        "price": info.get("price"),
-        "date": info.get("date"),
-        "pages": info.get("pages"),
-        "size": info.get("size"),
-        "isstrans": info.get("isstrans"),
-        "ean": None
-    }
+    return _build_metadata(issue_path, title, info)
 
 def resolve_de_metadata(info):
     title = info.get("title", "DE Comic")
@@ -65,17 +74,8 @@ def resolve_de_metadata(info):
 
     # 2. Regex fallback for very well-known series (faster, no DB needed)
     if not issue_path:
-        mappings = [
-            (r'Lustiges Taschenbuch Young Comics (?:Nr\.\s*)?(\d+)', r'de/LTBYC \1'),
-            (r'Lustiges Taschenbuch Weihnachtsgeschichten (?:Nr\.\s*)?(\d+)', r'de/LTBWE \1'),
-            (r'Micky Maus Magazin (?:Nr\.\s*)?(\d+)', r'de/MM \1'),
-            (r'Micky Maus Legacy Collection (?:Nr\.\s*)?(\d+)', r'de/MMLC \1'),
-            (r'Lustiges Taschenbuch (?:Nr\.\s*)?(\d+)', r'de/LTB \1'),
-            (r'Entenhausener Ikonen (?:0*)?(\d+)', r'de/EIB \1'),
-            (r'Enthologien (?:0*)?(\d+)', r'de/ENT \1'),
-        ]
-        for pattern, repl in mappings:
-            m = re.search(pattern, title, re.IGNORECASE)
+        for pattern, repl in DE_MAPPINGS:
+            m = pattern.search(title)
             if m:
                 issue_path = m.expand(repl)
                 break
@@ -91,16 +91,7 @@ def resolve_de_metadata(info):
         if not issue_path:
             issue_path = f"de/DE_{clean_id[-6:]}"
 
-    return {
-        "issue_path": issue_path,
-        "name": title,
-        "price": info.get("price"),
-        "date": info.get("date"),
-        "pages": info.get("pages"),
-        "size": info.get("size"),
-        "isstrans": info.get("isstrans"),
-        "ean": None
-    }
+    return _build_metadata(issue_path, title, info)
 
 def resolve_gr_metadata(info):
     title = info.get("title", "GR Comic")
@@ -111,14 +102,8 @@ def resolve_gr_metadata(info):
 
     # 2. Regex fallback
     if not issue_path:
-        mappings = [
-            (r'Super MIKY\s*(?:#|Nr\.\s*)?(\d+)', r'gr/SM \1'),
-            (r'M[ií]k[yu]\s+M[aá]ous\s*#(\d+)', r'gr/GR \1'),
-            (r'K[oó]mix\s*#(\d+)', r'gr/GRC \1'),
-            (r'Nt[oó]nalnt\s*#(\d+)', r'gr/GRD \1'),
-        ]
-        for pattern, repl in mappings:
-            m = re.search(pattern, title, re.IGNORECASE)
+        for pattern, repl in GR_MAPPINGS:
+            m = pattern.search(title)
             if m:
                 issue_path = m.expand(repl)
                 break
@@ -127,16 +112,7 @@ def resolve_gr_metadata(info):
     if not issue_path:
         issue_path = f"gr/GR_{book_id[-6:]}"
 
-    return {
-        "issue_path": issue_path,
-        "name": title,
-        "price": info.get("price"),
-        "date": info.get("date"),
-        "pages": info.get("pages"),
-        "size": info.get("size"),
-        "isstrans": info.get("isstrans"),
-        "ean": None
-    }
+    return _build_metadata(issue_path, title, info)
 
 def resolve_glenat_metadata(info):
     title = info.get("title", "Album Disney")
@@ -148,16 +124,7 @@ def resolve_glenat_metadata(info):
         serie_label=info.get("serie_label"),
         tome_num=info.get("numero_de_tome")
     )
-    return {
-        "issue_path": issue_path,
-        "name": title,
-        "price": info.get("price"),
-        "date": info.get("date"),
-        "pages": info.get("pages"),
-        "size": info.get("size"),
-        "isstrans": info.get("isstrans"),
-        "ean": ean_val
-    }
+    return _build_metadata(issue_path, title, info, ean=ean_val)
 
 def build_inducks_path(inducks, numero: str) -> str | None:
     if not inducks or not numero:

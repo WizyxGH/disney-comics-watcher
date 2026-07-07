@@ -8,7 +8,7 @@ from src.notifications import notify_magazine, notify_glenat_announce, notify_gl
 # Explicit imports
 from src.scrapers.fr import discover_de, discover_mlp_families, get_mlp_releve, discover_glenat, fetch_glenat_details
 from src.scrapers.us import discover_fantagraphics, discover_marvel
-from src.scrapers.de import discover_egmont_de
+from src.scrapers.de import discover_egmont_de, fetch_egmont_de_details
 from src.scrapers.gr import discover_kathimerini
 
 def process_magazines(state: dict, first_run: bool) -> int:
@@ -153,7 +153,7 @@ def main():
         ("Glénat", GLENAT_KEY_PREFIX, discover_glenat, "fr", "announced", fetch_glenat_details, True),
         ("Fantagraphics", FANTAGRAPHICS_KEY_PREFIX, discover_fantagraphics, "us", "announced", None, False),
         ("Marvel", MARVEL_KEY_PREFIX, discover_marvel, "us", "announced", None, False),
-        ("Egmont DE", EGMONT_DE_KEY_PREFIX, discover_egmont_de, "de", "released", None, False),
+        ("Egmont DE", EGMONT_DE_KEY_PREFIX, discover_egmont_de, "de", "released", fetch_egmont_de_details, False),
         ("Kathimerini GR", KATHIMERINI_KEY_PREFIX, discover_kathimerini, "gr", "released", None, False),
     ]
     

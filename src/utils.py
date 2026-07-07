@@ -69,6 +69,9 @@ def parse_date_fr(s):
         if "-" in s:
             y, m, d = s.split("-")
             return datetime(int(y), int(m), int(d)).date()
+        elif "." in s:
+            d, m, y = s.split(".")
+            return datetime(int(y), int(m), int(d)).date()
         else:
             d, m, y = s.split("/")
             return datetime(int(y), int(m), int(d)).date()

@@ -83,6 +83,9 @@ EGMONT_BASE = "https://www.egmont-shop.de"
 KATHIMERINI_URL = "https://www.kathimerini.gr/k/disney/"
 KATHIMERINI_KEY_PREFIX = "kathi-gr:"
 
+PANINI_IT_KEY_PREFIX = "panini-it:"
+PANINI_BR_KEY_PREFIX = "panini-br:"
+
 STATE_FILE    = "state.json"
 
 if os.path.exists(".env"):
@@ -101,6 +104,8 @@ TELEGRAM_THREAD_ID_FR = os.environ.get("TELEGRAM_THREAD_ID_FR", "")
 TELEGRAM_THREAD_ID_US = os.environ.get("TELEGRAM_THREAD_ID_US", "")
 TELEGRAM_THREAD_ID_DE = os.environ.get("TELEGRAM_THREAD_ID_DE", "")
 TELEGRAM_THREAD_ID_GR = os.environ.get("TELEGRAM_THREAD_ID_GR", "")
+TELEGRAM_THREAD_ID_IT = os.environ.get("TELEGRAM_THREAD_ID_IT", "")
+TELEGRAM_THREAD_ID_BR = os.environ.get("TELEGRAM_THREAD_ID_BR", "")
 TELEGRAM_API = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; DisneyComicsWatcher/1.0)"}

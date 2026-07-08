@@ -2,13 +2,15 @@ import os
 from src.dbi.utils import _format_date_for_dbi, _format_price_for_dbi, sort_dbi_file
 from src.dbi.mappers import (
     resolve_magazine_metadata, resolve_us_metadata, resolve_de_metadata, 
-    resolve_gr_metadata, resolve_glenat_metadata
+    resolve_gr_metadata, resolve_glenat_metadata, resolve_it_metadata, resolve_br_metadata
 )
 
 _RESOLVERS = {
     "us":       resolve_us_metadata,
     "de":       resolve_de_metadata,
     "gr":       resolve_gr_metadata,
+    "it":       resolve_it_metadata,
+    "br":       resolve_br_metadata,
     "glenat":   resolve_glenat_metadata,
     # magazine needs overrides -> handled separately
 }
@@ -50,10 +52,10 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         price   = _format_price_for_dbi(prix_raw)
 
         os.makedirs("issues", exist_ok=True)
-        dbi_path = os.path.join("issues", f"{publication_type}.dbi" if publication_type in ["us", "de", "gr"] else "fr.dbi")
+        dbi_path = os.path.join("issues", f"{publication_type}.dbi" if publication_type in ["us", "de", "gr", "it", "br"] else "fr.dbi")
 
         dbi_issue_code = issue_path
-        for prefix in ("fr/", "us/", "de/", "gr/"):
+        for prefix in ("fr/", "us/", "de/", "gr/", "it/", "br/"):
             if dbi_issue_code.startswith(prefix):
                 dbi_issue_code = dbi_issue_code[3:]
                 break

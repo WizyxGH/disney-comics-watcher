@@ -33,6 +33,20 @@ GR_MAPPINGS = [
 
 US_MAPPINGS = []
 
+IT_MAPPINGS = [
+    (re.compile(r'Topolino\s*(\d+)', re.IGNORECASE), r'it/TL \1'),
+    (re.compile(r'Paperinik\s*(\d+)', re.IGNORECASE), r'it/PK \1'),
+    (re.compile(r'Zio Paperone\s*(\d+)', re.IGNORECASE), r'it/ZP \1'),
+    (re.compile(r'I Classici Disney\s*(\d+)', re.IGNORECASE), r'it/CWD \1'),
+]
+
+BR_MAPPINGS = [
+    (re.compile(r'Mickey\s*(\d+)', re.IGNORECASE), r'br/MK \1'),
+    (re.compile(r'Pato Donald\s*(\d+)', re.IGNORECASE), r'br/PD \1'),
+    (re.compile(r'Zé Carioca\s*(\d+)', re.IGNORECASE), r'br/ZC \1'),
+    (re.compile(r'Tio Patinhas\s*(\d+)', re.IGNORECASE), r'br/TP \1'),
+]
+
 def resolve_magazine_metadata(info, overrides):
     codif   = info.get("codif", "")
     ov      = overrides.get(codif, {})
@@ -114,6 +128,42 @@ def resolve_gr_metadata(info):
 
     return _build_metadata(issue_path, title, info)
 
+def resolve_it_metadata(info):
+    title = info.get("title", "IT Comic")
+    book_id = str(info.get("id") or "TODO")
+
+    issue_path = search_publication_code(title, "it")
+
+    if not issue_path:
+        for pattern, repl in IT_MAPPINGS:
+            m = pattern.search(title)
+            if m:
+                issue_path = m.expand(repl)
+                break
+
+    if not issue_path:
+        issue_path = f"it/IT_{book_id[-6:]}"
+
+    return _build_metadata(issue_path, title, info)
+
+def resolve_br_metadata(info):
+    title = info.get("title", "BR Comic")
+    book_id = str(info.get("id") or "TODO")
+
+    issue_path = search_publication_code(title, "br")
+
+    if not issue_path:
+        for pattern, repl in BR_MAPPINGS:
+            m = pattern.search(title)
+            if m:
+                issue_path = m.expand(repl)
+                break
+
+    if not issue_path:
+        issue_path = f"br/BR_{book_id[-6:]}"
+
+    return _build_metadata(issue_path, title, info)
+
 def resolve_glenat_metadata(info):
     title = info.get("title", "Album Disney")
     ean_val = info.get("ean", "")
@@ -192,6 +242,8 @@ def _build_glenat_inducks_path(title: str, ean: str | None = None, collection_la
         path = f"fr/GHP{str(tome_num).rjust(4)}" if tome_num is not None else "fr/GHP"
     elif any(k in title_clean for k in ("ages d'or", "age d'or")) or "ages d'or" in coll_clean or "ages d'or" in serie_clean:
         path = f"fr/AOD{str(tome_num).rjust(4)}" if tome_num is not None else "fr/AOD"
+    elif "les grands heros" in coll_clean or "les grands heros" in serie_clean or "les grands heros" in title_clean:
+        path = f"fr/GHD{str(tome_num).rjust(4)}" if tome_num is not None else "fr/GHD"
 
     if path and re.match(r'^fr/[A-Z]+$', path):
         found = _find_issue_by_title(title, "fr")

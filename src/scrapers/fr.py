@@ -76,6 +76,8 @@ def discover_de():
             info = parse_block(text[starts[i]: starts[i + 1]])
             if not info or info["codif"] in SKIP_CODIFS:
                 continue
+            if re.search(r'\bREV\b', info.get("site_name", "")):
+                continue
             if info["expired_on"]:
                 d = parse_date_fr(info["expired_on"])
                 if d and d < today:
@@ -200,6 +202,8 @@ def discover_mlp_families(known_codifs: set, state: dict | None = None):
                 title       = titre_span.get_text(strip=True) if titre_span else ""
                 title_lower = title.lower()
                 if codif not in OVERRIDES and not any(kw in title_lower for kw in KEYWORDS):
+                    continue
+                if re.search(r'\bREV\b', title):
                     continue
 
                 numero_list = num_span.get_text(strip=True) if num_span else ""

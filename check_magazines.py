@@ -1,7 +1,7 @@
 import sys
 sys.stdout.reconfigure(encoding='utf-8')
 from datetime import datetime
-from src.config import PARIS_TZ, SKIP_CODIFS, OVERRIDES, GLENAT_KEY_PREFIX, FANTAGRAPHICS_KEY_PREFIX, MARVEL_KEY_PREFIX, EGMONT_DE_KEY_PREFIX, KATHIMERINI_KEY_PREFIX
+from src.config import PARIS_TZ, SKIP_CODIFS, OVERRIDES, GLENAT_KEY_PREFIX, FANTAGRAPHICS_KEY_PREFIX, MARVEL_KEY_PREFIX, EGMONT_DE_KEY_PREFIX, KATHIMERINI_KEY_PREFIX, PANINI_IT_KEY_PREFIX, PANINI_BR_KEY_PREFIX
 from src.utils import load_state, save_state, parse_date_fr
 from src.notifications import notify_magazine, notify_glenat_announce, notify_glenat_release, notify_international_comic
 
@@ -10,6 +10,8 @@ from src.scrapers.fr import discover_de, discover_mlp_families, get_mlp_releve, 
 from src.scrapers.us import discover_fantagraphics, discover_marvel
 from src.scrapers.de import discover_egmont_de, fetch_egmont_de_details
 from src.scrapers.gr import discover_kathimerini
+from src.scrapers.it import discover_panini_it, fetch_panini_it_details
+from src.scrapers.br import discover_panini_br, fetch_panini_br_details
 
 def process_magazines(state: dict, first_run: bool) -> int:
     notif_count = 0
@@ -60,25 +62,19 @@ def process_magazines(state: dict, first_run: bool) -> int:
         state[f'magazine:{codif}'] = numero
     return notif_count
 
-def process_provider(
+def _process_provider_books(
     state: dict, 
     first_run: bool, 
     provider_name: str, 
     key_prefix: str, 
-    discover_func, 
+    books: list, 
     country: str,
     default_status: str = "announced",
     fetch_details_func = None,
     is_glenat: bool = False
 ) -> int:
     notif_count = 0
-    print(f"[{provider_name}] Discovering comics...")
-    try:
-        books = discover_func()
-    except Exception as e:
-        print(f"  [error] discover_{provider_name.lower()}: {e}")
-        books = []
-        
+    print(f"[{provider_name}] Processing {len(books)} comic(s)...")
     today = datetime.now(PARIS_TZ).date()
 
     for book in books:
@@ -154,15 +150,37 @@ def main():
         ("Marvel", MARVEL_KEY_PREFIX, discover_marvel, "us", "announced", None, False),
         ("Egmont DE", EGMONT_DE_KEY_PREFIX, discover_egmont_de, "de", "released", fetch_egmont_de_details, False),
         ("Kathimerini GR", KATHIMERINI_KEY_PREFIX, discover_kathimerini, "gr", "released", None, False),
+        ("Panini IT", PANINI_IT_KEY_PREFIX, discover_panini_it, "it", "released", fetch_panini_it_details, False),
+        ("Panini BR", PANINI_BR_KEY_PREFIX, discover_panini_br, "br", "released", fetch_panini_br_details, False),
     ]
     
+    import concurrent.futures
+    print("[Global] Starting parallel discovery for providers...")
+    discovered_books = {}
+    
+    with concurrent.futures.ThreadPoolExecutor(max_workers=len(PROVIDERS)) as executor:
+        future_to_provider = {
+            executor.submit(func): (name, prefix, country, default_status, fetch_details, is_glenat)
+            for name, prefix, func, country, default_status, fetch_details, is_glenat in PROVIDERS
+        }
+        for future in concurrent.futures.as_completed(future_to_provider):
+            provider_info = future_to_provider[future]
+            name = provider_info[0]
+            try:
+                books = future.result()
+                discovered_books[name] = books
+            except Exception as e:
+                print(f"  [error] discover_{name.lower()}: {e}")
+                discovered_books[name] = []
+
     for name, prefix, func, country, default_status, fetch_details, is_glenat in PROVIDERS:
-        notif_count += process_provider(
+        books = discovered_books.get(name, [])
+        notif_count += _process_provider_books(
             state=state, 
             first_run=first_run, 
             provider_name=name, 
             key_prefix=prefix, 
-            discover_func=func, 
+            books=books, 
             country=country,
             default_status=default_status,
             fetch_details_func=fetch_details,
@@ -177,7 +195,7 @@ def main():
         print(f"[done] {notif_count} Telegram notification(s) sent.")
 
     from src.dbi.cleanup import cleanup_indexed_issues
-    cleanup_indexed_issues(["issues/fr.dbi", "issues/us.dbi", "issues/de.dbi", "issues/gr.dbi"])
+    cleanup_indexed_issues(["issues/fr.dbi", "issues/us.dbi", "issues/de.dbi", "issues/gr.dbi", "issues/it.dbi", "issues/br.dbi"])
 
 if __name__ == "__main__":
     main()

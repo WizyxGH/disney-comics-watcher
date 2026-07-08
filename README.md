@@ -10,7 +10,7 @@
 
 <hr/>
 
-**Disney Comics Watcher** is an open-source, automated bot designed to monitor new releases of Disney magazines (Picsou Magazine, Le Journal de Mickey, Super Picsou Géant, Fantomiald) and comic books (Glénat albums, Don Rosa, Carl Barks) in France, the US, Germany, and Greece.
+**Disney Comics Watcher** is an open-source, automated bot designed to monitor new releases of Disney magazines and comic books in France, the US, Germany, Greece, Italy, and Brazil.
 
 > ⭐️ **If you like this project, please consider giving it a star on GitHub! It helps a lot!** ⭐️
 
@@ -47,6 +47,8 @@ Stay updated with all the latest Disney comics releases directly on your phone!
 | [egmont-shop.de](https://www.egmont-shop.de/) | German Disney comic books and magazines published by Egmont Ehapa |
 | [lustiges-taschenbuch.de](https://www.lustiges-taschenbuch.de/) | Story data enricher for German LTB series |
 | [kathimerini.gr](https://www.kathimerini.gr/k/disney/) | Greek Disney comic books and magazines published by Kathimerini |
+| [panini.it](https://www.panini.it/) | Italian Disney comic books and magazines published by Panini Comics (Topolino, Paperinik...) |
+| [panini.com.br](https://panini.com.br/) | Brazilian Disney comic books and magazines published by Panini Brasil (Mickey, Tio Patinhas...) |
 
 ---
 
@@ -72,6 +74,8 @@ Want to run your own instance of the Watcher? Follow these simple steps:
    - `TELEGRAM_CHAT_ID_US`: The channel's username (e.g., `@MyDisneyComicsUS`) for US releases
    - `TELEGRAM_THREAD_ID_DE`: The thread ID for German releases (if using topics)
    - `TELEGRAM_THREAD_ID_GR`: The thread ID for Greek releases (if using topics)
+   - `TELEGRAM_THREAD_ID_IT`: The thread ID for Italian releases (if using topics)
+   - `TELEGRAM_THREAD_ID_BR`: The thread ID for Brazilian releases (if using topics)
 3. Go to the **Actions** tab and enable workflows. The bot will now run hourly automatically!
 
 ---
@@ -91,6 +95,8 @@ You can easily run the monitoring script locally without configuring global syst
    TELEGRAM_CHAT_ID_US=your_test_chat_id_us
    TELEGRAM_THREAD_ID_DE=your_test_thread_id_de
    TELEGRAM_THREAD_ID_GR=your_test_thread_id_gr
+   TELEGRAM_THREAD_ID_IT=your_test_thread_id_it
+   TELEGRAM_THREAD_ID_BR=your_test_thread_id_br
    # Optional: Add GEMINI_API_KEY for AI cover analysis
    ```
 3. Run the test suite:
@@ -114,7 +120,7 @@ Whether you want to add support for a new country, improve the Gemini AI prompts
 5. **Open a Pull Request** 🚀
 
 ### Ideas for future contributions:
-- Adding support for other countries (Italy, Brazil...)
+- Adding support for other countries (Netherlands, Spain, Scandinavia...)
 - Improving the Telegram message formatting
 - Enhancing the Gemini AI character detection
 - Adding new comic book publishers

@@ -4,7 +4,7 @@ import html as html_lib
 import time
 import requests
 from urllib.parse import quote, quote_plus
-from src.config import TELEGRAM_API, TELEGRAM_CHAT_ID, TELEGRAM_THREAD_ID_FR, TELEGRAM_THREAD_ID_US, TELEGRAM_THREAD_ID_DE, TELEGRAM_THREAD_ID_GR, OVERRIDES, AMAZON_AFFILIATE_TAG, SITE_BASE
+from src.config import TELEGRAM_API, TELEGRAM_CHAT_ID, TELEGRAM_THREAD_ID_FR, TELEGRAM_THREAD_ID_US, TELEGRAM_THREAD_ID_DE, TELEGRAM_THREAD_ID_GR, TELEGRAM_THREAD_ID_IT, TELEGRAM_THREAD_ID_BR, OVERRIDES, AMAZON_AFFILIATE_TAG, SITE_BASE
 from src.utils import format_price_fr, get_session, truncate_summary, isbn13_to_isbn10, is_fully_indexed_in_inducks
 from src.dbi.generator import generate_dbi_skeleton
 from src.dbi.mappers import build_inducks_path
@@ -140,21 +140,44 @@ def fetch_disneymagazines_cover(slug: str) -> str | None:
         print(f"  [warn] Unable to retrieve cover from DisneyMagazines for {slug}: {e}")
     return None
 
-def build_glenat_inducks_url(title: str) -> str:
+def build_glenat_inducks_url(album: dict) -> str:
     """Builds the Inducks URL for a Glénat album (direct page if possible, otherwise search)."""
+    title = album.get("title", "")
     title_lower = title.lower()
-    tome_match = re.search(r'(?:tome|t\.)\s*(\d+)', title_lower)
-    tome_num = int(tome_match.group(1)) if tome_match else None
+    tome_num = album.get("numero_de_tome")
 
-    if "grande histoire de picsou" in title_lower or "grande epopee de picsou" in title_lower or "grande épopée de picsou" in title_lower:
+    if tome_num is None:
+        tome_match = re.search(r'(?:tome|t\.)\s*(\d+)', title_lower)
+        if tome_match:
+            tome_num = int(tome_match.group(1))
+
+    collection_label = (album.get("collection_label") or "").lower()
+    serie_label = (album.get("serie_label") or "").lower()
+
+    import unicodedata
+    def clean_str(s):
+        if not s: return ""
+        s = unicodedata.normalize('NFKD', s)
+        return "".join(c for c in s if not unicodedata.combining(c))
+
+    coll_clean = clean_str(collection_label)
+    serie_clean = clean_str(serie_label)
+    title_clean = clean_str(title_lower)
+
+    if "grande histoire de picsou" in title_clean or "grande epopee de picsou" in title_clean or "grande histoire de picsou" in serie_clean:
         if tome_num is not None:
             return f"https://inducks.org/issue.php?c={quote_plus(f'fr/GHP{str(tome_num).rjust(4)}')}"
         return "https://inducks.org/publication.php?c=fr/GHP"
 
-    if "ages d'or" in title_lower or "âges d'or" in title_lower or "age d'or" in title_lower or "âge d'or" in title_lower:
+    if "ages d'or" in title_clean or "age d'or" in title_clean or "ages d'or" in coll_clean or "ages d'or" in serie_clean:
         if tome_num is not None:
             return f"https://inducks.org/issue.php?c={quote_plus(f'fr/AOD{str(tome_num).rjust(4)}')}"
         return "https://inducks.org/publication.php?c=fr/AOD"
+
+    if "les grands heros" in coll_clean or "les grands heros" in serie_clean or "les grands heros" in title_clean:
+        if tome_num is not None:
+            return f"https://inducks.org/issue.php?c={quote_plus(f'fr/GHD{str(tome_num).rjust(4)}')}"
+        return "https://inducks.org/publication.php?c=fr/GHD"
 
     return f"https://inducks.org/search.php?search={quote(title)}"
 
@@ -199,7 +222,7 @@ def _dispatch_notification(
     else:
         safe_code = re.sub(r'[^a-zA-Z0-9]', '_', issue_code).lower()
     
-    country_prefix = publication_type if publication_type in ("us", "de", "gr") else "fr"
+    country_prefix = publication_type if publication_type in ("us", "de", "gr", "it", "br") else "fr"
     cover_filename = f"{country_prefix}_{safe_code}a_001"
 
     # 1. Truncate summary if necessary
@@ -313,7 +336,7 @@ def _build_glenat_buttons(album: dict, raw_title: str) -> list:
     if AMAZON_AFFILIATE_TAG:
         asin = isbn13_to_isbn10(album.get("ean", ""))
         if asin: row1.append({"text": "Buy on Amazon", "url": f"https://www.amazon.fr/dp/{asin}/?tag={AMAZON_AFFILIATE_TAG}"})
-    return [row1, [{"text": "Search on Inducks", "url": build_glenat_inducks_url(raw_title)}]]
+    return [row1, [{"text": "Search on Inducks", "url": build_glenat_inducks_url(album)}]]
 
 def notify_glenat_announce(album: dict, state: dict | None = None):
     """Glénat announcement notification (upcoming album)."""
@@ -386,6 +409,20 @@ def notify_international_comic(album: dict, state: dict | None = None, country: 
             "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
             "price_prefix": "💶 Price:",
             "thread_id": TELEGRAM_THREAD_ID_GR,
+        },
+        "it": {
+            "announce_title": f"<b>Announcement — {title}</b>",
+            "release_title": f"<b>{title}</b>",
+            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
+            "price_prefix": "💶 Price:",
+            "thread_id": TELEGRAM_THREAD_ID_IT,
+        },
+        "br": {
+            "announce_title": f"<b>Announcement — {title}</b>",
+            "release_title": f"<b>{title}</b>",
+            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
+            "price_prefix": "💵 Price:",
+            "thread_id": TELEGRAM_THREAD_ID_BR,
         }
     }
 
@@ -427,6 +464,23 @@ def notify_international_comic(album: dict, state: dict | None = None, country: 
             inducks_url = f"https://inducks.org/issue.php?c={quote_plus(inducks_code)}"
         else:
             inducks_url = f"https://inducks.org/search.php?search={search_query}"
+    elif country == "it" or country == "br":
+        row1.append({"text": "View Source", "url": album.get("url", "")})
+        
+        # Extrapolate Topolino
+        inducks_code = None
+        if country == "it":
+            if "Topolino" in raw_title:
+                m = re.search(r'(\d+)', raw_title)
+                if m: inducks_code = f"it/TL {m.group(1)}"
+            elif "Paperinik" in raw_title:
+                m = re.search(r'(\d+)', raw_title)
+                if m: inducks_code = f"it/PK {m.group(1)}"
+        
+        if inducks_code:
+            inducks_url = f"https://inducks.org/issue.php?c={quote_plus(inducks_code)}"
+        else:
+            inducks_url = f"https://inducks.org/search.php?search={quote(raw_title)}"
 
     buttons = [row1, [{"text": "Search on Inducks", "url": inducks_url}]] if row1 else [[{"text": "Search on Inducks", "url": inducks_url}]]
 

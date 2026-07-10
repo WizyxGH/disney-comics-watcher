@@ -276,8 +276,10 @@ def _dispatch_notification(
         admin_id = os.environ.get("TELEGRAM_ADMIN_ID")
         if admin_id and dbi_content:
             clean_dbi = html_lib.escape(dbi_content.strip())
-            dm_text = f"New DBI generated for <b>{html_lib.escape(raw_title)}</b>:\n<pre>{clean_dbi}</pre>"
-            send_telegram(photo_url=None, caption=dm_text, chat_id=admin_id)
+            source_url = info.get("url")
+            title_html = f'<a href="{html_lib.escape(source_url)}"><b>{html_lib.escape(raw_title)}</b></a>' if source_url else f'<b>{html_lib.escape(raw_title)}</b>'
+            dm_text = f"New DBI generated for {title_html}:\n<pre>{clean_dbi}</pre>"
+            send_telegram(photo_url=cover_url, caption=dm_text, chat_id=admin_id)
 
 
 # ── PUBLIC NOTIFICATION FUNCTIONS ───────────────────────────────────────────────

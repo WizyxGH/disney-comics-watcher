@@ -16,16 +16,15 @@ from bs4 import BeautifulSoup
 # Configuration – extend here to support new sub-series
 # ---------------------------------------------------------------------------
 LTB_BASE = "https://www.lustiges-taschenbuch.de/ausgaben/"
-LTB_DEFAULT_PAGES = 256  # used to estimate last story length
 
 LTB_URL_PATTERNS: dict[str, str] = {
-    "de/LTB":    "alle-ausgaben/ltb-{num}",
-    "de/ENT":    "nebenreihen/enthologien/band-{num}",
     "de/EIB":    "nebenreihen/entenhausener-ikonen/band-{num}",
+    "de/ENT":    "nebenreihen/enthologien/band-{num}",
+    "de/LTB":    "alle-ausgaben/ltb-{num}",    
+    "de/LTBBA":  "nebenreihen/ltb-camping/band-{num}",
     "de/LTBWE":  "nebenreihen/weihnachtsgeschichten/band-{num}",
     "de/LTBYC":  "nebenreihen/ltb-young-comics/band-{num}",
     "de/MMLC":   "nebenreihen/micky-maus-legacy-collection/band-{num}",
-    "de/LTBBA":  "nebenreihen/ltb-camping/band-{num}",
 }
 
 # Regex matching any known Inducks story code prefix:
@@ -123,8 +122,6 @@ def _parse_stories(html: str) -> tuple[str | None, str | None, list[dict]]:
             continue
         if i + 1 < len(stories) and 'start_page' in stories[i + 1]:
             story['pages'] = stories[i + 1]['start_page'] - story['start_page']
-        else:
-            story['pages'] = LTB_DEFAULT_PAGES - story['start_page'] + 1
 
     return cover_title, issue_date, stories
 
@@ -156,8 +153,6 @@ def enrich_ltb_metadata(info: dict) -> dict:
             last_story = stories[-1]
             if 'start_page' in last_story and 'pages' in last_story:
                 info['pages'] = last_story['start_page'] + last_story['pages'] - 1
-            else:
-                info['pages'] = LTB_DEFAULT_PAGES
             if cover_title:
                 info['name'] = cover_title
             if issue_date:

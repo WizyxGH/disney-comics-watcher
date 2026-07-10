@@ -8,7 +8,7 @@ def discover_panini_it():
     result = []
     
     # Starting with the most probable URL for Disney comics on Panini Italy
-    url = "https://www.panini.it/fumetti-libri-riviste/disney.html"
+    url = "https://www.panini.it/shp_ita_it/fumetti-libri-riviste/disney.html"
     
     try:
         r = s.get(url, timeout=15)
@@ -46,7 +46,7 @@ def discover_panini_it():
                 "price": price,
                 "cover_url": cover_url,
                 "date": None,
-                "released": True
+                "released": False
             })
             
     except Exception as e:

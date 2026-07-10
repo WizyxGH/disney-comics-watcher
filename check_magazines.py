@@ -150,8 +150,8 @@ def main():
         ("Marvel", MARVEL_KEY_PREFIX, discover_marvel, "us", "announced", None, False),
         ("Egmont DE", EGMONT_DE_KEY_PREFIX, discover_egmont_de, "de", "released", fetch_egmont_de_details, False),
         ("Kathimerini GR", KATHIMERINI_KEY_PREFIX, discover_kathimerini, "gr", "released", None, False),
-        ("Panini IT", PANINI_IT_KEY_PREFIX, discover_panini_it, "it", "released", fetch_panini_it_details, False),
-        ("Panini BR", PANINI_BR_KEY_PREFIX, discover_panini_br, "br", "released", fetch_panini_br_details, False),
+        ("Panini IT", PANINI_IT_KEY_PREFIX, discover_panini_it, "it", "announced", fetch_panini_it_details, False),
+        ("Panini BR", PANINI_BR_KEY_PREFIX, discover_panini_br, "br", "announced", fetch_panini_br_details, False),
     ]
     
     import concurrent.futures

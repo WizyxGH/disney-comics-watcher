@@ -143,6 +143,8 @@ def enrich_ltb_metadata(info: dict) -> dict:
     if not url:
         return info
 
+    info['url'] = url
+
     print(f"  [LTB] Fetching story list: {url}")
     try:
         r = requests.get(url, timeout=15)

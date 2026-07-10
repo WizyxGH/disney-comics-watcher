@@ -14,46 +14,48 @@ def _build_metadata(issue_path: str | None, name: str, info: dict, ean: str | No
         "ean": ean
     }
 
+ISSUE_NUM_PATTERN = r'(\d+(?:/\d+)?)'
+
 DE_MAPPINGS = [
-    (re.compile(r'Lustiges Taschenbuch Young Comics (?:Nr\.\s*)?(\d+)', re.IGNORECASE), r'de/LTBYC \1'),
-    (re.compile(r'Lustiges Taschenbuch Weihnachtsgeschichten (?:Nr\.\s*)?(\d+)', re.IGNORECASE), r'de/LTBWE \1'),
-    (re.compile(r'Micky Maus Magazin (?:Nr\.\s*)?(\d+)', re.IGNORECASE), r'de/MM \1'),
-    (re.compile(r'Micky Maus Comics (?:Nr\.\s*)?(\d+)', re.IGNORECASE), r'de/MMC \1'),
-    (re.compile(r'Micky Maus Legacy Collection (?:Nr\.\s*)?(\d+)', re.IGNORECASE), r'de/MMLC \1'),
-    (re.compile(r'Die tollsten Geschichten von Donald Duck (?:Sonderheft)?.*?(\d+)', re.IGNORECASE), r'de/DDSH \1'),
-    (re.compile(r'Lustiges Taschenbuch (?:Nr\.\s*)?(\d+)', re.IGNORECASE), r'de/LTB \1'),
-    (re.compile(r'Entenhausener Ikonen (?:0*)?(\d+)', re.IGNORECASE), r'de/EIB \1'),
-    (re.compile(r'Enthologien (?:0*)?(\d+)', re.IGNORECASE), r'de/ENT \1'),
+    (re.compile(rf'Lustiges Taschenbuch Young Comics (?:Nr\.\s*)?{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'de/LTBYC \1'),
+    (re.compile(rf'Lustiges Taschenbuch Weihnachtsgeschichten (?:Nr\.\s*)?{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'de/LTBWE \1'),
+    (re.compile(rf'Micky Maus Magazin (?:Nr\.\s*)?{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'de/MM \1'),
+    (re.compile(rf'Micky Maus Comics (?:Nr\.\s*)?{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'de/MMC \1'),
+    (re.compile(rf'Micky Maus Legacy Collection (?:Nr\.\s*)?{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'de/MMLC \1'),
+    (re.compile(rf'Die tollsten Geschichten von Donald Duck (?:Sonderheft)?.*?{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'de/DDSH \1'),
+    (re.compile(rf'Lustiges Taschenbuch (?:Nr\.\s*)?{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'de/LTB \1'),
+    (re.compile(rf'Entenhausener Ikonen (?:0*)?{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'de/EIB \1'),
+    (re.compile(rf'Enthologien (?:0*)?{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'de/ENT \1'),
 ]
 
 GR_MAPPINGS = [
-    (re.compile(r'Super MIKY\s*(?:#|Nr\.\s*)?(\d+)', re.IGNORECASE), r'gr/SM \1'),
-    (re.compile(r'Μίκυ\s+Μάους\s*#(\d+)', re.IGNORECASE), r'gr/MM \1'),
-    (re.compile(r'Κόμιξ\s*#(\d+)', re.IGNORECASE), r'gr/KX \1'),
-    (re.compile(r'Ντόναλντ\s*#(\d+)', re.IGNORECASE), r'gr/DD \1'),
+    (re.compile(rf'Super MIKY\s*(?:#|Nr\.\s*)?{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'gr/SM \1'),
+    (re.compile(rf'Μίκυ\s+Μάους\s*#{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'gr/MM \1'),
+    (re.compile(rf'Κόμιξ\s*#{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'gr/KX \1'),
+    (re.compile(rf'Ντόναλντ\s*#{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'gr/DD \1'),
 ]
 
 US_MAPPINGS = [
-    (re.compile(r'The Complete Carl Barks Disney Library.*?Vol\.\s*(\d+)', re.IGNORECASE), r'us/CBL \1'),
-    (re.compile(r'Disney Masters.*?Vol\.\s*(\d+)', re.IGNORECASE), r'us/DM \1'),
-    (re.compile(r'Disney Afternoon Adventures.*?Vol\.\s*(\d+)', re.IGNORECASE), r'us/DAA \1'),
-    (re.compile(r'Life and Times of Scrooge McDuck.*?Vol(?:ume|\.)\s*(\d+)', re.IGNORECASE), r'us/CLTS \1'),
+    (re.compile(rf'The Complete Carl Barks Disney Library.*?Vol\.\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'us/CBL \1'),
+    (re.compile(rf'Disney Masters.*?Vol\.\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'us/DM \1'),
+    (re.compile(rf'Disney Afternoon Adventures.*?Vol\.\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'us/DAA \1'),
+    (re.compile(rf'Life and Times of Scrooge McDuck.*?Vol(?:ume|\.)\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'us/CLTS \1'),
 ]
 
 IT_MAPPINGS = [
-    (re.compile(r'Topolino\s*(\d+)', re.IGNORECASE), r'it/TL \1'),
-    (re.compile(r'Paperinik\s*(\d+)', re.IGNORECASE), r'it/PK \1'),
-    (re.compile(r'Zio Paperone\s*(\d+)', re.IGNORECASE), r'it/ZP \1'),
-    (re.compile(r'I Classici Disney\s*(\d+)', re.IGNORECASE), r'it/CWD \1'),
+    (re.compile(rf'Topolino\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'it/TL \1'),
+    (re.compile(rf'Paperinik\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'it/PK \1'),
+    (re.compile(rf'Zio Paperone\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'it/ZP \1'),
+    (re.compile(rf'I Classici Disney\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'it/CWD \1'),
 ]
 
 BR_MAPPINGS = [
-    (re.compile(r'Mickey\s*(\d+)', re.IGNORECASE), r'br/MK \1'),
-    (re.compile(r'Pato Donald\s*(\d+)', re.IGNORECASE), r'br/PD \1'),
-    (re.compile(r'Zé Carioca\s*(\d+)', re.IGNORECASE), r'br/ZC \1'),
-    (re.compile(r'Tio Patinhas\s*(\d+)', re.IGNORECASE), r'br/TP \1'),
+    (re.compile(rf'Mickey\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'br/MK \1'),
+    (re.compile(rf'Pato Donald\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'br/PD \1'),
+    (re.compile(rf'Zé Carioca\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'br/ZC \1'),
+    (re.compile(rf'Tio Patinhas\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'br/TP \1'),
     (re.compile(r'\(BD Disney\)', re.IGNORECASE), r'br/BDD'),
-    (re.compile(r'Grandes Sagas Disney.*?Vol\.\s*(\d+)', re.IGNORECASE), r'br/GSD \1'),
+    (re.compile(rf'Grandes Sagas Disney.*?Vol\.\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'br/GSD \1'),
 ]
 
 def resolve_magazine_metadata(info, overrides):
@@ -105,7 +107,7 @@ def resolve_de_metadata(info):
 
     # 3. Generic acronym fallback
     if not issue_path:
-        m = re.search(r'([A-Za-z\s\.]+)(?:Nr\.\s*|0*)?(\d+)', title)
+        m = re.search(r'([A-Za-z\s\.]+)(?:Nr\.\s*|0*)?(\d+(?:/\d+)?)', title)
         if m:
             text_part, num_part = m.group(1).strip(), m.group(2)
             acronym = "".join([w[0].upper() for w in text_part.split() if w and w[0].isalpha()])
@@ -113,6 +115,19 @@ def resolve_de_metadata(info):
                 issue_path = f"de/{acronym} {num_part}"
         if not issue_path:
             issue_path = f"de/UNK_{clean_id[-6:]}"
+
+    # Bolderbast rules: MM/YYYY -> YYYY-MM (e.g. 03/2026 -> 2026-03)
+    # Also removes the space if it's just a prefix and date.
+    if issue_path:
+        m = re.search(r'( ?)(\d{1,2})/(\d{4})$', issue_path)
+        if m:
+            space, mm, yyyy = m.groups()
+            base = issue_path[:m.start()]
+            if base.startswith("de/") and " " not in base[3:]:
+                # If it's a simple prefix like 'de/DS', remove the space (e.g. de/DS2026-03)
+                issue_path = f"{base.strip()}{yyyy}-{mm.zfill(2)}"
+            else:
+                issue_path = f"{base.strip()} {yyyy}-{mm.zfill(2)}"
 
     return _build_metadata(issue_path, title, info)
 

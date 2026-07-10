@@ -436,53 +436,20 @@ def notify_international_comic(album: dict, state: dict | None = None, country: 
 
     row1 = []
     inducks_url = f"https://inducks.org/search.php?search={quote(raw_title)}"
+    issue_path = album.get("issue_path")
+    if issue_path and "UNK" not in issue_path:
+        if " " in issue_path:
+            inducks_url = f"https://inducks.org/issue.php?c={quote_plus(issue_path)}"
+        else:
+            inducks_url = f"https://inducks.org/publication.php?c={quote_plus(issue_path)}"
 
     if country == "us":
         row1.append({"text": "View Source", "url": album.get("url", "")})
         if AMAZON_AFFILIATE_TAG and album.get("sku"):
             asin = isbn13_to_isbn10(album.get("sku", ""))
             if asin: row1.append({"text": "Buy on Amazon", "url": f"https://www.amazon.fr/dp/{asin}/?tag={AMAZON_AFFILIATE_TAG}"})
-    elif country == "de":
+    else:
         row1.append({"text": "View Source", "url": album.get("url", "")})
-    elif country == "gr":
-        row1.append({"text": "View Source", "url": album.get("url", "")})
-        # Try to parse Greek title to Inducks code
-        inducks_code = None
-        search_query = quote(raw_title)
-        if "Μίκυ Μάους" in raw_title:
-            m = re.search(r'#(\d+)', raw_title)
-            if m: inducks_code = f"gr/MM {m.group(1)}"
-        elif "Ντόναλντ" in raw_title:
-            m = re.search(r'#(\d+)', raw_title)
-            if m: inducks_code = f"gr/DD {m.group(1)}"
-        elif "Super MIKY" in raw_title:
-            m = re.search(r'#(\d+)', raw_title)
-            if m: inducks_code = f"gr/SM {m.group(1)}"
-        elif "Κόμιξ" in raw_title or "ΚΟΜΙΞ" in raw_title:
-            m = re.search(r'#(\d+)', raw_title)
-            if m: inducks_code = f"gr/KX {m.group(1)}"
-        
-        if inducks_code:
-            inducks_url = f"https://inducks.org/issue.php?c={quote_plus(inducks_code)}"
-        else:
-            inducks_url = f"https://inducks.org/search.php?search={search_query}"
-    elif country == "it" or country == "br":
-        row1.append({"text": "View Source", "url": album.get("url", "")})
-        
-        # Extrapolate Topolino
-        inducks_code = None
-        if country == "it":
-            if "Topolino" in raw_title:
-                m = re.search(r'(\d+)', raw_title)
-                if m: inducks_code = f"it/TL {m.group(1)}"
-            elif "Paperinik" in raw_title:
-                m = re.search(r'(\d+)', raw_title)
-                if m: inducks_code = f"it/PK {m.group(1)}"
-        
-        if inducks_code:
-            inducks_url = f"https://inducks.org/issue.php?c={quote_plus(inducks_code)}"
-        else:
-            inducks_url = f"https://inducks.org/search.php?search={quote(raw_title)}"
 
     buttons = [row1, [{"text": "Search on Inducks", "url": inducks_url}]] if row1 else [[{"text": "Search on Inducks", "url": inducks_url}]]
 

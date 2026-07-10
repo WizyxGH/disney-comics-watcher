@@ -134,7 +134,7 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         
         src_url = info.get("url") or info.get("link") or ""
         if src_url:
-            body_parts.append(f"\n^^ Source:  {src_url}\n")
+            body_parts.append(f"\n^^ Source: {src_url}\n")
         else:
             body_parts.append(f"\n^^ Source:\n")
             

@@ -40,8 +40,9 @@ def discover_kathimerini() -> list[dict]:
                     # 1. Try PressReader high-res cover
                     img_url = None
 
-                    # 1. Fetch cover from the Kathimerini article itself (most reliable)
+                    # 1. Fetch cover and date from the Kathimerini article itself (most reliable)
                     try:
+                        date_val = None
                         r_art = s.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
                         if r_art.status_code == 200:
                             art_soup = BeautifulSoup(r_art.text, 'html.parser')
@@ -50,6 +51,12 @@ def discover_kathimerini() -> list[dict]:
                                 if src and ('uploads' in src or 'img' in src) and src.startswith('http'):
                                     img_url = src
                                     break
+                                    
+                            time_elem = art_soup.find('time')
+                            if time_elem:
+                                m_date = re.search(r'(\d{2})\.(\d{2})\.(\d{4})', time_elem.text)
+                                if m_date:
+                                    date_val = f"{m_date.group(1)}/{m_date.group(2)}/{m_date.group(3)}"
                     except Exception as e:
                         print(f"  [warn] Failed to fetch Kathimerini article {url}: {e}")
 
@@ -79,7 +86,7 @@ def discover_kathimerini() -> list[dict]:
                         "url": url,
                         "price": "N/A (Kiosk)",  # Usually distributed with Sunday newspaper
                         "cover_url": img_url,
-                        "date": None,
+                        "date": date_val,
                         "summary": ""
                     })
     except Exception as e:

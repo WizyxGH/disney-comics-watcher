@@ -59,15 +59,22 @@ def cleanup_indexed_issues(dbi_paths: list[str]):
         return
 
     search_list = list(issue_codes_to_check)
+    
+    query_items = set(search_list)
+    for code in search_list:
+        if '-' in code:
+            query_items.add(code.split('-')[0])
+    query_list = list(query_items)
+    
     found_codes = set()
     
-    print(f"  [DBI] Checking {len(search_list)} issue(s) against Inducks database...")
+    print(f"  [DBI] Checking {len(query_list)} issue(s) against Inducks database...")
     from src.db import query_db
     try:
         # Process in batches of 100 to avoid overly large queries
         batch_size = 100
-        for i in range(0, len(search_list), batch_size):
-            batch = search_list[i:i+batch_size]
+        for i in range(0, len(query_list), batch_size):
+            batch = query_list[i:i+batch_size]
             placeholders = ','.join(['?'] * len(batch))
             query = f"SELECT issuecode, fullyindexed FROM inducks_issue WHERE LOWER(REPLACE(issuecode, ' ', '')) IN ({placeholders})"
             res = query_db(query, tuple(batch))
@@ -106,7 +113,16 @@ def cleanup_indexed_issues(dbi_paths: list[str]):
         country_prefix = os.path.basename(path).replace(".dbi", "").lower()
         
         for orig_code, clean_code, block in parsed_blocks:
-            if not clean_code or clean_code not in found_codes:
+            is_found = False
+            if clean_code:
+                if clean_code in found_codes:
+                    is_found = True
+                elif '-' in clean_code:
+                    first_part = clean_code.split('-')[0]
+                    if first_part in found_codes:
+                        is_found = True
+                        
+            if not is_found:
                 kept_blocks.append(block)
             else:
                 print(f"  [DBI] Issue {orig_code} is already in Inducks. Removing from {path}.")

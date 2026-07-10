@@ -119,6 +119,13 @@ def is_fully_indexed_in_inducks(issue_code: str) -> bool:
         res = query_db("SELECT fullyindexed FROM inducks_issue WHERE LOWER(REPLACE(issuecode, ' ', '')) = ?", (clean_code,))
         if res and len(res) > 0:
             return res[0][0] == 'Y'
+            
+        # Fallback for double issues (e.g. fr/JM 3864-65 -> check fr/JM 3864)
+        if '-' in clean_code:
+            first_part = clean_code.split('-')[0]
+            res = query_db("SELECT fullyindexed FROM inducks_issue WHERE LOWER(REPLACE(issuecode, ' ', '')) = ?", (first_part,))
+            if res and len(res) > 0:
+                return res[0][0] == 'Y'
     except Exception as e:
         print(f"  [warn] Failed to query fully indexed status from DB for {issue_code}: {e}")
         

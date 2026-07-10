@@ -28,6 +28,8 @@ def discover_panini_br():
             
             img_elem = item.select_one('.product-image-photo')
             cover_url = img_elem.get('src') if img_elem else None
+            if cover_url:
+                cover_url = re.sub(r'-S\d+-.*$', '-S897-f.webp', cover_url)
             
             sku = None
             action_elem = item.select_one('[data-product-id]')

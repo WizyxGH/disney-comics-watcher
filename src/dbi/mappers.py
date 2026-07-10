@@ -33,7 +33,12 @@ GR_MAPPINGS = [
     (re.compile(r'Ντόναλντ\s*#(\d+)', re.IGNORECASE), r'gr/DD \1'),
 ]
 
-US_MAPPINGS = []
+US_MAPPINGS = [
+    (re.compile(r'The Complete Carl Barks Disney Library.*?Vol\.\s*(\d+)', re.IGNORECASE), r'us/CBL \1'),
+    (re.compile(r'Disney Masters.*?Vol\.\s*(\d+)', re.IGNORECASE), r'us/DM \1'),
+    (re.compile(r'Disney Afternoon Adventures.*?Vol\.\s*(\d+)', re.IGNORECASE), r'us/DAA \1'),
+    (re.compile(r'Life and Times of Scrooge McDuck.*?Vol(?:ume|\.)\s*(\d+)', re.IGNORECASE), r'us/CLTS \1'),
+]
 
 IT_MAPPINGS = [
     (re.compile(r'Topolino\s*(\d+)', re.IGNORECASE), r'it/TL \1'),
@@ -47,6 +52,8 @@ BR_MAPPINGS = [
     (re.compile(r'Pato Donald\s*(\d+)', re.IGNORECASE), r'br/PD \1'),
     (re.compile(r'Zé Carioca\s*(\d+)', re.IGNORECASE), r'br/ZC \1'),
     (re.compile(r'Tio Patinhas\s*(\d+)', re.IGNORECASE), r'br/TP \1'),
+    (re.compile(r'\(BD Disney\)', re.IGNORECASE), r'br/BDD'),
+    (re.compile(r'Grandes Sagas Disney.*?Vol\.\s*(\d+)', re.IGNORECASE), r'br/GSD \1'),
 ]
 
 def resolve_magazine_metadata(info, overrides):
@@ -58,12 +65,12 @@ def resolve_magazine_metadata(info, overrides):
     
     issue_path = build_inducks_path(inducks, numero) if inducks and numero else None
     if not issue_path:
-        issue_path = f"fr/TODO_{codif} {numero}"
+        issue_path = "fr/UNK"
     return _build_metadata(issue_path, name, info)
 
 def resolve_us_metadata(info):
     title = info.get("title", "US Comic")
-    sku   = str(info.get("sku") or info.get("id") or "TODO")
+    sku   = str(info.get("sku") or info.get("id") or "UNK")
     
     issue_path = None
     for pattern, repl in US_MAPPINGS:
@@ -76,13 +83,13 @@ def resolve_us_metadata(info):
         issue_path = search_publication_code(title, "us")
         
     if not issue_path:
-        issue_path = f"us/US_{sku[-6:]}"
+        issue_path = f"us/UNK_{sku[-6:]}"
         
     return _build_metadata(issue_path, title, info)
 
 def resolve_de_metadata(info):
     title = info.get("title", "DE Comic")
-    book_id = str(info.get("id") or "TODO")
+    book_id = str(info.get("id") or "UNK")
     clean_id = book_id.split('/')[-1]
 
     # 1. DB lookup first (exact / contains / fuzzy)
@@ -105,13 +112,13 @@ def resolve_de_metadata(info):
             if acronym:
                 issue_path = f"de/{acronym} {num_part}"
         if not issue_path:
-            issue_path = f"de/DE_{clean_id[-6:]}"
+            issue_path = f"de/UNK_{clean_id[-6:]}"
 
     return _build_metadata(issue_path, title, info)
 
 def resolve_gr_metadata(info):
     title = info.get("title", "GR Comic")
-    book_id = str(info.get("id") or "TODO")
+    book_id = str(info.get("id") or "UNK")
 
     # 1. DB lookup first
     issue_path = search_publication_code(title, "gr")
@@ -126,13 +133,13 @@ def resolve_gr_metadata(info):
 
     # 3. Generic fallback using the article ID
     if not issue_path:
-        issue_path = f"gr/GR_{book_id[-6:]}"
+        issue_path = f"gr/UNK_{book_id[-6:]}"
 
     return _build_metadata(issue_path, title, info)
 
 def resolve_it_metadata(info):
     title = info.get("title", "IT Comic")
-    book_id = str(info.get("id") or "TODO")
+    book_id = str(info.get("id") or "UNK")
 
     issue_path = search_publication_code(title, "it")
 
@@ -144,13 +151,13 @@ def resolve_it_metadata(info):
                 break
 
     if not issue_path:
-        issue_path = f"it/IT_{book_id[-6:]}"
+        issue_path = f"it/UNK_{book_id[-6:]}"
 
     return _build_metadata(issue_path, title, info)
 
 def resolve_br_metadata(info):
     title = info.get("title", "BR Comic")
-    book_id = str(info.get("id") or "TODO")
+    book_id = str(info.get("id") or "UNK")
 
     issue_path = search_publication_code(title, "br")
 
@@ -162,7 +169,7 @@ def resolve_br_metadata(info):
                 break
 
     if not issue_path:
-        issue_path = f"br/BR_{book_id[-6:]}"
+        issue_path = f"br/UNK_{book_id[-6:]}"
 
     return _build_metadata(issue_path, title, info)
 
@@ -255,4 +262,4 @@ def _build_glenat_inducks_path(title: str, ean: str | None = None, collection_la
     if path:
         return path
 
-    return f"fr/GL_{ean[-6:]}" if ean else "fr/GL_TODO"
+    return "fr/UNK"

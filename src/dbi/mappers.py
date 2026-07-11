@@ -57,6 +57,8 @@ BR_MAPPINGS = [
     (re.compile(rf'Tio Patinhas\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'br/TP \1'),
     (re.compile(r'\(BD Disney\)', re.IGNORECASE), r'br/BDD'),
     (re.compile(rf'Grandes Sagas Disney.*?Vol\.\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'br/GSD \1'),
+    (re.compile(r'\(Graphic Disney\)', re.IGNORECASE), r'br/GD'),
+    (re.compile(rf'Coleção Carl Barks.*?Vol\.\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'br/CCB \1'),
 ]
 
 EG_MAPPINGS = [

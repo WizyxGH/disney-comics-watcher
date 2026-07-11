@@ -35,6 +35,14 @@ _RESOLVERS = {
     # magazine needs overrides -> handled separately
 }
 
+def _sanitize_bolderbast(text: str) -> str:
+    if not text: return ""
+    text = text.replace("–", "-").replace("—", "-")
+    text = text.replace("’", "'").replace("‘", "'")
+    text = text.replace("“", '"').replace("”", '"')
+    text = text.replace("…", "...")
+    return text
+
 def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | None = None) -> str | None:
     overrides = overrides or {}
     try:
@@ -60,7 +68,7 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
             except Exception as e:
                 print(f"  [warn] Failed to enrich LTB: {e}")
                 
-        name = data["name"]
+        name = _sanitize_bolderbast(data["name"])
         prix_raw = data["price"]
         date_raw = data["date"]
         pages_val = data["pages"]
@@ -197,7 +205,7 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
                 else:
                     st_prefix = f"->          {story_code.ljust(14)}{st_pages_block}{brokpg}{pagel}{story_rest}"
 
-                st_title = story.get("title", "").strip()
+                st_title = _sanitize_bolderbast(story.get("title", "").strip())
                 st_suffixes = []
                 if "LTB " in dbi_issue_code:
                     st_suffixes.append("[part:]")

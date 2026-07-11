@@ -112,7 +112,7 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         storycode = "?"
         
         storycode_field = storycode[:14].ljust(14)
-        pages_field     = " 1 "
+        pages_field     = " " + "1".rjust(4)
         brokpg          = " "
         pagel           = "c "
         
@@ -126,7 +126,8 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         if dbi_issue_code.startswith("JM "):
             writ_val, art_val = "FPt", "FPt"
 
-        rest = plot_val.ljust(4) + writ_val.ljust(4) + art_val.ljust(4) + ink_val.ljust(4) + hero_val.ljust(4)
+        rest = plot_val.ljust(4) + writ_val.ljust(4) + art_val.ljust(4) + ink_val.ljust(4) + hero_val.ljust(1)
+        rest = rest[:17].ljust(17)
 
         if len(cover_ec) <= 12:
             prefix = f"{cover_ec.ljust(12)}{storycode_field}{pages_field}{brokpg}{pagel}{rest}"
@@ -184,23 +185,22 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
                 story_code = story.get("story_code", "") or story.get("code", "")
                 
                 pages_str = str(story.get("pages", "")).strip()
-                if len(pages_str) == 1:
-                    st_pages = f" {pages_str} "
-                else:
-                    st_pages = pages_str.ljust(3)
+                st_pages_block = " " + pages_str.rjust(4)
                     
                 brokpg = " "
                 pagel = "  "
                 
-                story_rest = "".ljust(4) + "".ljust(4) + "".ljust(4) + "".ljust(4) + "".ljust(4)
+                story_rest = " " * 17
                 
                 if len(story_ec) <= 12:
-                    st_prefix = f"{story_ec.ljust(12)}{story_code.ljust(14)}{st_pages}{brokpg}{pagel}{story_rest}"
+                    st_prefix = f"{story_ec.ljust(12)}{story_code.ljust(14)}{st_pages_block}{brokpg}{pagel}{story_rest}"
                 else:
-                    st_prefix = f"->          {story_code.ljust(14)}{st_pages}{brokpg}{pagel}{story_rest}"
+                    st_prefix = f"->          {story_code.ljust(14)}{st_pages_block}{brokpg}{pagel}{story_rest}"
 
                 st_title = story.get("title", "").strip()
                 st_suffixes = []
+                if "LTB " in dbi_issue_code:
+                    st_suffixes.append("[part:]")
                 if len(story_ec) > 12: st_suffixes.append(f"[entrycode:{story_ec}]")
                 if story.get("characters"):
                     c_codes = [c["code"] for c in story["characters"] if c.get("code")]

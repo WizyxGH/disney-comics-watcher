@@ -71,6 +71,7 @@ EGMONT_DE_URLS = [
 ]
 EGMONT_DE_KEY_PREFIX = "egmont-de:"
 EGMONT_BASE = "https://www.egmont-shop.de"
+LTB_DE_KEY_PREFIX = "ltb-de:"
 
 KATHIMERINI_URL = "https://www.kathimerini.gr/k/disney/"
 KATHIMERINI_KEY_PREFIX = "kathi-gr:"

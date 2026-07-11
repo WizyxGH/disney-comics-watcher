@@ -7,7 +7,7 @@ from src.config import (
     NAHDET_MISR_EG_KEY_PREFIX, BG_KEY_PREFIX, HR_KEY_PREFIX, EE_KEY_PREFIX, LV_KEY_PREFIX,
     LT_KEY_PREFIX, PL_KEY_PREFIX, CZ_KEY_PREFIX, RS_KEY_PREFIX, SI_KEY_PREFIX, CN_KEY_PREFIX,
     DK_KEY_PREFIX, ES_KEY_PREFIX, FI_KEY_PREFIX, IS_KEY_PREFIX, NO_KEY_PREFIX, NL_KEY_PREFIX,
-    UK_KEY_PREFIX, SE_KEY_PREFIX
+    UK_KEY_PREFIX, SE_KEY_PREFIX, LTB_DE_KEY_PREFIX
 )
 from src.utils import load_state, save_state, parse_date_fr
 from src.notifications import notify_magazine, notify_glenat_announce, notify_glenat_release, notify_international_comic
@@ -15,7 +15,7 @@ from src.notifications import notify_magazine, notify_glenat_announce, notify_gl
 # Explicit imports
 from src.scrapers.fr import discover_fr_kiosk, fetch_fr_kiosk_details, discover_glenat, fetch_glenat_details
 from src.scrapers.us import discover_fantagraphics, discover_marvel
-from src.scrapers.de import discover_egmont_de, fetch_egmont_de_details
+from src.scrapers.de import discover_egmont_de, fetch_egmont_de_details, discover_lustiges_taschenbuch_de
 from src.scrapers.gr import discover_kathimerini
 from src.scrapers.it import discover_panini_it, fetch_panini_it_details
 from src.scrapers.br import discover_panini_br, fetch_panini_br_details
@@ -132,6 +132,7 @@ def main():
         ("Fantagraphics", FANTAGRAPHICS_KEY_PREFIX, discover_fantagraphics, "us", "announced", None, False),
         ("Marvel", MARVEL_KEY_PREFIX, discover_marvel, "us", "announced", None, False),
         ("Egmont DE", EGMONT_DE_KEY_PREFIX, discover_egmont_de, "de", "released", fetch_egmont_de_details, False),
+        ("LTB DE", LTB_DE_KEY_PREFIX, discover_lustiges_taschenbuch_de, "de", "announced", None, False),
         ("Kathimerini GR", KATHIMERINI_KEY_PREFIX, discover_kathimerini, "gr", "released", None, False),
         ("Panini IT", PANINI_IT_KEY_PREFIX, discover_panini_it, "it", "announced", fetch_panini_it_details, False),
         ("Panini BR", PANINI_BR_KEY_PREFIX, discover_panini_br, "br", "announced", fetch_panini_br_details, False),

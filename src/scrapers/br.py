@@ -1,4 +1,4 @@
-from src.scrapers.shared_panini import discover_panini_magento
+from src.scrapers.shared_panini import discover_panini_magento, fetch_panini_magento_details
 
 def discover_panini_br():
     """Discovers Disney comics on Panini Brazil."""
@@ -7,4 +7,4 @@ def discover_panini_br():
 
 def fetch_panini_br_details(url: str) -> dict:
     """Fetches additional details from the product page if needed."""
-    return {}
+    return fetch_panini_magento_details(url)

@@ -20,6 +20,9 @@ def discover_panini_magento(url: str, country_code: str) -> list[dict]:
                 continue
                 
             title = title_elem.get_text(strip=True)
+            if "abbonamento" in title.lower():
+                continue
+                
             link = title_elem.get('href')
             
             price_elem = item.select_one('.price')
@@ -52,3 +55,42 @@ def discover_panini_magento(url: str, country_code: str) -> list[dict]:
         print(f"  [warn] Panini {country_code.upper()}: {e}")
         
     return result
+
+def fetch_panini_magento_details(url: str) -> dict:
+    """
+    Fetches the high-resolution cover image from a Panini product page.
+    """
+    if not url: return {}
+    s = get_session()
+    details = {}
+    try:
+        r = s.get(url, timeout=15)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, 'html.parser')
+        
+        # Try og:image first
+        og = soup.find('meta', property='og:image')
+        if og and og.get('content'):
+            img_url = og['content']
+            # Remove query parameters to get the uncompressed image
+            if '?' in img_url:
+                img_url = img_url.split('?')[0]
+            details['cover_url'] = img_url
+            return details
+            
+        # Fallback to Magento gallery script
+        for script in soup.find_all('script', type='text/x-magento-init'):
+            if 'mage/gallery/gallery' in script.text:
+                m = re.search(r'"full":"(.*?)"', script.text)
+                if m:
+                    img_url = m.group(1).replace(r'\/', '/')
+                    if '?' in img_url:
+                        img_url = img_url.split('?')[0]
+                    details['cover_url'] = img_url
+                    break
+                    
+    except Exception as e:
+        print(f"  [warn] Failed to fetch Panini HD cover from {url}: {e}")
+        
+    return details
+

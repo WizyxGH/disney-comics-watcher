@@ -129,12 +129,21 @@ def discover_egmont_de():
 def fetch_egmont_de_details(url: str) -> dict:
     if not url: return {}
     s = get_session()
+    details = {}
     try:
         r = s.get(url, timeout=15)
         if r.status_code != 200: return {}
         from bs4 import BeautifulSoup
         soup = BeautifulSoup(r.text, 'html.parser')
         
+        # Try finding high res image
+        og = soup.find('meta', property='og:image')
+        if og and og.get('content'):
+            img_url = og['content']
+            if '?' in img_url:
+                img_url = img_url.split('?')[0]
+            details['cover_url'] = img_url
+            
         # Look for the script data state
         script = soup.find('script', attrs={'data-state': 'product-details-product', 'type': 'application/json'})
         if script:
@@ -142,15 +151,16 @@ def fetch_egmont_de_details(url: str) -> dict:
             data = json.loads(script.text)
             for spec in data.get('specs', []):
                 if spec.get('key') == 'Erscheinungsdatum':
-                    return {'date': spec.get('value')}
+                    details['date'] = spec.get('value')
+                    return details
         
         # Fallback HTML table
         th = soup.find(lambda tag: tag.name == 'th' and tag.text and 'Erscheinungsdatum' in tag.text)
         if th:
             td = th.find_next_sibling('td')
             if td:
-                return {'date': td.text.strip()}
+                details['date'] = td.text.strip()
     except Exception as e:
         print(f"  [warn] fetch_egmont_de_details failed for {url}: {e}")
     
-    return {}
+    return details

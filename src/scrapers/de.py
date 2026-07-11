@@ -164,3 +164,8 @@ def fetch_egmont_de_details(url: str) -> dict:
         print(f"  [warn] fetch_egmont_de_details failed for {url}: {e}")
     
     return details
+
+
+def discover_lustiges_taschenbuch_de():
+    """Placeholder for discovering LTB from lustiges-taschenbuch.de directly."""
+    return []

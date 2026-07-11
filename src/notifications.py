@@ -311,7 +311,15 @@ def _dispatch_notification(
             dm_buttons = None
             if issue_path and "UNK" not in issue_path:
                 cvs_url = f"https://inducks.org/cvsedit.php?action=edit&issue={quote_plus(issue_path)}"
-                upload_url = f"https://inducks.org/uploadscan.php?c={quote_plus(issue_path)}"
+                
+                # sendscan.php for Bolderbast server (e.g. c=de&s=LTBYC&i=LTBYC22&u=LTBYC22a)
+                country_part = issue_path.split("/", 1)[0]
+                issue_part = issue_path.split("/", 1)[1] if "/" in issue_path else issue_path
+                s_part = quote_plus(issue_part.split(" ")[0] if " " in issue_part else issue_part)
+                i_part = quote_plus(issue_part.replace(" ", ""))
+                u_part = f"{i_part}a"
+                upload_url = f"https://inducks.org/sendscan.php?c={quote_plus(country_part)}&s={s_part}&i={i_part}&u={u_part}"
+                
                 dm_buttons = [[{"text": "Edit Index", "url": cvs_url}, {"text": "Upload Scan", "url": upload_url}]]
                 
             send_telegram(photo_url=cover_url, caption=dm_text, chat_id=admin_id, buttons=dm_buttons)

@@ -130,3 +130,25 @@ def is_fully_indexed_in_inducks(issue_code: str) -> bool:
         print(f"  [warn] Failed to query fully indexed status from DB for {issue_code}: {e}")
         
     return False
+
+def does_issue_exist_in_inducks(issue_code: str) -> bool:
+    """Check if an issue exists in Inducks by querying the Turso DB."""
+    if not issue_code:
+        return False
+        
+    try:
+        from src.db import query_db
+        clean_code = issue_code.replace(" ", "").lower()
+        res = query_db("SELECT 1 FROM inducks_issue WHERE LOWER(REPLACE(issuecode, ' ', '')) = ?", (clean_code,))
+        if res and len(res) > 0:
+            return True
+            
+        if '-' in clean_code:
+            first_part = clean_code.split('-')[0]
+            res = query_db("SELECT 1 FROM inducks_issue WHERE LOWER(REPLACE(issuecode, ' ', '')) = ?", (first_part,))
+            if res and len(res) > 0:
+                return True
+    except Exception as e:
+        print(f"  [warn] Failed to query issue existence from DB for {issue_code}: {e}")
+        
+    return False

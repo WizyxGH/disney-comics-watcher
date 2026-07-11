@@ -1,6 +1,6 @@
 <div align="center">
   <h1>Disney Comics Watcher</h1>
-  <p><strong>The Ultimate Automated Tracker for Disney Magazines & Comic Books in France, US, Germany & Greece</strong></p>
+  <p><strong>The ultimate automated tracker for Disney comic books around the world</strong></p>
 
   [![Python](https://img.shields.io/badge/Python-3.12+-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
   [![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-Active-success.svg?logo=github-actions)](https://github.com/features/actions)
@@ -10,7 +10,7 @@
 
 <hr/>
 
-**Disney Comics Watcher** is an open-source, automated bot designed to monitor new releases of Disney magazines and comic books in France, the US, Germany, Greece, Italy, and Brazil.
+**Disney Comics Watcher** is an open-source, automated bot designed to monitor new releases of Disney magazines and comic books in France, the US, Germany, Greece, Italy, Brazil, Egypt, and 9 Eastern European countries (Bulgaria, Croatia, Estonia, Latvia, Lithuania, Poland, Czech Republic, Serbia, Slovenia).
 
 > ⭐️ **If you like this project, please consider giving it a star on GitHub! It helps a lot!** ⭐️
 
@@ -26,11 +26,12 @@ Stay updated with all the latest Disney comics releases directly on your phone!
 
 ## 🎯 Features & Notifications
 
-- **New kiosk magazine issues** — Complete with cover image, issue number, retail price, and publication dates.
-- **Glénat album announcements** — Notifies you when an upcoming comic book appears as "to be published" in the official catalog.
-- **Glénat album releases** — Alerts you on the exact day the publication date is reached in bookstores.
+- **Global Coverage** — Tracks releases from publishers in France, USA, Germany, Greece, Italy, Brazil, Egypt, and Croatia!
+- **New magazine issues** — Complete with cover image, issue number, retail price, and publication dates.
+- **Comic book announcements** — Notifies you when an upcoming comic book appears as "to be published" in official catalogs.
+- **Release day alerts** — Alerts you on the exact day the publication date is reached in bookstores.
 - **Gemini AI integration** — Automatically analyzes magazine covers to detect featured characters and extract the main story titles!
-- **Inducks pre-indexing** — Automatically generates `.dbi` skeleton files (`fr.dbi` and `us.dbi`) for seamless contributions to the [Inducks database](https://inducks.org/). It also automatically cleans up these files by removing issues once they are indexed and available in the Inducks database.
+- **Inducks pre-indexing** — Automatically generates `.dbi` skeleton files for all monitored countries for seamless contributions to the [Inducks database](https://inducks.org/). It also automatically cleans up these files by removing issues once they are indexed.
 - **Local cover archive** — Automatically downloads and saves high-quality cover images to a local `covers/` folder.
 
 ---
@@ -49,6 +50,8 @@ Stay updated with all the latest Disney comics releases directly on your phone!
 | [kathimerini.gr](https://www.kathimerini.gr/k/disney/) | Greek Disney comic books and magazines published by Kathimerini |
 | [panini.it](https://www.panini.it/) | Italian Disney comic books and magazines published by Panini Comics (Topolino, Paperinik...) |
 | [panini.com.br](https://panini.com.br/) | Brazilian Disney comic books and magazines published by Panini Brasil (Mickey, Tio Patinhas...) |
+| [nahdetmisrbookstore.com](https://nahdetmisrbookstore.com/) | Egyptian Disney comic books and magazines published by Nahdet Misr (Miki, Super Miki...) |
+| Eastern European publishers | Prepared architecture for Bulgaria (bg), Croatia (hr), Estonia (ee), Latvia (lv), Lithuania (lt), Poland (pl), Czech Republic (cz), Serbia (rs), Slovenia (si) |
 
 ---
 
@@ -76,6 +79,8 @@ Want to run your own instance of the Watcher? Follow these simple steps:
    - `TELEGRAM_THREAD_ID_GR`: The thread ID for Greek releases (if using topics)
    - `TELEGRAM_THREAD_ID_IT`: The thread ID for Italian releases (if using topics)
    - `TELEGRAM_THREAD_ID_BR`: The thread ID for Brazilian releases (if using topics)
+   - `TELEGRAM_THREAD_ID_EG`: The thread ID for Egyptian releases (if using topics)
+   - `TELEGRAM_THREAD_ID_BG`, `_HR`, `_EE`, `_LV`, `_LT`, `_PL`, `_CZ`, `_RS`, `_SI`: Thread IDs for Eastern European releases
 3. Go to the **Actions** tab and enable workflows. The bot will now run hourly automatically!
 
 ---
@@ -97,6 +102,16 @@ You can easily run the monitoring script locally without configuring global syst
    TELEGRAM_THREAD_ID_GR=your_test_thread_id_gr
    TELEGRAM_THREAD_ID_IT=your_test_thread_id_it
    TELEGRAM_THREAD_ID_BR=your_test_thread_id_br
+   TELEGRAM_THREAD_ID_EG=your_test_thread_id_eg
+   TELEGRAM_THREAD_ID_BG=your_test_thread_id_bg
+   TELEGRAM_THREAD_ID_HR=your_test_thread_id_hr
+   TELEGRAM_THREAD_ID_EE=your_test_thread_id_ee
+   TELEGRAM_THREAD_ID_LV=your_test_thread_id_lv
+   TELEGRAM_THREAD_ID_LT=your_test_thread_id_lt
+   TELEGRAM_THREAD_ID_PL=your_test_thread_id_pl
+   TELEGRAM_THREAD_ID_CZ=your_test_thread_id_cz
+   TELEGRAM_THREAD_ID_RS=your_test_thread_id_rs
+   TELEGRAM_THREAD_ID_SI=your_test_thread_id_si
    # Optional: Add GEMINI_API_KEY for AI cover analysis
    ```
 3. Run the test suite:

@@ -4,7 +4,7 @@ import html as html_lib
 import time
 import requests
 from urllib.parse import quote, quote_plus
-from src.config import TELEGRAM_API, TELEGRAM_CHAT_ID, TELEGRAM_THREAD_ID_FR, TELEGRAM_THREAD_ID_US, TELEGRAM_THREAD_ID_DE, TELEGRAM_THREAD_ID_GR, TELEGRAM_THREAD_ID_IT, TELEGRAM_THREAD_ID_BR, OVERRIDES, AMAZON_AFFILIATE_TAG, SITE_BASE
+from src.config import TELEGRAM_API, TELEGRAM_CHAT_ID, TELEGRAM_THREAD_ID_FR, TELEGRAM_THREAD_ID_US, TELEGRAM_THREAD_ID_DE, TELEGRAM_THREAD_ID_GR, TELEGRAM_THREAD_ID_IT, TELEGRAM_THREAD_ID_BR, TELEGRAM_THREAD_ID_EG, TELEGRAM_THREAD_ID_BG, TELEGRAM_THREAD_ID_HR, TELEGRAM_THREAD_ID_EE, TELEGRAM_THREAD_ID_LV, TELEGRAM_THREAD_ID_LT, TELEGRAM_THREAD_ID_PL, TELEGRAM_THREAD_ID_CZ, TELEGRAM_THREAD_ID_RS, TELEGRAM_THREAD_ID_SI, TELEGRAM_THREAD_ID_CN, TELEGRAM_THREAD_ID_DK, TELEGRAM_THREAD_ID_ES, TELEGRAM_THREAD_ID_FI, TELEGRAM_THREAD_ID_IS, TELEGRAM_THREAD_ID_NO, TELEGRAM_THREAD_ID_NL, TELEGRAM_THREAD_ID_UK, TELEGRAM_THREAD_ID_SE, OVERRIDES, AMAZON_AFFILIATE_TAG, SITE_BASE
 from src.utils import format_price_fr, get_session, truncate_summary, isbn13_to_isbn10, is_fully_indexed_in_inducks
 from src.dbi.generator import generate_dbi_skeleton
 from src.dbi.mappers import build_inducks_path
@@ -214,15 +214,19 @@ def _dispatch_notification(
     issue_path = get_issue_path_from_info(info, publication_type)
     issue_code = issue_path.split("/", 1)[-1] if "/" in issue_path else issue_path
     
+    country_prefix = publication_type if publication_type in ("us", "de", "gr", "it", "br", "eg", "bg", "hr", "ee", "lv", "lt", "pl", "cz", "rs", "si", "cn", "dk", "es", "fi", "isl", "no", "nl", "uk", "se") else "fr"
+    
     m = re.match(r'^([a-zA-Z]+)(\s+)(.*)$', issue_code)
     if m:
         pub_code = m.group(1).lower()
         number = re.sub(r'[^a-zA-Z0-9]', '_', m.group(3)).lower()
-        safe_code = f"{pub_code}_{number.zfill(4)}"
+        if pub_code == country_prefix:
+            safe_code = number.zfill(4)
+        else:
+            safe_code = f"{pub_code}_{number.zfill(4)}"
     else:
         safe_code = re.sub(r'[^a-zA-Z0-9]', '_', issue_code).lower()
     
-    country_prefix = publication_type if publication_type in ("us", "de", "gr", "it", "br") else "fr"
     cover_filename = f"{country_prefix}_{safe_code}a_001"
 
     # 1. Truncate summary if necessary
@@ -243,9 +247,30 @@ def _dispatch_notification(
     if cover_url and not is_fully_indexed:
         download_cover(cover_url, cover_filename)
 
-    # 4. Send via Telegram
+    # 4. Process buttons dynamically based on Turso DB
+    from src.utils import does_issue_exist_in_inducks
+    final_buttons = []
+    if buttons:
+        for row in buttons:
+            new_row = []
+            for btn in row:
+                if btn.get("text") == "Search on Inducks":
+                    if issue_path and "UNK" not in issue_path:
+                        if does_issue_exist_in_inducks(issue_path):
+                            new_row.append({"text": "View on Inducks", "url": f"https://inducks.org/issue.php?c={quote_plus(issue_path)}"})
+                        else:
+                            pub_code = issue_path.split(" ")[0] if " " in issue_path else issue_path
+                            new_row.append({"text": "View Publication", "url": f"https://inducks.org/publication.php?c={quote_plus(pub_code)}"})
+                            new_row.append({"text": "Search Inducks", "url": f"https://inducks.org/search.php?search={quote_plus(raw_title)}"})
+                    else:
+                        new_row.append(btn)
+                else:
+                    new_row.append(btn)
+            final_buttons.append(new_row)
+
+    # 5. Send via Telegram
     if TELEGRAM_CHAT_ID:
-        send_telegram(cover_url, caption, buttons=buttons, message_thread_id=message_thread_id)
+        send_telegram(cover_url, caption, buttons=final_buttons, message_thread_id=message_thread_id)
         time.sleep(1)
     else:
         print("  [warn] No TELEGRAM_CHAT_ID configured.")
@@ -279,7 +304,13 @@ def _dispatch_notification(
             source_url = info.get("url")
             title_html = f'<a href="{html_lib.escape(source_url)}"><b>{html_lib.escape(raw_title)}</b></a>' if source_url else f'<b>{html_lib.escape(raw_title)}</b>'
             dm_text = f"New DBI generated for {title_html}:\n<pre>{clean_dbi}</pre>"
-            send_telegram(photo_url=cover_url, caption=dm_text, chat_id=admin_id)
+            
+            dm_buttons = None
+            if issue_path and "UNK" not in issue_path:
+                cvs_url = f"https://inducks.org/cvsedit.php?action=edit&issue={quote_plus(issue_path)}"
+                dm_buttons = [[{"text": "Edit using SVN", "url": cvs_url}]]
+                
+            send_telegram(photo_url=cover_url, caption=dm_text, chat_id=admin_id, buttons=dm_buttons)
 
 
 # ── PUBLIC NOTIFICATION FUNCTIONS ───────────────────────────────────────────────
@@ -425,7 +456,140 @@ def notify_international_comic(album: dict, state: dict | None = None, country: 
             "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
             "price_prefix": "💵 Price:",
             "thread_id": TELEGRAM_THREAD_ID_BR,
-        }
+        },
+        "eg": {
+            "announce_title": f"<b>Announcement — {title}</b>",
+            "release_title": f"<b>{title}</b>",
+            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
+            "price_prefix": "EGP Price:",
+            "thread_id": TELEGRAM_THREAD_ID_EG,
+        },
+        "bg": {
+            "announce_title": f"<b>Announcement — {title}</b>",
+            "release_title": f"<b>{title}</b>",
+            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
+            "price_prefix": "Price:",
+            "thread_id": TELEGRAM_THREAD_ID_BG,
+        },
+        "hr": {
+            "announce_title": f"<b>Announcement — {title}</b>",
+            "release_title": f"<b>{title}</b>",
+            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
+            "price_prefix": "Price:",
+            "thread_id": TELEGRAM_THREAD_ID_HR,
+        },
+        "ee": {
+            "announce_title": f"<b>Announcement — {title}</b>",
+            "release_title": f"<b>{title}</b>",
+            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
+            "price_prefix": "Price:",
+            "thread_id": TELEGRAM_THREAD_ID_EE,
+        },
+        "lv": {
+            "announce_title": f"<b>Announcement — {title}</b>",
+            "release_title": f"<b>{title}</b>",
+            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
+            "price_prefix": "Price:",
+            "thread_id": TELEGRAM_THREAD_ID_LV,
+        },
+        "lt": {
+            "announce_title": f"<b>Announcement — {title}</b>",
+            "release_title": f"<b>{title}</b>",
+            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
+            "price_prefix": "Price:",
+            "thread_id": TELEGRAM_THREAD_ID_LT,
+        },
+        "pl": {
+            "announce_title": f"<b>Announcement — {title}</b>",
+            "release_title": f"<b>{title}</b>",
+            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
+            "price_prefix": "Price:",
+            "thread_id": TELEGRAM_THREAD_ID_PL,
+        },
+        "cz": {
+            "announce_title": f"<b>Announcement — {title}</b>",
+            "release_title": f"<b>{title}</b>",
+            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
+            "price_prefix": "Price:",
+            "thread_id": TELEGRAM_THREAD_ID_CZ,
+        },
+        "rs": {
+            "announce_title": f"<b>Announcement — {title}</b>",
+            "release_title": f"<b>{title}</b>",
+            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
+            "price_prefix": "Price:",
+            "thread_id": TELEGRAM_THREAD_ID_RS,
+        },
+        "si": {
+            "announce_title": f"<b>Announcement — {title}</b>",
+            "release_title": f"<b>{title}</b>",
+            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
+            "price_prefix": "Price:",
+            "thread_id": TELEGRAM_THREAD_ID_SI,
+        },
+        "cn": {
+            "announce_title": f"<b>Announcement — {title}</b>",
+            "release_title": f"<b>{title}</b>",
+            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
+            "price_prefix": "Price:",
+            "thread_id": TELEGRAM_THREAD_ID_CN,
+        },
+        "dk": {
+            "announce_title": f"<b>Announcement — {title}</b>",
+            "release_title": f"<b>{title}</b>",
+            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
+            "price_prefix": "Price:",
+            "thread_id": TELEGRAM_THREAD_ID_DK,
+        },
+        "es": {
+            "announce_title": f"<b>Announcement — {title}</b>",
+            "release_title": f"<b>{title}</b>",
+            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
+            "price_prefix": "Price:",
+            "thread_id": TELEGRAM_THREAD_ID_ES,
+        },
+        "fi": {
+            "announce_title": f"<b>Announcement — {title}</b>",
+            "release_title": f"<b>{title}</b>",
+            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
+            "price_prefix": "Price:",
+            "thread_id": TELEGRAM_THREAD_ID_FI,
+        },
+        "is": {
+            "announce_title": f"<b>Announcement — {title}</b>",
+            "release_title": f"<b>{title}</b>",
+            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
+            "price_prefix": "Price:",
+            "thread_id": TELEGRAM_THREAD_ID_IS,
+        },
+        "no": {
+            "announce_title": f"<b>Announcement — {title}</b>",
+            "release_title": f"<b>{title}</b>",
+            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
+            "price_prefix": "Price:",
+            "thread_id": TELEGRAM_THREAD_ID_NO,
+        },
+        "nl": {
+            "announce_title": f"<b>Announcement — {title}</b>",
+            "release_title": f"<b>{title}</b>",
+            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
+            "price_prefix": "Price:",
+            "thread_id": TELEGRAM_THREAD_ID_NL,
+        },
+        "uk": {
+            "announce_title": f"<b>Announcement — {title}</b>",
+            "release_title": f"<b>{title}</b>",
+            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
+            "price_prefix": "Price:",
+            "thread_id": TELEGRAM_THREAD_ID_UK,
+        },
+        "se": {
+            "announce_title": f"<b>Announcement — {title}</b>",
+            "release_title": f"<b>{title}</b>",
+            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
+            "price_prefix": "Price:",
+            "thread_id": TELEGRAM_THREAD_ID_SE,
+        },
     }
 
     cfg = config.get(country, config["us"])

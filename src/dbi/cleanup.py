@@ -95,7 +95,10 @@ def cleanup_indexed_issues(dbi_paths: list[str]):
         if m:
             pub_code = m.group(1).lower()
             number = re.sub(r'[^a-zA-Z0-9]', '_', m.group(3)).lower()
-            safe_code = f"{pub_code}_{number.zfill(4)}"
+            if pub_code == country_prefix:
+                safe_code = number.zfill(4)
+            else:
+                safe_code = f"{pub_code}_{number.zfill(4)}"
         else:
             safe_code = re.sub(r'[^a-zA-Z0-9]', '_', issue_code).lower()
             

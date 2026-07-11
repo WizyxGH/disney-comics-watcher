@@ -210,6 +210,11 @@ def discover_mlp_families(known_codifs: set, state: dict | None = None):
                 date_list   = date_span.get_text(strip=True) if date_span else ""
                 href        = link['href'] if link else ""
 
+                # We check if fr_kiosk:{codif}_{numero_list} exists and is 'released'
+                if state.get(f'fr_kiosk:{codif}_{numero_list}') == 'released':
+                    continue
+                
+                # Backwards compatibility check
                 state_val = state.get(f'magazine:{codif}')
                 if state_val:
                     digits_list = "".join(filter(str.isdigit, numero_list))
@@ -287,6 +292,48 @@ def get_mlp_releve(codif: str):
         except requests.RequestException:
             continue
     return None
+
+
+
+def discover_fr_kiosk():
+    """Unified wrapper for French Kiosk magazines (DE and MLP) returning standard provider books format."""
+    from src.utils import load_state
+    state = load_state()
+    try:
+        magazines = discover_de()
+    except Exception as e:
+        print(f"  [error] discover_de: {e}")
+        magazines = {}
+
+    try:
+        mlp_extra = discover_mlp_families(known_codifs=set(magazines), state=state)
+        added = {c: v for c, v in mlp_extra.items() if c not in magazines}
+        magazines.update(added)
+    except Exception as e:
+        print(f"  [error] discover_mlp: {e}")
+
+    books = []
+    for codif, info in magazines.items():
+        if codif in SKIP_CODIFS:
+            continue
+        numero = info.get("numero")
+        if not numero:
+            continue
+
+        ov   = OVERRIDES.get(codif, {})
+        name = ov.get("name") or info.get("site_name") or codif
+        
+        info["id"] = f"{codif}_{numero}"
+        info["title"] = f"{name} - N°{numero}"
+        info["released"] = True
+        
+        # In check_magazines _process_provider_books, state tracks book_id = codif_numero.
+        books.append(info)
+
+    return books
+
+def fetch_fr_kiosk_details(url: str) -> dict:
+    return {}
 
 
 def discover_glenat():

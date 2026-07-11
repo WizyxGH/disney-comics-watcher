@@ -2,7 +2,8 @@ import os
 from src.dbi.utils import _format_date_for_dbi, _format_price_for_dbi, sort_dbi_file
 from src.dbi.mappers import (
     resolve_magazine_metadata, resolve_us_metadata, resolve_de_metadata, 
-    resolve_gr_metadata, resolve_glenat_metadata, resolve_it_metadata, resolve_br_metadata
+    resolve_gr_metadata, resolve_glenat_metadata, resolve_it_metadata, resolve_br_metadata,
+    resolve_eg_metadata, resolve_bg_metadata, resolve_hr_metadata, resolve_ee_metadata, resolve_lv_metadata, resolve_lt_metadata, resolve_pl_metadata, resolve_cz_metadata, resolve_rs_metadata, resolve_si_metadata, resolve_cn_metadata, resolve_dk_metadata, resolve_es_metadata, resolve_fi_metadata, resolve_is_metadata, resolve_no_metadata, resolve_nl_metadata, resolve_uk_metadata, resolve_se_metadata
 )
 
 _RESOLVERS = {
@@ -11,6 +12,25 @@ _RESOLVERS = {
     "gr":       resolve_gr_metadata,
     "it":       resolve_it_metadata,
     "br":       resolve_br_metadata,
+    "eg":       resolve_eg_metadata,
+    "bg":       resolve_bg_metadata,
+    "hr":       resolve_hr_metadata,
+    "ee":       resolve_ee_metadata,
+    "lv":       resolve_lv_metadata,
+    "lt":       resolve_lt_metadata,
+    "pl":       resolve_pl_metadata,
+    "cz":       resolve_cz_metadata,
+    "rs":       resolve_rs_metadata,
+    "si":       resolve_si_metadata,
+    "cn":       resolve_cn_metadata,
+    "dk":       resolve_dk_metadata,
+    "es":       resolve_es_metadata,
+    "fi":       resolve_fi_metadata,
+    "is":       resolve_is_metadata,
+    "no":       resolve_no_metadata,
+    "nl":       resolve_nl_metadata,
+    "uk":       resolve_uk_metadata,
+    "se":       resolve_se_metadata,
     "glenat":   resolve_glenat_metadata,
     # magazine needs overrides -> handled separately
 }
@@ -52,10 +72,10 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         price   = _format_price_for_dbi(prix_raw)
 
         os.makedirs("issues", exist_ok=True)
-        dbi_path = os.path.join("issues", f"{publication_type}.dbi" if publication_type in ["us", "de", "gr", "it", "br"] else "fr.dbi")
+        dbi_path = os.path.join("issues", f"{publication_type}.dbi" if publication_type in ["us", "de", "gr", "it", "br", "eg", "bg", "hr", "ee", "lv", "lt", "pl", "cz", "rs", "si", "cn", "dk", "es", "fi", "is", "no", "nl", "uk", "se"] else "fr.dbi")
 
         dbi_issue_code = issue_path
-        for prefix in ("fr/", "us/", "de/", "gr/", "it/", "br/"):
+        for prefix in ("fr/", "us/", "de/", "gr/", "it/", "br/", "eg/", "bg/", "hr/", "ee/", "lv/", "lt/", "pl/", "cz/", "rs/", "si/", "cn/", "dk/", "es/", "fi/", "is/", "no/", "nl/", "uk/", "se/"):
             if dbi_issue_code.startswith(prefix):
                 dbi_issue_code = dbi_issue_code[3:]
                 break

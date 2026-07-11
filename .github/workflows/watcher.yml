@@ -49,6 +49,27 @@ jobs:
           TELEGRAM_THREAD_ID_US: ${{ secrets.TELEGRAM_THREAD_ID_US }}
           TELEGRAM_THREAD_ID_DE: ${{ secrets.TELEGRAM_THREAD_ID_DE }}
           TELEGRAM_THREAD_ID_GR: ${{ secrets.TELEGRAM_THREAD_ID_GR }}
+          TELEGRAM_THREAD_ID_IT: ${{ secrets.TELEGRAM_THREAD_ID_IT }}
+          TELEGRAM_THREAD_ID_BR: ${{ secrets.TELEGRAM_THREAD_ID_BR }}
+          TELEGRAM_THREAD_ID_EG: ${{ secrets.TELEGRAM_THREAD_ID_EG }}
+          TELEGRAM_THREAD_ID_BG: ${{ secrets.TELEGRAM_THREAD_ID_BG }}
+          TELEGRAM_THREAD_ID_HR: ${{ secrets.TELEGRAM_THREAD_ID_HR }}
+          TELEGRAM_THREAD_ID_EE: ${{ secrets.TELEGRAM_THREAD_ID_EE }}
+          TELEGRAM_THREAD_ID_LV: ${{ secrets.TELEGRAM_THREAD_ID_LV }}
+          TELEGRAM_THREAD_ID_LT: ${{ secrets.TELEGRAM_THREAD_ID_LT }}
+          TELEGRAM_THREAD_ID_PL: ${{ secrets.TELEGRAM_THREAD_ID_PL }}
+          TELEGRAM_THREAD_ID_CZ: ${{ secrets.TELEGRAM_THREAD_ID_CZ }}
+          TELEGRAM_THREAD_ID_RS: ${{ secrets.TELEGRAM_THREAD_ID_RS }}
+          TELEGRAM_THREAD_ID_SI: ${{ secrets.TELEGRAM_THREAD_ID_SI }}
+          TELEGRAM_THREAD_ID_CN: ${{ secrets.TELEGRAM_THREAD_ID_CN }}
+          TELEGRAM_THREAD_ID_DK: ${{ secrets.TELEGRAM_THREAD_ID_DK }}
+          TELEGRAM_THREAD_ID_ES: ${{ secrets.TELEGRAM_THREAD_ID_ES }}
+          TELEGRAM_THREAD_ID_FI: ${{ secrets.TELEGRAM_THREAD_ID_FI }}
+          TELEGRAM_THREAD_ID_IS: ${{ secrets.TELEGRAM_THREAD_ID_IS }}
+          TELEGRAM_THREAD_ID_NO: ${{ secrets.TELEGRAM_THREAD_ID_NO }}
+          TELEGRAM_THREAD_ID_NL: ${{ secrets.TELEGRAM_THREAD_ID_NL }}
+          TELEGRAM_THREAD_ID_UK: ${{ secrets.TELEGRAM_THREAD_ID_UK }}
+          TELEGRAM_THREAD_ID_SE: ${{ secrets.TELEGRAM_THREAD_ID_SE }}
           TELEGRAM_ADMIN_ID: ${{ secrets.TELEGRAM_ADMIN_ID }}
           AMAZON_AFFILIATE_TAG: ${{ secrets.AMAZON_AFFILIATE_TAG }}
         run: python check_magazines.py

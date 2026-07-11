@@ -78,6 +78,10 @@ def discover_de():
                 continue
             if re.search(r'\bREV\b', info.get("site_name", "")):
                 continue
+            if "pochette" in info.get("site_name", "").lower() or "pochette" in info.get("numero", "").lower():
+                continue
+            if "+ produit" in info.get("site_name", "").lower():
+                continue
             if info["expired_on"]:
                 d = parse_date_fr(info["expired_on"])
                 if d and d < today:
@@ -214,13 +218,6 @@ def discover_mlp_families(known_codifs: set, state: dict | None = None):
                 if state.get(f'fr_kiosk:{codif}_{numero_list}') == 'released':
                     continue
                 
-                # Backwards compatibility check
-                state_val = state.get(f'magazine:{codif}')
-                if state_val:
-                    digits_list = "".join(filter(str.isdigit, numero_list))
-                    digits_state = "".join(filter(str.isdigit, state_val))
-                    if digits_list and digits_state and digits_list == digits_state:
-                        continue
 
                 if href:
                     tasks.append(executor.submit(_fetch_product_details, href, codif, numero_list, date_list, title))
@@ -239,59 +236,6 @@ def discover_mlp_families(known_codifs: set, state: dict | None = None):
             result.update(future.result())
 
     return result
-
-def get_mlp_releve(codif: str):
-    """Returns the expected off-sale date ('Jusqu'au') from MLP."""
-    s = get_session()
-    patterns = [
-        r"[Jj]usqu[\x27\x22]au\s*:?\s*(?:<[^>]+>)?\s*(\d{2}/\d{2}/\d{4})",
-        r"[Rr]el[eè]ve?\s*(?:le|pr[eé]vue?)?\s*:?\s*(?:<[^>]+>)?\s*(\d{2}/\d{2}/\d{4})",
-    ]
-
-    # Start by searching for the search links to find the actual product page
-    search_url = f"{MLP_URL}?recherche={codif}"
-    try:
-        r = s.get(search_url, timeout=10)
-        if r.status_code == 200:
-            r.encoding = "utf-8"
-            from bs4 import BeautifulSoup
-            soup = BeautifulSoup(r.text, 'html.parser')
-            for cat in soup.find_all(class_='catalogue'):
-                code_span = cat.find(id=re.compile('results_ctl.*_titCode'))
-                if code_span and code_span.get_text(strip=True) == codif:
-                    link = cat.find('a', href=True)
-                    if link:
-                        prod_url = f"https://catalogueproduits.mlp.fr/{link['href']}"
-                        rp = s.get(prod_url, timeout=10)
-                        if rp.status_code == 200:
-                            rp.encoding = "utf-8"
-                            unescaped = html_lib.unescape(rp.text)
-                            for pat in patterns:
-                                m = re.search(pat, unescaped)
-                                if m:
-                                    return m.group(1)
-    except Exception:
-        pass
-
-    # Fallback to standard URLs
-    for url in [
-        f"{MLP_URL}?recherche={codif}",
-        f"{MLP_URL}?ref={codif}",
-        f"https://catalogueproduits.mlp.fr/produit/{codif}",
-    ]:
-        try:
-            r = s.get(url, timeout=10)
-            if r.status_code != 200:
-                continue
-            r.encoding = "utf-8"
-            unescaped = html_lib.unescape(r.text)
-            for pat in patterns:
-                m = re.search(pat, unescaped)
-                if m:
-                    return m.group(1)
-        except requests.RequestException:
-            continue
-    return None
 
 
 

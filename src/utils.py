@@ -7,12 +7,27 @@ from src.config import HEADERS, SEARCH_URL, STATE_FILE
 
 _session = None
 
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
 def get_session():
-    """Returns a shared HTTP requests session."""
+    """Returns a shared HTTP requests session with retries."""
     global _session
     if _session is None:
         _session = requests.Session()
         _session.headers.update(HEADERS)
+        
+        # Configure retries
+        retry = Retry(
+            total=3,
+            backoff_factor=1,
+            status_forcelist=[429, 500, 502, 503, 504],
+            allowed_methods=["HEAD", "GET", "OPTIONS"]
+        )
+        adapter = HTTPAdapter(max_retries=retry)
+        _session.mount("http://", adapter)
+        _session.mount("https://", adapter)
+        
         try:
             _session.get(SEARCH_URL, timeout=15)
         except requests.RequestException:

@@ -216,7 +216,7 @@ def _dispatch_notification(
     
     country_prefix = publication_type if publication_type in ("us", "de", "gr", "it", "br", "eg", "bg", "hr", "ee", "lv", "lt", "pl", "cz", "rs", "si", "cn", "dk", "es", "fi", "isl", "no", "nl", "uk", "se") else "fr"
     
-    m = re.match(r'^([a-zA-Z]+)(\s+)(.*)$', issue_code)
+    m = re.match(r'^([a-zA-Z]+)([\s_]+)(.*)$', issue_code)
     if m:
         pub_code = m.group(1).lower()
         number = re.sub(r'[^a-zA-Z0-9]', '_', m.group(3)).lower()

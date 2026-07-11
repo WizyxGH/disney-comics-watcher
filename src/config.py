@@ -29,27 +29,19 @@ OVERRIDES = {
     "18658": {"name": "Picsou Soir"},
     "18360": {"name": "Nouvelle Jeunesse de Picsou"},
     "19607": {"name": "Le Destin de Picsou"},
-    "19052": {"name": "Pochette Picsou Magazine"},
     "14016": {"name": "Super Picsou Géant",                     "inducks": "SPG"},
     "12651": {"name": "SPG HS Dynastie de Picsou",              "inducks": ("SPGHS", 3, "H")},
-    "15599": {"name": "SPG HS Dynastie de Picsou (REV)",        "inducks": ("SPGHS", 3, "H")},
     "12825": {"name": "SPG HS Super Donald Géant",              "inducks": ("SPGHS", 3, "D")},
-    "18262": {"name": "SPG HS Super Donald Géant (REV)",        "inducks": ("SPGHS", 3, "D")},
-    "18268": {"name": "SPG HS Donald Double Duck (REV)",        "inducks": ("DON", 4)},
     "13459": {"name": "SPG HS Jeux",                            "inducks": ("SPGHS", 3, "J")},
     "11065": {"name": "Les grands méchants",                    "inducks": ("SPGHS", 3, "M")},
     "14068": {"name": "Les Trésors de Picsou",                  "inducks": "TP"},
     "14067": {"name": "Journal de Mickey",                      "inducks": "JM"},
     "14108": {"name": "Journal de Mickey HS",                   "inducks": ("JMHSN", 3)},
-    "13588": {"name": "JdM HS Spécial Aventures (REV)"},
-    "16096": {"name": "Journal de Mickey + Produit"},
     "15935": {"name": "Le Meilleur du Journal de Mickey",       "inducks": "JMC"},
     "15970": {"name": "Le Meilleur du JdM HS"},
     "18914": {"name": "Le Meilleur du JdM HS Spécial Enquêtes"},
-    "11068": {"name": "Pochette Mickey Parade"},
     "15190": {"name": "Les Chroniques de Fantomiald",           "inducks": ("CF", 5)},
     "14268": {"name": "Les Incontournables de Disney",          "inducks": ("LI", 4)},
-    "19064": {"name": "Les Incontournables (REV)",              "inducks": ("LI", 4)},
 }
 
 PARIS_TZ = ZoneInfo("Europe/Paris")
@@ -66,7 +58,7 @@ GLENAT_KEY_PREFIX     = "glenat:"
 
 FANTAGRAPHICS_DISNEY_URL = "https://www.fantagraphics.com/collections/disney/products.json"
 FANTAGRAPHICS_BASE       = "https://www.fantagraphics.com/products/"
-FANTAGRAPHICS_KEY_PREFIX = "fanta:"
+FANTAGRAPHICS_KEY_PREFIX = "fantagraphics:"
 
 MARVEL_SERIES_URLS = [
     "https://www.marvel.com/comics/series/42808/uncle_scrooge_earths_mightiest_duck_2025_present"

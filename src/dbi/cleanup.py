@@ -91,7 +91,7 @@ def cleanup_indexed_issues(dbi_paths: list[str]):
         return
 
     def delete_cover_for_issue(issue_code: str, country_prefix: str):
-        m = re.match(r'^([a-zA-Z]+)(\s+)(.*)$', issue_code)
+        m = re.match(r'^([a-zA-Z]+)([\s_]+)(.*)$', issue_code)
         if m:
             pub_code = m.group(1).lower()
             number = re.sub(r'[^a-zA-Z0-9]', '_', m.group(3)).lower()

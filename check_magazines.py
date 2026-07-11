@@ -56,68 +56,67 @@ def _process_provider_books(
     today = datetime.now(PARIS_TZ).date()
 
     for book in books:
-        book_id = book.get("id") or book.get("sku") or book.get("ean")
-        if not book_id: continue
-        
-        key = f"{key_prefix}{book_id}"
-        current = state.get(key)
-        
-        pub_date = parse_date_fr(book.get("date")) if not book.get("pub_date") else book.get("pub_date")
-        is_released = book.get("released", False)
-        if pub_date and pub_date <= today:
-            is_released = True
-        if default_status == "released":
-            is_released = True
-            
-        target_status = "released" if is_released else "announced"
+        try:
+            book_id = book.get("id") or book.get("sku") or book.get("ean")
+            if not book_id: continue
 
-        if current is None or (current == "announced" and target_status == "released"):
-            is_indexed = False
-            from src.notifications import get_issue_path_from_info
-            from src.utils import is_fully_indexed_in_inducks
-            
-            # Identify path and check indexing to skip heavy fetching
-            issue_path = get_issue_path_from_info(book, country)
-            if issue_path and issue_path != "unknown":
-                is_indexed = is_fully_indexed_in_inducks(issue_path)
+            key = f"{key_prefix}{book_id}"
+            current = state.get(key)
 
-            if fetch_details_func and not is_indexed:
-                book.update(fetch_details_func(book["url"]))
+            pub_date = parse_date_fr(book.get("date")) if not book.get("pub_date") else book.get("pub_date")
+            is_released = book.get("released", False)
+            if pub_date and pub_date <= today:
+                is_released = True
+            if default_status == "released":
+                is_released = True
 
-            silent = False
-            if current is None:
-                if target_status == "released":
-                    silent = (not first_run and default_status != "released") # Wait, if default_status == "released", not first_run -> notify
-                    # Actual silent condition in original code: if not first_run and default_status == "released" => notify. else silent.
-                    silent = not (not first_run and default_status == "released")
-                else:
-                    silent = first_run
-            else:
-                # current == "announced" and target_status == "released"
-                silent = first_run
+            target_status = "released" if is_released else "announced"
 
-            event_str = "RELEASE" if target_status == "released" else "ANNOUNCE"
-            if silent:
-                print(f"  [{provider_name}-{event_str}-SILENT] {book.get('title')}")
-            else:
-                print(f"  [{provider_name}-{event_str}] {book.get('title')}")
-                if is_glenat:
+            if current is None or (current == "announced" and target_status == "released"):
+                is_indexed = False
+                from src.notifications import get_issue_path_from_info
+                from src.utils import is_fully_indexed_in_inducks
+
+                # Identify path and check indexing to skip heavy fetching
+                issue_path = get_issue_path_from_info(book, country)
+                if issue_path and issue_path != "unknown":
+                    is_indexed = is_fully_indexed_in_inducks(issue_path)
+
+                if fetch_details_func and not is_indexed:
+                    book.update(fetch_details_func(book["url"]))
+
+                silent = False
+                if current is None:
                     if target_status == "released":
-                        notify_glenat_release(book, state=state)
+                        silent = (not first_run and default_status != "released") # Wait, if default_status == "released", not first_run -> notify
+                        # Actual silent condition in original code: if not first_run and default_status == "released" => notify. else silent.
+                        silent = not (not first_run and default_status == "released")
                     else:
-                        notify_glenat_announce(book, state=state)
-                elif country == "fr_kiosk":
-                    releve = book.get("releve_date")
-                    if not releve:
-                        from src.scrapers.fr import get_mlp_releve
-                        try: releve = get_mlp_releve(book.get("codif"))
-                        except Exception: pass
-                    notify_magazine(book, releve_date=releve)
+                        silent = first_run
                 else:
-                    notify_international_comic(book, state=state, country=country, event_type="release" if target_status == "released" else "announce")
-                notif_count += 1
-                
-            state[key] = target_status
+                    # current == "announced" and target_status == "released"
+                    silent = first_run
+
+                event_str = "RELEASE" if target_status == "released" else "ANNOUNCE"
+                if silent:
+                    print(f"  [{provider_name}-{event_str}-SILENT] {book.get('title')}")
+                else:
+                    print(f"  [{provider_name}-{event_str}] {book.get('title')}")
+                    if is_glenat:
+                        if target_status == "released":
+                            notify_glenat_release(book, state=state)
+                        else:
+                            notify_glenat_announce(book, state=state)
+                    elif country == "fr_kiosk":
+                        notify_magazine(book, releve_date=book.get("releve_date"))
+                    else:
+                        notify_international_comic(book, state=state, country=country, event_type="release" if target_status == "released" else "announce")
+                    notif_count += 1
+
+                state[key] = target_status
+
+        except Exception as e:
+            print(f"  [error] Failed to process book {book.get('title')}: {e}")
 
     return notif_count
 

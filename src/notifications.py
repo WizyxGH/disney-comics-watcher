@@ -300,7 +300,10 @@ def _dispatch_notification(
         # 7. Send DBI to Admin DM
         admin_id = os.environ.get("TELEGRAM_ADMIN_ID")
         if admin_id and dbi_content:
-            clean_dbi = html_lib.escape(dbi_content.strip())
+            # Remove ^^ Source: line for the Telegram message
+            dbi_lines = [line for line in dbi_content.strip().split("\n") if not line.startswith("^^ Source")]
+            clean_dbi = html_lib.escape("\n".join(dbi_lines).strip())
+            
             source_url = info.get("url")
             title_html = f'<a href="{html_lib.escape(source_url)}"><b>{html_lib.escape(raw_title)}</b></a>' if source_url else f'<b>{html_lib.escape(raw_title)}</b>'
             dm_text = f"New DBI generated for {title_html}:\n<pre>{clean_dbi}</pre>"
@@ -308,7 +311,8 @@ def _dispatch_notification(
             dm_buttons = None
             if issue_path and "UNK" not in issue_path:
                 cvs_url = f"https://inducks.org/cvsedit.php?action=edit&issue={quote_plus(issue_path)}"
-                dm_buttons = [[{"text": "Edit using SVN", "url": cvs_url}]]
+                upload_url = f"https://inducks.org/uploadscan.php?c={quote_plus(issue_path)}"
+                dm_buttons = [[{"text": "Edit Index", "url": cvs_url}, {"text": "Upload Scan", "url": upload_url}]]
                 
             send_telegram(photo_url=cover_url, caption=dm_text, chat_id=admin_id, buttons=dm_buttons)
 

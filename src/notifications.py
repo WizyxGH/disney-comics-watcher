@@ -310,11 +310,11 @@ def _dispatch_notification(
             
             dm_buttons = None
             if issue_path and "UNK" not in issue_path:
-                # sendscan.php for Bolderbast server (e.g. c=de&s=LTBYC&i=LTBYC22&u=LTBYC22a)
+                # sendscan.php for Bolderbast server (e.g. c=de&s=LTBYC&i=LTB+YC+22&u=LTB+YC+22a)
                 country_part = issue_path.split("/", 1)[0]
                 issue_part = issue_path.split("/", 1)[1] if "/" in issue_path else issue_path
                 s_part = quote_plus(issue_part.split(" ")[0] if " " in issue_part else issue_part)
-                i_part = quote_plus(issue_part.replace(" ", ""))
+                i_part = quote_plus(issue_part)
                 u_part = f"{i_part}a"
                 upload_url = f"https://inducks.org/sendscan.php?c={quote_plus(country_part)}&s={s_part}&i={i_part}&u={u_part}"
                 

@@ -3,7 +3,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 from datetime import datetime
 from src.config import (
     PARIS_TZ, SKIP_CODIFS, OVERRIDES, GLENAT_KEY_PREFIX, FANTAGRAPHICS_KEY_PREFIX, MARVEL_KEY_PREFIX,
-    EGMONT_DE_KEY_PREFIX, KATHIMERINI_KEY_PREFIX, PANINI_IT_KEY_PREFIX, PANINI_BR_KEY_PREFIX,
+    DYNAMITE_KEY_PREFIX, EGMONT_DE_KEY_PREFIX, KATHIMERINI_KEY_PREFIX, PANINI_IT_KEY_PREFIX, PANINI_BR_KEY_PREFIX,
     NAHDET_MISR_EG_KEY_PREFIX, BG_KEY_PREFIX, HR_KEY_PREFIX, EE_KEY_PREFIX, LV_KEY_PREFIX,
     LT_KEY_PREFIX, PL_KEY_PREFIX, CZ_KEY_PREFIX, RS_KEY_PREFIX, SI_KEY_PREFIX, CN_KEY_PREFIX,
     DK_KEY_PREFIX, ES_KEY_PREFIX, FI_KEY_PREFIX, IS_KEY_PREFIX, NO_KEY_PREFIX, NL_KEY_PREFIX,
@@ -12,9 +12,8 @@ from src.config import (
 from src.utils import load_state, save_state, parse_date_fr
 from src.notifications import notify_magazine, notify_glenat_announce, notify_glenat_release, notify_international_comic
 
-# Explicit imports
 from src.scrapers.fr import discover_fr_kiosk, fetch_fr_kiosk_details, discover_glenat, fetch_glenat_details
-from src.scrapers.us import discover_fantagraphics, discover_marvel
+from src.scrapers.us import discover_fantagraphics, discover_marvel, discover_dynamite
 from src.scrapers.de import discover_egmont_de, fetch_egmont_de_details, discover_lustiges_taschenbuch_de
 from src.scrapers.gr import discover_kathimerini
 from src.scrapers.it import discover_panini_it, fetch_panini_it_details
@@ -131,6 +130,7 @@ def main():
         ("Glénat", GLENAT_KEY_PREFIX, discover_glenat, "fr", "announced", fetch_glenat_details, True),
         ("Fantagraphics", FANTAGRAPHICS_KEY_PREFIX, discover_fantagraphics, "us", "announced", None, False),
         ("Marvel", MARVEL_KEY_PREFIX, discover_marvel, "us", "announced", None, False),
+        ("Dynamite", DYNAMITE_KEY_PREFIX, discover_dynamite, "us", "released", None, False),
         ("Egmont DE", EGMONT_DE_KEY_PREFIX, discover_egmont_de, "de", "released", fetch_egmont_de_details, False),
         ("LTB DE", LTB_DE_KEY_PREFIX, discover_lustiges_taschenbuch_de, "de", "announced", None, False),
         ("Kathimerini GR", KATHIMERINI_KEY_PREFIX, discover_kathimerini, "gr", "released", None, False),

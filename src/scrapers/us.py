@@ -126,3 +126,51 @@ def discover_marvel():
             
     return result
 
+def discover_dynamite():
+    """Discovers US Disney comic books on Dynamite Entertainment via their On Sale endpoint."""
+    from bs4 import BeautifulSoup
+    from src.config import KEYWORDS
+    
+    s = get_session()
+    result = []
+    
+    # Dynamite loads its lists via CGI scripts. The most accessible one without 
+    # relying on complex JS execution is their weekly "On Sale" sidebar endpoint.
+    url = "https://www.dynamite.com/cgi-bin/sidebar.pl?read=onSaleWhole&show=1"
+    try:
+        r = s.get(url, timeout=15)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, 'html.parser')
+        
+        links = soup.find_all('a', href=True)
+        for a in links:
+            href = a['href']
+            if 'viewProduct' in href:
+                title = a.text.strip()
+                title_lower = title.lower()
+                
+                # Check for Disney-related keywords
+                is_disney = False
+                disney_keywords = ["disney", "gargoyles", "darkwing duck", "lilo", "stitch", "scar", "maleficent", "hades", "cruella"]
+                for kw in disney_keywords:
+                    if kw in title_lower:
+                        is_disney = True
+                        break
+                        
+                if is_disney:
+                    m = re.search(r'PRO=([A-Za-z0-9]+)', href)
+                    issue_id = m.group(1) if m else title
+                    full_url = f"https://www.dynamite.com/htmlfiles/{href}" if not href.startswith("http") else href
+                    
+                    result.append({
+                        "id": issue_id,
+                        "title": title,
+                        "url": full_url,
+                        "cover_url": None, # Cannot easily extract high-res cover from sidebar
+                        "source": "dynamite"
+                    })
+    except Exception as e:
+        print(f"  [warn] discover_dynamite failed: {e}")
+        
+    return result
+

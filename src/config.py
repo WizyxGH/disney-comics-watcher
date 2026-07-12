@@ -64,6 +64,7 @@ MARVEL_SERIES_URLS = [
     "https://www.marvel.com/comics/series/42808/uncle_scrooge_earths_mightiest_duck_2025_present"
 ]
 MARVEL_KEY_PREFIX = "marvel:"
+DYNAMITE_KEY_PREFIX = "dynamite:"
 
 EGMONT_DE_URLS = [
     "https://www.egmont-shop.de/comics/disney/",

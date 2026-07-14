@@ -57,8 +57,10 @@ INDEXES = [
     "CREATE INDEX IF NOT EXISTS idx_issue_pub   ON inducks_issue(publicationcode)",
 ]
 
+from src.config import SUPPORTED_COUNTRIES
+
 # Countries we care about
-TARGET_COUNTRIES = {"fr", "us", "de", "gr"}
+TARGET_COUNTRIES = SUPPORTED_COUNTRIES
 
 
 def download_isv(table_name: str) -> list[list[str]]:

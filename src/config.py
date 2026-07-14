@@ -8,6 +8,11 @@ except ImportError:
     pass
 
 
+SUPPORTED_COUNTRIES = {
+    "fr", "us", "de", "gr", "it", "br", "eg", "bg", "hr", "ee", "lv", "lt",
+    "pl", "cz", "rs", "si", "cn", "dk", "es", "fi", "is", "no", "nl", "uk", "se"
+}
+
 # Keywords for automatic discovery on Direct Editeurs + MLP
 KEYWORDS = ["picsou", "mickey", "mickey hs", "mickey parade", "fantomiald", "donald"]
 
@@ -37,6 +42,7 @@ OVERRIDES = {
     "14068": {"name": "Les Trésors de Picsou",                  "inducks": "TP"},
     "14067": {"name": "Journal de Mickey",                      "inducks": "JM"},
     "14108": {"name": "Journal de Mickey HS",                   "inducks": ("JMHSN", 3)},
+    "12011": {"name": "Le Journal de Mickey HS BD Collector",   "inducks": "JMHSC"},
     "15935": {"name": "Le Meilleur du Journal de Mickey",       "inducks": "JMC"},
     "15970": {"name": "Le Meilleur du JdM HS"},
     "18914": {"name": "Le Meilleur du JdM HS Spécial Enquêtes"},

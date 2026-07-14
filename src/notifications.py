@@ -4,7 +4,7 @@ import html as html_lib
 import time
 import requests
 from urllib.parse import quote, quote_plus
-from src.config import TELEGRAM_API, TELEGRAM_CHAT_ID, TELEGRAM_THREAD_ID_FR, TELEGRAM_THREAD_ID_US, TELEGRAM_THREAD_ID_DE, TELEGRAM_THREAD_ID_GR, TELEGRAM_THREAD_ID_IT, TELEGRAM_THREAD_ID_BR, TELEGRAM_THREAD_ID_EG, TELEGRAM_THREAD_ID_BG, TELEGRAM_THREAD_ID_HR, TELEGRAM_THREAD_ID_EE, TELEGRAM_THREAD_ID_LV, TELEGRAM_THREAD_ID_LT, TELEGRAM_THREAD_ID_PL, TELEGRAM_THREAD_ID_CZ, TELEGRAM_THREAD_ID_RS, TELEGRAM_THREAD_ID_SI, TELEGRAM_THREAD_ID_CN, TELEGRAM_THREAD_ID_DK, TELEGRAM_THREAD_ID_ES, TELEGRAM_THREAD_ID_FI, TELEGRAM_THREAD_ID_IS, TELEGRAM_THREAD_ID_NO, TELEGRAM_THREAD_ID_NL, TELEGRAM_THREAD_ID_UK, TELEGRAM_THREAD_ID_SE, OVERRIDES, AMAZON_AFFILIATE_TAG, SITE_BASE
+from src.config import TELEGRAM_API, TELEGRAM_CHAT_ID, TELEGRAM_THREAD_ID_FR, TELEGRAM_THREAD_ID_US, TELEGRAM_THREAD_ID_DE, TELEGRAM_THREAD_ID_GR, TELEGRAM_THREAD_ID_IT, TELEGRAM_THREAD_ID_BR, TELEGRAM_THREAD_ID_EG, TELEGRAM_THREAD_ID_BG, TELEGRAM_THREAD_ID_HR, TELEGRAM_THREAD_ID_EE, TELEGRAM_THREAD_ID_LV, TELEGRAM_THREAD_ID_LT, TELEGRAM_THREAD_ID_PL, TELEGRAM_THREAD_ID_CZ, TELEGRAM_THREAD_ID_RS, TELEGRAM_THREAD_ID_SI, TELEGRAM_THREAD_ID_CN, TELEGRAM_THREAD_ID_DK, TELEGRAM_THREAD_ID_ES, TELEGRAM_THREAD_ID_FI, TELEGRAM_THREAD_ID_IS, TELEGRAM_THREAD_ID_NO, TELEGRAM_THREAD_ID_NL, TELEGRAM_THREAD_ID_UK, TELEGRAM_THREAD_ID_SE, OVERRIDES, AMAZON_AFFILIATE_TAG, SITE_BASE, SUPPORTED_COUNTRIES
 from src.utils import format_price_fr, get_session, truncate_summary, isbn13_to_isbn10, is_fully_indexed_in_inducks
 from src.dbi.generator import generate_dbi_skeleton
 from src.dbi.mappers import build_inducks_path
@@ -214,7 +214,7 @@ def _dispatch_notification(
     issue_path = get_issue_path_from_info(info, publication_type)
     issue_code = issue_path.split("/", 1)[-1] if "/" in issue_path else issue_path
     
-    country_prefix = publication_type if publication_type in ("us", "de", "gr", "it", "br", "eg", "bg", "hr", "ee", "lv", "lt", "pl", "cz", "rs", "si", "cn", "dk", "es", "fi", "isl", "no", "nl", "uk", "se") else "fr"
+    country_prefix = publication_type if publication_type in SUPPORTED_COUNTRIES and publication_type != "fr" else "fr"
     
     m = re.match(r'^([a-zA-Z]+)([\s_]+)(.*)$', issue_code)
     if m:

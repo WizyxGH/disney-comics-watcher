@@ -1,4 +1,5 @@
 import os
+from src.config import SUPPORTED_COUNTRIES
 from src.dbi.utils import _format_date_for_dbi, _format_price_for_dbi, sort_dbi_file
 from src.dbi.mappers import (
     resolve_magazine_metadata, resolve_us_metadata, resolve_de_metadata, 
@@ -80,10 +81,11 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         price   = _format_price_for_dbi(prix_raw)
 
         os.makedirs("issues", exist_ok=True)
-        dbi_path = os.path.join("issues", f"{publication_type}.dbi" if publication_type in ["us", "de", "gr", "it", "br", "eg", "bg", "hr", "ee", "lv", "lt", "pl", "cz", "rs", "si", "cn", "dk", "es", "fi", "is", "no", "nl", "uk", "se"] else "fr.dbi")
+        dbi_path = os.path.join("issues", f"{publication_type}.dbi" if publication_type in SUPPORTED_COUNTRIES and publication_type != "fr" else "fr.dbi")
 
         dbi_issue_code = issue_path
-        for prefix in ("fr/", "us/", "de/", "gr/", "it/", "br/", "eg/", "bg/", "hr/", "ee/", "lv/", "lt/", "pl/", "cz/", "rs/", "si/", "cn/", "dk/", "es/", "fi/", "is/", "no/", "nl/", "uk/", "se/"):
+        for country in SUPPORTED_COUNTRIES:
+            prefix = f"{country}/"
             if dbi_issue_code.startswith(prefix):
                 dbi_issue_code = dbi_issue_code[3:]
                 break

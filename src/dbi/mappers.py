@@ -307,174 +307,29 @@ def _build_glenat_inducks_path(title: str, ean: str | None = None, collection_la
 
     return "fr/UNK"
 
-def resolve_bg_metadata(info):
-    title = info.get("title", "BG Comic")
+def _resolve_generic_metadata(info: dict, country_code: str) -> dict:
+    title = info.get("title", f"{country_code.upper()} Comic")
     book_id = str(info.get("id") or "UNK")
-
-    issue_path = search_publication_code(title, "bg")
-
+    issue_path = search_publication_code(title, country_code)
     if not issue_path:
-        issue_path = f"bg/UNK_{book_id[-6:]}"
-
+        issue_path = f"{country_code}/UNK_{book_id[-6:]}"
     return _build_metadata(issue_path, title, info)
 
-def resolve_hr_metadata(info):
-    title = info.get("title", "HR Comic")
-    book_id = str(info.get("id") or "UNK")
-
-    issue_path = search_publication_code(title, "hr")
-
-    if not issue_path:
-        issue_path = f"hr/UNK_{book_id[-6:]}"
-
-    return _build_metadata(issue_path, title, info)
-
-def resolve_ee_metadata(info):
-    title = info.get("title", "EE Comic")
-    book_id = str(info.get("id") or "UNK")
-
-    issue_path = search_publication_code(title, "ee")
-
-    if not issue_path:
-        issue_path = f"ee/UNK_{book_id[-6:]}"
-
-    return _build_metadata(issue_path, title, info)
-
-def resolve_lv_metadata(info):
-    title = info.get("title", "LV Comic")
-    book_id = str(info.get("id") or "UNK")
-
-    issue_path = search_publication_code(title, "lv")
-
-    if not issue_path:
-        issue_path = f"lv/UNK_{book_id[-6:]}"
-
-    return _build_metadata(issue_path, title, info)
-
-def resolve_lt_metadata(info):
-    title = info.get("title", "LT Comic")
-    book_id = str(info.get("id") or "UNK")
-
-    issue_path = search_publication_code(title, "lt")
-
-    if not issue_path:
-        issue_path = f"lt/UNK_{book_id[-6:]}"
-
-    return _build_metadata(issue_path, title, info)
-
-def resolve_pl_metadata(info):
-    title = info.get("title", "PL Comic")
-    book_id = str(info.get("id") or "UNK")
-
-    issue_path = search_publication_code(title, "pl")
-
-    if not issue_path:
-        issue_path = f"pl/UNK_{book_id[-6:]}"
-
-    return _build_metadata(issue_path, title, info)
-
-def resolve_cz_metadata(info):
-    title = info.get("title", "CZ Comic")
-    book_id = str(info.get("id") or "UNK")
-
-    issue_path = search_publication_code(title, "cz")
-
-    if not issue_path:
-        issue_path = f"cz/UNK_{book_id[-6:]}"
-
-    return _build_metadata(issue_path, title, info)
-
-def resolve_rs_metadata(info):
-    title = info.get("title", "RS Comic")
-    book_id = str(info.get("id") or "UNK")
-
-    issue_path = search_publication_code(title, "rs")
-
-    if not issue_path:
-        issue_path = f"rs/UNK_{book_id[-6:]}"
-
-    return _build_metadata(issue_path, title, info)
-
-def resolve_si_metadata(info):
-    title = info.get("title", "SI Comic")
-    book_id = str(info.get("id") or "UNK")
-
-    issue_path = search_publication_code(title, "si")
-
-    if not issue_path:
-        issue_path = f"si/UNK_{book_id[-6:]}"
-
-    return _build_metadata(issue_path, title, info)
-
-
-def resolve_cn_metadata(info: dict) -> dict:
-    return {
-        "issue_path": info.get("issue_path", "cn/UNK"),
-        "title": info.get("title", ""),
-        "date": info.get("date", ""),
-        "price": info.get("price", ""),
-    }
-
-def resolve_dk_metadata(info: dict) -> dict:
-    return {
-        "issue_path": info.get("issue_path", "dk/UNK"),
-        "title": info.get("title", ""),
-        "date": info.get("date", ""),
-        "price": info.get("price", ""),
-    }
-
-def resolve_es_metadata(info: dict) -> dict:
-    return {
-        "issue_path": info.get("issue_path", "es/UNK"),
-        "title": info.get("title", ""),
-        "date": info.get("date", ""),
-        "price": info.get("price", ""),
-    }
-
-def resolve_fi_metadata(info: dict) -> dict:
-    return {
-        "issue_path": info.get("issue_path", "fi/UNK"),
-        "title": info.get("title", ""),
-        "date": info.get("date", ""),
-        "price": info.get("price", ""),
-    }
-
-def resolve_is_metadata(info: dict) -> dict:
-    return {
-        "issue_path": info.get("issue_path", "is/UNK"),
-        "title": info.get("title", ""),
-        "date": info.get("date", ""),
-        "price": info.get("price", ""),
-    }
-
-def resolve_no_metadata(info: dict) -> dict:
-    return {
-        "issue_path": info.get("issue_path", "no/UNK"),
-        "title": info.get("title", ""),
-        "date": info.get("date", ""),
-        "price": info.get("price", ""),
-    }
-
-def resolve_nl_metadata(info: dict) -> dict:
-    return {
-        "issue_path": info.get("issue_path", "nl/UNK"),
-        "title": info.get("title", ""),
-        "date": info.get("date", ""),
-        "price": info.get("price", ""),
-    }
-
-def resolve_uk_metadata(info: dict) -> dict:
-    return {
-        "issue_path": info.get("issue_path", "uk/UNK"),
-        "title": info.get("title", ""),
-        "date": info.get("date", ""),
-        "price": info.get("price", ""),
-    }
-
-def resolve_se_metadata(info: dict) -> dict:
-    return {
-        "issue_path": info.get("issue_path", "se/UNK"),
-        "title": info.get("title", ""),
-        "date": info.get("date", ""),
-        "price": info.get("price", ""),
-    }
+def resolve_bg_metadata(info): return _resolve_generic_metadata(info, "bg")
+def resolve_hr_metadata(info): return _resolve_generic_metadata(info, "hr")
+def resolve_ee_metadata(info): return _resolve_generic_metadata(info, "ee")
+def resolve_lv_metadata(info): return _resolve_generic_metadata(info, "lv")
+def resolve_lt_metadata(info): return _resolve_generic_metadata(info, "lt")
+def resolve_pl_metadata(info): return _resolve_generic_metadata(info, "pl")
+def resolve_cz_metadata(info): return _resolve_generic_metadata(info, "cz")
+def resolve_rs_metadata(info): return _resolve_generic_metadata(info, "rs")
+def resolve_si_metadata(info): return _resolve_generic_metadata(info, "si")
+def resolve_cn_metadata(info): return _resolve_generic_metadata(info, "cn")
+def resolve_dk_metadata(info): return _resolve_generic_metadata(info, "dk")
+def resolve_es_metadata(info): return _resolve_generic_metadata(info, "es")
+def resolve_fi_metadata(info): return _resolve_generic_metadata(info, "fi")
+def resolve_is_metadata(info): return _resolve_generic_metadata(info, "is")
+def resolve_no_metadata(info): return _resolve_generic_metadata(info, "no")
+def resolve_nl_metadata(info): return _resolve_generic_metadata(info, "nl")
+def resolve_uk_metadata(info): return _resolve_generic_metadata(info, "uk")
+def resolve_se_metadata(info): return _resolve_generic_metadata(info, "se")

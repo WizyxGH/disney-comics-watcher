@@ -20,7 +20,12 @@ def discover_panini_magento(url: str, country_code: str) -> list[dict]:
                 continue
                 
             title = title_elem.get_text(strip=True)
-            if "abbonamento" in title.lower():
+            title_lower = title.lower()
+            if "abbonamento" in title_lower or "cofanetto" in title_lower or "pacote" in title_lower or "bundle" in title_lower or "pack" in title_lower:
+                continue
+                
+            # Exclude bundles like "Vol. 1, 2 e 3", "Vol. 1 ao 3", etc.
+            if re.search(r'\b(?:vol\.|vols\.|volumes?|n\.|nr\.)\s*\d+\s*(?:,|e|y|and|al|ao|a|-)\s*\d+\b', title, re.IGNORECASE):
                 continue
                 
             link = title_elem.get('href')

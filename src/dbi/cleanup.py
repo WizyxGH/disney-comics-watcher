@@ -44,7 +44,7 @@ def cleanup_indexed_issues(dbi_paths: list[str]):
                     cleaned_block = '\n'.join(lines)
                     code = parse_issue_code_from_block(cleaned_block)
                     if code:
-                        clean_code = code.replace(" ", "").lower()
+                        clean_code = code.replace(" ", "").replace("_", "").lower()
                         if "/" not in clean_code:
                             clean_code = f"{country_prefix}/{clean_code}"
                         parsed_blocks.append((code, clean_code, cleaned_block))
@@ -76,10 +76,10 @@ def cleanup_indexed_issues(dbi_paths: list[str]):
         for i in range(0, len(query_list), batch_size):
             batch = query_list[i:i+batch_size]
             placeholders = ','.join(['?'] * len(batch))
-            query = f"SELECT issuecode, fullyindexed FROM inducks_issue WHERE LOWER(REPLACE(issuecode, ' ', '')) IN ({placeholders})"
+            query = f"SELECT issuecode, fullyindexed FROM inducks_issue WHERE LOWER(REPLACE(REPLACE(issuecode, ' ', ''), '_', '')) IN ({placeholders})"
             res = query_db(query, tuple(batch))
             for row in res:
-                issuecode_clean = row[0].replace(" ", "").lower()
+                issuecode_clean = row[0].replace(" ", "").replace("_", "").lower()
                 fully_indexed = row[1].strip().upper() if row[1] else ''
                 if fully_indexed == 'Y':
                     found_codes.add(issuecode_clean)
@@ -95,10 +95,7 @@ def cleanup_indexed_issues(dbi_paths: list[str]):
         if m:
             pub_code = m.group(1).lower()
             number = re.sub(r'[^a-zA-Z0-9]', '_', m.group(3)).lower()
-            if pub_code == country_prefix:
-                safe_code = number.zfill(4)
-            else:
-                safe_code = f"{pub_code}_{number.zfill(4)}"
+            safe_code = f"{pub_code}_{number.zfill(4)}"
         else:
             safe_code = re.sub(r'[^a-zA-Z0-9]', '_', issue_code).lower()
             

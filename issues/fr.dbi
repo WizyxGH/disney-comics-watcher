@@ -40,17 +40,11 @@ SPGHS J8a   ?              1  c
 SPGHS M1     h3 Les grands méchants [issdate:2026-06-06] [price:6.99 EUR] [inx:-]
 SPGHS M1a   ?                 1 c
 
-^^ Source:  https://direct-editeurs.fr/magazine/11071_le-journal-de-mickey-hs-collector-fantasy-rev_2
-TODO_11071 2 h3 LE JOURNAL DE MICKEY HS COLLECTOR FANTASY REV [issdate:2026-07-08] [price:6.95 EUR] [inx:-]
-->          ?              1  c                     [entrycode:TODO_11071 2a]
 
 ^^ Source:  https://direct-editeurs.fr/magazine/12011_le-journal-de-mickey-hs-bd-collector_1
 TODO_12011 1 h3 LE JOURNAL DE MICKEY HS BD COLLECTOR [issdate:2026-07-08] [price:6.95 EUR] [inx:-]
 ->          ?              1  c                     [entrycode:TODO_12011 1a]
 
-^^ Source:  https://direct-editeurs.fr/magazine/16096_le-journal-de-mickey--produit_3864
-->           h3 Journal de Mickey + Produit [issdate:2026-07-08] [price:8.90 EUR] [inx:-]
-->          ?              1  c                     [entrycode:TODO_16096 3864a]
 
 ^^ Source: https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_75;jsessionid=9C8089E09AF698C9BE88C9927442D3C2
 TP 75        h3 Les Trésors de Picsou [issdate:2026-06-19] [price:7.99 EUR] [inx:-]

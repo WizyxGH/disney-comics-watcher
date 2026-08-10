@@ -2,6 +2,10 @@
 B 2          h3 Phineas und Ferb - Band 2 [price:14.99 EUR] [inx:-]
 B 2a        ?              1 c
 
+^^ Source: https://www.egmont-shop.de/donald-duck-co-nr-103/
+CN 103       h3 Donald Duck & Co. Nr. 103 [price:4.99 EUR] [inx:-]
+CN 103a     ?                 1 c
+
 ^^ Source:  https://www.egmont-shop.de/donald-duck-sonderheft-nr-470/
 DDSN 470     h3 Donald Duck Sonderheft Nr. 470 [price:4.99 EUR] [inx:-]
 DDSN 470a   ?              1  c
@@ -113,6 +117,10 @@ MM2026-16a  ?                 1 c
 MM2026-17    h3 Micky Maus Magazin Nr. 17/2026 - Ruhrgebiet Regionalausgabe [price:5.99 EUR] [inx:-]
 MM2026-17a  ?                 1 c
 
+^^ Source: https://www.egmont-shop.de/micky-maus-magazin-nr-182026/
+MM2026-18    h3 Micky Maus Magazin Nr. 18/2026 [price:4.99 EUR] [inx:-]
+MM2026-18a  ?                 1 c
+
 ^^ Source:  https://www.egmont-shop.de/micky-maus-magazin-nr-092026/
 MM 09        h3 Micky Maus Magazin Nr. 09/2026 [price:4.99 EUR] [inx:-]
 MM 09a      ?              1 c
@@ -148,6 +156,10 @@ NSN2026-04a ?                 1 c
 ^^ Source:  https://www.egmont-shop.de/disney-die-eiskonigin-spezial-nr-032026/
 NSN 3        h3 Disney Die Eiskönigin Spezial Nr. 03/2026 [price:5.99 EUR] [inx:-]
 NSN 3a      ?              1 c
+
+^^ Source: https://www.egmont-shop.de/disney-stars-prasentiert-022026/
+S2026-02     h3 Disney Stars präsentiert 02/2026 [price:5.99 EUR] [inx:-]
+S2026-02a   ?                 1 c
 
 ^^ Source: https://www.egmont-shop.de/donald-duck-sonderheft-nr-471/
 TGDD 471     h3 Donald Duck Sonderheft Nr. 471 [price:4.99 EUR] [inx:-]

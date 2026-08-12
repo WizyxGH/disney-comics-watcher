@@ -6,6 +6,10 @@ CD    3a    ?              1  c
 CF   38      h3 Les Chroniques de Fantomiald [issdate:2026-05-13] [price:6.99 EUR] [inx:-]
 CF   38a    ?              1  c
 
+^^ Source: https://direct-editeurs.fr/magazine/15190_les-chroniques-de-fantomiald_39
+CF   39      h3 Les Chroniques de Fantomiald [issdate:2026-08-12] [price:6.99 EUR] [inx:-]
+CF   39a    ?                 1 c
+
 ^^ Source: https://www.glenat.com/glenat-disney/la-grande-histoire-de-picsou-tome-04-9782344075135
 GHP   4      h3 La Grande Histoire de Picsou - Tome 04 [issdate:2026-11-18] [price:19.00 EUR] [pages:184] [size:200 x 273 mm] [EAN 9782344075135] [inx:-]
 GHP   4a    ?                 1 c
@@ -33,6 +37,10 @@ JMHSN 12a   ?              1  c
 ^^ Source: https://direct-editeurs.fr/magazine/13159_picsou-magazine_595;jsessionid=9C8089E09AF698C9BE88C9927442D3C2
 PM  595      h3 Picsou Magazine [issdate:2026-06-24] [price:8.99 EUR] [inx:-]
 PM  595a    ?              1  c
+
+^^ Source: https://direct-editeurs.fr/magazine/13159_picsou-magazine_596;jsessionid=175DC8C0675CF33347D62CC01E224A07
+PM  596      h3 Picsou Magazine [issdate:2026-08-12] [price:6.99 EUR] [inx:-]
+PM  596a    ?                 1 c
 
 ^^ Source: https://direct-editeurs.fr/magazine/14016_super-picsou-geant_254;jsessionid=9C8089E09AF698C9BE88C9927442D3C2
 SPG 254      h3 Super Picsou Géant [issdate:2026-05-12] [price:6.99 EUR] [inx:-]

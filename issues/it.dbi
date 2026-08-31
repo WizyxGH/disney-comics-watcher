@@ -6,9 +6,17 @@ PK 115a     ?              1  c
 PK 116       h3 Paperinik 116 Con Carte da Gioco [price:6.00 EUR] [inx:-]
 PK 116a     ?                 1 c
 
+^^ Source: https://www.panini.it/shp_ita_it/paperinik-117-1wpnik11718-it08.html
+PK 117       h3 Paperinik 117 [price:4.50 EUR] [inx:-]
+PK 117a     ?                 1 c
+
 ^^ Source: https://www.panini.it/shp_ita_it/i-viaggi-di-topolino-1-1wtrip001-it08.html
 TL 1         h3 I Viaggi di Topolino 1 [price:5.50 EUR] [inx:-]
 TL 1a       ?              1  c
+
+^^ Source: https://www.panini.it/shp_ita_it/topolino-3d-1wspev061-it08.html
+TL 3         h3 Topolino 3D [price:5.90 EUR] [inx:-]
+TL 3a       ?                 1 c
 
 ^^ Source: https://www.panini.it/shp_ita_it/almanacco-topolino-27-1walma027-it08.html
 TL 27        h3 Almanacco Topolino 27 [price:5.90 EUR] [inx:-]
@@ -50,8 +58,8 @@ TL 3691a    ?                 1 c
 TL 3692      h3 Topolino 3692 [price:8.50 EUR] [inx:-]
 TL 3692a    ?                 1 c
 
-^^ Source: https://www.panini.it/shp_ita_it/topolino-3693-1wtopo3693-it08.html
-TL 3693      h3 Topolino 3693 [price:3.50 EUR] [inx:-]
+^^ Source: https://www.panini.it/shp_ita_it/topolino-3693-1wtopo3693v-it08.html
+TL 3693      h3 Topolino 3693 [price:14.90 EUR] [inx:-]
 TL 3693a    ?                 1 c
 
 ^^ Source: https://www.panini.it/shp_ita_it/abbonamento-a-topolino-con-raccoglitore-conf1wtopoabbracco-itd.html
@@ -174,6 +182,10 @@ UNK_334988a ?              1  c
 UNK_335500   h3 Paperino e L'Ombroso [price:13.00 EUR] [inx:-]
 UNK_335500a ?                 1 c
 
+^^ Source: https://www.panini.it/shp_ita_it/100-topolino-e-gambadilegno-1wpast051-it08.html
+UNK_335539   h3 100% Topolino e Gambadilegno [price:5.00 EUR] [inx:-]
+UNK_335539a ?                 1 c
+
 ^^ Source: https://www.panini.it/shp_ita_it/paperdetective-indagini-e-misteri-3-1wfant007-it08.html
 UNK_335545   h3 Paperdetective: Indagini e Misteri 3 [price:5.00 EUR] [inx:-]
 UNK_335545a ?                 1 c
@@ -182,9 +194,17 @@ UNK_335545a ?                 1 c
 UNK_335551   h3 Paperino Sport 14 [price:5.00 EUR] [inx:-]
 UNK_335551a ?                 1 c
 
+^^ Source: https://www.panini.it/shp_ita_it/paperino-in-team-1wsudi122-it08.html
+UNK_335557   h3 Paperino in Team [price:6.50 EUR] [inx:-]
+UNK_335557a ?                 1 c
+
 ^^ Source: https://www.panini.it/shp_ita_it/i-grandi-classici-128-1wgcla128-it08.html
 UNK_335566   h3 I Grandi Classici 128 [price:5.50 EUR] [inx:-]
 UNK_335566a ?                 1 c
+
+^^ Source: https://www.panini.it/shp_ita_it/scuolissima-1wtime128-it08.html
+UNK_335569   h3 Scuolissima [price:4.50 EUR] [inx:-]
+UNK_335569a ?                 1 c
 
 ^^ Source: https://www.panini.it/shp_ita_it/disney-big-221-1wdbig221-it08.html
 UNK_335572   h3 Disney Big 221 [price:6.90 EUR] [inx:-]

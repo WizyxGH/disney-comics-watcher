@@ -141,6 +141,10 @@ MM2026-19a  ?                 1 c
 MM 09        h3 Micky Maus Magazin Nr. 09/2026 [price:4.99 EUR] [inx:-]
 MM 09a      ?              1 c
 
+^^ Source: https://www.egmont-shop.de/micky-maus-comics-nr-105/
+MMC 105      h3 Micky Maus Comics Nr. 105 [price:4.99 EUR] [inx:-]
+MMC 105a    ?                 1 c
+
 ^^ Source:  https://www.egmont-shop.de/micky-maus-comics-nr-104/
 MMCN 104     h3 Micky Maus Comics Nr. 104 [price:4.99 EUR] [inx:-]
 MMCN 104a   ?              1  c
@@ -180,6 +184,10 @@ S2026-02a   ?                 1 c
 ^^ Source: https://www.egmont-shop.de/donald-duck-sonderheft-nr-471/
 TGDD 471     h3 Donald Duck Sonderheft Nr. 471 [price:4.99 EUR] [inx:-]
 TGDD 471a   ?                 1 c
+
+^^ Source: https://www.egmont-shop.de/donald-duck-sonderheft-nr-472/
+TGDD 472     h3 Donald Duck Sonderheft Nr. 472 [price:4.99 EUR] [inx:-]
+TGDD 472a   ?                 1 c
 
 ^^ Source: https://www.egmont-shop.de/micky-maus-jubilaums-edition/
 UNK_03509    h3 Micky Maus Jubiläums Edition [price:49.99 EUR] [inx:-]

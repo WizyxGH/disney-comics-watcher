@@ -147,7 +147,7 @@ def _parse_role_ids(raw: str) -> dict[str, str]:
 
     Pairs are extracted rather than split, so the id half may be a raw Discord
     mention and the separators may be commas, spaces or newlines. That way the
-    output of typing '\@France' in a channel pastes in unedited.
+    output of typing '\\@France' in a channel pastes in unedited.
     """
     roles = {
         cc.lower(): role_id

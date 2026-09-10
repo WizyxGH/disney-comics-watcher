@@ -14,7 +14,7 @@ from src.utils import load_state, save_state, parse_date_fr
 from src.notifications import notify_magazine, notify_glenat_announce, notify_glenat_release, notify_international_comic
 
 from src.scrapers.fr import discover_fr_kiosk, fetch_fr_kiosk_details, discover_glenat, fetch_glenat_details
-from src.scrapers.us import discover_fantagraphics, discover_marvel, discover_dynamite
+from src.scrapers.us import discover_fantagraphics, discover_marvel, discover_dynamite, fetch_dynamite_details
 from src.scrapers.de import discover_egmont_de, fetch_egmont_de_details, discover_lustiges_taschenbuch_de
 from src.scrapers.gr import discover_kathimerini
 from src.scrapers.it import discover_panini_it, fetch_panini_it_details
@@ -60,6 +60,13 @@ def _process_provider_books(
     notif_count = 0
     print(f"[{provider_name}] Processing {len(books)} comic(s)...")
     today = datetime.now(PARIS_TZ).date()
+
+    # A provider with nothing in the state yet (new, or repaired after being
+    # broken) is seeded silently, like a global first run: otherwise its whole
+    # current catalogue would be announced at once.
+    if books and not any(k.startswith(key_prefix) for k in state):
+        print(f"  [{provider_name}] No history yet: recording its catalogue silently.")
+        first_run = True
 
     for book in books:
         try:
@@ -166,7 +173,7 @@ def main():
         ("Glénat", GLENAT_KEY_PREFIX, discover_glenat, "fr", "announced", fetch_glenat_details, True),
         ("Fantagraphics", FANTAGRAPHICS_KEY_PREFIX, discover_fantagraphics, "us", "announced", None, False),
         ("Marvel", MARVEL_KEY_PREFIX, discover_marvel, "us", "announced", None, False),
-        ("Dynamite", DYNAMITE_KEY_PREFIX, discover_dynamite, "us", "released", None, False),
+        ("Dynamite", DYNAMITE_KEY_PREFIX, discover_dynamite, "us", "announced", fetch_dynamite_details, False),
         ("Egmont DE", EGMONT_DE_KEY_PREFIX, discover_egmont_de, "de", "released", fetch_egmont_de_details, False),
         ("LTB DE", LTB_DE_KEY_PREFIX, discover_lustiges_taschenbuch_de, "de", "announced", None, False),
         ("Kathimerini GR", KATHIMERINI_KEY_PREFIX, discover_kathimerini, "gr", "released", None, False),

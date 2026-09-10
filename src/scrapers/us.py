@@ -98,22 +98,31 @@ def discover_marvel():
             r.raise_for_status()
             soup = BeautifulSoup(r.text, 'html.parser')
             
-            cards = soup.find_all('div', class_='ComicCard')
-            for c in cards:
-                title_tag = c.find(class_='ComicCard__Meta__Title')
-                title = title_tag.text.strip() if title_tag else "Unknown Title"
+            # Target the grid container of actual issues (avoiding 'comic-series' which contains recommendations)
+            grid = soup.select_one('div.FeaturedGrid__Container:not(.comic-series)')
+            if not grid:
+                grid = soup
                 
+            cards = grid.find_all('div', class_='ComicCard')
+            for c in cards:
                 link_tag = c.find('a', class_='ComicCard__Link', href=True)
-                issue_url = "https://www.marvel.com" + link_tag['href'] if link_tag else url
+                if not link_tag:
+                    continue
+                issue_url = "https://www.marvel.com" + link_tag['href']
                 
                 # Extract issue ID from URL e.g., /comics/issue/123735/...
                 m = re.search(r'/issue/(\d+)/', issue_url)
-                issue_id = m.group(1) if m else title
+                if not m:
+                    # Skip cards pointing to series/related products rather than issues
+                    continue
+                issue_id = m.group(1)
+                
+                title_tag = c.find(class_='ComicCard__Meta__Title')
+                title = title_tag.text.strip() if title_tag else "Unknown Title"
                 
                 img_tag = c.find('img')
                 cover_url = img_tag['src'] if img_tag and 'src' in img_tag.attrs else None
                 
-                # Basic parsing, we consider the card presence as a release for our tracker
                 result.append({
                     "id": issue_id,
                     "title": title,

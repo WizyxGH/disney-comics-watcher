@@ -39,6 +39,12 @@ from src.scrapers.uk import discover_uk, fetch_uk_details
 from src.scrapers.se import discover_se, fetch_se_details
 
 
+# A release older than this is catch-up, not news: it only happens when a
+# scraper starts exposing dates, gets repaired, or a site was down for a while.
+# The state still moves to "released", just without announcing it.
+STALE_RELEASE_DAYS = 14
+
+
 def _process_provider_books(
     state: dict, 
     first_run: bool, 
@@ -95,6 +101,10 @@ def _process_provider_books(
                 else:
                     # current == "announced" and target_status == "released"
                     silent = first_run
+                    if pub_date and (today - pub_date).days > STALE_RELEASE_DAYS:
+                        silent = True
+                        print(f"  [{provider_name}-RELEASE-STALE] {book.get('title')} "
+                              f"(out since {pub_date}, not announced)")
 
                 event_str = "RELEASE" if target_status == "released" else "ANNOUNCE"
                 if silent:

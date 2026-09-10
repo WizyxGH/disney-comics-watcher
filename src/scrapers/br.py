@@ -7,4 +7,4 @@ def discover_panini_br():
 
 def fetch_panini_br_details(url: str) -> dict:
     """Fetches additional details from the product page if needed."""
-    return fetch_panini_magento_details(url)
+    return fetch_panini_magento_details(url, "BR")

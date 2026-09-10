@@ -45,6 +45,7 @@ OVERRIDES = {
     "12011": {"name": "Le Journal de Mickey HS BD Collector",   "inducks": "JMHSC"},
     "15935": {"name": "Le Meilleur du Journal de Mickey",       "inducks": "JMC"},
     "15970": {"name": "Le Meilleur du JdM HS"},
+    "15350": {"name": "Le Meilleur des Trésors de Picsou"},
     "18914": {"name": "Le Meilleur du JdM HS Spécial Enquêtes"},
     "15190": {"name": "Les Chroniques de Fantomiald",           "inducks": ("CF", 5)},
     "14268": {"name": "Les Incontournables de Disney",          "inducks": ("LI", 4)},

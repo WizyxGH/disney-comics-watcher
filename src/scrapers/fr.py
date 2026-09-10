@@ -10,6 +10,28 @@ from src.config import KEYWORDS, SKIP_CODIFS, BI_ISSUE_CODIFS, OVERRIDES, SEARCH
 from src.utils import get_session, parse_date_fr
 
 
+def title_matches_keywords(title: str) -> bool:
+    """True if the title matches a keyword, tolerating MLP's title truncation.
+
+    MLP cuts titles at a fixed width, so the last word may be clipped
+    (e.g. 'MEILLEURS DES TRESORS DE PICSO' for '… PICSOU'). A clipped
+    trailing word is accepted when it is a prefix of a keyword's last word,
+    with at least 4 characters to avoid false positives.
+    """
+    title_lower = title.lower()
+    if any(kw in title_lower for kw in KEYWORDS):
+        return True
+
+    last_word = title_lower.split()[-1] if title_lower.split() else ""
+    if len(last_word) < 4:
+        return False
+    return any(
+        kw.split()[-1].startswith(last_word)
+        for kw in KEYWORDS
+        if len(kw.split()[-1]) > len(last_word)
+    )
+
+
 def parse_block(block):
     """Extracts codif/number/date/cover/url from a <div class='info-mag'> block."""
     codif_m   = re.search(r"<span>Codif :</span>\s*(\d+)", block)
@@ -204,10 +226,12 @@ def discover_mlp_families(known_codifs: set, state: dict | None = None):
                 link       = cat.find('a', href=True)
 
                 title       = titre_span.get_text(strip=True) if titre_span else ""
-                title_lower = title.lower()
-                if codif not in OVERRIDES and not any(kw in title_lower for kw in KEYWORDS):
+                if codif not in OVERRIDES and not title_matches_keywords(title):
                     continue
                 if re.search(r'\bREV\b', title):
+                    continue
+                # Same bundle exclusions as DE; '+ produ' covers MLP's truncated '+ produit'
+                if "pochette" in title.lower() or "+ produ" in title.lower():
                     continue
 
                 numero_list = num_span.get_text(strip=True) if num_span else ""

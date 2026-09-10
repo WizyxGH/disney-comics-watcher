@@ -4,11 +4,20 @@ import html as html_lib
 import time
 import requests
 from urllib.parse import quote, quote_plus
-from src.config import TELEGRAM_API, TELEGRAM_CHAT_ID, TELEGRAM_THREAD_ID_FR, TELEGRAM_THREAD_ID_US, TELEGRAM_THREAD_ID_DE, TELEGRAM_THREAD_ID_GR, TELEGRAM_THREAD_ID_IT, TELEGRAM_THREAD_ID_BR, TELEGRAM_THREAD_ID_EG, TELEGRAM_THREAD_ID_BG, TELEGRAM_THREAD_ID_HR, TELEGRAM_THREAD_ID_EE, TELEGRAM_THREAD_ID_LV, TELEGRAM_THREAD_ID_LT, TELEGRAM_THREAD_ID_PL, TELEGRAM_THREAD_ID_CZ, TELEGRAM_THREAD_ID_RS, TELEGRAM_THREAD_ID_SI, TELEGRAM_THREAD_ID_CN, TELEGRAM_THREAD_ID_DK, TELEGRAM_THREAD_ID_ES, TELEGRAM_THREAD_ID_FI, TELEGRAM_THREAD_ID_IS, TELEGRAM_THREAD_ID_NO, TELEGRAM_THREAD_ID_NL, TELEGRAM_THREAD_ID_UK, TELEGRAM_THREAD_ID_SE, OVERRIDES, AMAZON_AFFILIATE_TAG, SITE_BASE, SUPPORTED_COUNTRIES
-from src.utils import format_price_fr, get_session, truncate_summary, isbn13_to_isbn10, is_fully_indexed_in_inducks
+from src.config import (
+    TELEGRAM_API, TELEGRAM_CHAT_ID, TELEGRAM_THREADS,
+    DISCORD_ADMIN_WEBHOOK_URL, NOTIFY_BACKENDS,
+    OVERRIDES, SITE_BASE, SUPPORTED_COUNTRIES,
+)
+from src.discord import send_discord, role_mention, build_link_line, html_to_markdown
+from src.utils import format_price_fr, get_session, truncate_summary, is_fully_indexed_in_inducks
 from src.dbi.generator import generate_dbi_skeleton
 from src.dbi.mappers import build_inducks_path
 from src.gemini_analyzer import analyze_cover_with_gemini
+
+# One pooled connection to api.telegram.org, mirroring the one in src/discord.py.
+_tg_session = requests.Session()
+
 
 def resolve_dbg_tome_number(album: dict, state: dict | None = None):
     """Resolves and extrapolates the next issue number for Disney By Glénat (DBG) albums."""
@@ -34,7 +43,7 @@ def download_cover(url: str | None, filename: str):
         return
         
     try:
-        r = requests.get(url, timeout=15)
+        r = get_session().get(url, timeout=15)
         r.raise_for_status()
         with open(filepath, "wb") as f:
             f.write(r.content)
@@ -63,7 +72,7 @@ def send_telegram(photo_url: str | None, caption: str, buttons: list | None = No
                     payload["message_thread_id"] = int(message_thread_id)
                 if reply_markup:
                     payload["reply_markup"] = reply_markup
-                resp = requests.post(f"{TELEGRAM_API}/sendPhoto", json=payload, timeout=15)
+                resp = _tg_session.post(f"{TELEGRAM_API}/sendPhoto", json=payload, timeout=15)
                 # Text fallback if image is inaccessible
                 if resp.status_code == 400:
                      print(f"  [debug] Telegram 400 error: {resp.text}")
@@ -83,7 +92,7 @@ def send_telegram(photo_url: str | None, caption: str, buttons: list | None = No
                     payload["message_thread_id"] = int(message_thread_id)
                 if reply_markup:
                     payload["reply_markup"] = reply_markup
-                resp = requests.post(f"{TELEGRAM_API}/sendMessage", json=payload, timeout=15)
+                resp = _tg_session.post(f"{TELEGRAM_API}/sendMessage", json=payload, timeout=15)
 
             if resp.status_code == 429:
                 retry_after = resp.json().get("parameters", {}).get("retry_after", delay)
@@ -205,17 +214,19 @@ def _dispatch_notification(
     summary: str,
     buttons: list,
     cover_url: str | None,
-    message_thread_id: str | None,
     publication_type: str,
     raw_title: str
 ):
-    """Internal helper to dispatch Telegram notification, download cover, and analyze with Gemini."""
+    """Internal helper to dispatch the notification to the enabled backends,
+    download the cover, and analyze it with Gemini."""
 # Calculate the official cover_filename
     issue_path = get_issue_path_from_info(info, publication_type)
     issue_code = issue_path.split("/", 1)[-1] if "/" in issue_path else issue_path
-    
-    country_prefix = publication_type if publication_type in SUPPORTED_COUNTRIES and publication_type != "fr" else "fr"
-    
+
+    # 'magazine' and 'glenat' are French publication types; the others are country codes.
+    country = publication_type if publication_type in SUPPORTED_COUNTRIES else "fr"
+    country_prefix = country
+
     m = re.match(r'^([a-zA-Z]+)([\s_]+)(.*)$', issue_code)
     if m:
         pub_code = m.group(1).lower()
@@ -268,12 +279,26 @@ def _dispatch_notification(
                     new_row.append(btn)
             final_buttons.append(new_row)
 
-    # 5. Send via Telegram
-    if TELEGRAM_CHAT_ID:
-        send_telegram(cover_url, caption, buttons=final_buttons, message_thread_id=message_thread_id)
+    # 5. Send to the enabled backends
+    if "telegram" in NOTIFY_BACKENDS:
+        if TELEGRAM_CHAT_ID:
+            send_telegram(cover_url, caption, buttons=final_buttons,
+                          message_thread_id=TELEGRAM_THREADS.get(country))
+            time.sleep(1)
+        else:
+            print("  [warn] No TELEGRAM_CHAT_ID configured.")
+
+    if "discord" in NOTIFY_BACKENDS:
+        description = html_to_markdown(caption)
+        link_line = build_link_line(final_buttons)
+        if link_line:
+            description += f"\n\n{link_line}"
+        send_discord(
+            description=description,
+            image_url=cover_url,
+            content=role_mention(country),
+        )
         time.sleep(1)
-    else:
-        print("  [warn] No TELEGRAM_CHAT_ID configured.")
 
     # 5. Gemini Cover Analysis (only if not fully indexed)
     api_key = os.environ.get("GEMINI_API_KEY")
@@ -297,13 +322,13 @@ def _dispatch_notification(
     if not is_fully_indexed:
         dbi_content = generate_dbi_skeleton(info, publication_type=publication_type, overrides=OVERRIDES)
 
-        # 7. Send DBI to Admin DM
+        # 7. Send DBI to the admin channel / DM
         admin_id = os.environ.get("TELEGRAM_ADMIN_ID")
-        if admin_id and dbi_content:
-            # Remove ^^ Source: line for the Telegram message
+        if dbi_content:
+            # Remove ^^ Source: line for the message
             dbi_lines = [line for line in dbi_content.strip().split("\n") if not line.startswith("^^ Source")]
             clean_dbi = html_lib.escape("\n".join(dbi_lines).strip())
-            
+
             source_url = info.get("url")
             title_html = f'<a href="{html_lib.escape(source_url)}"><b>{html_lib.escape(raw_title)}</b></a>' if source_url else f'<b>{html_lib.escape(raw_title)}</b>'
             dm_text = f"New DBI generated for {title_html}:\n<pre>{clean_dbi}</pre>"
@@ -319,8 +344,20 @@ def _dispatch_notification(
                 upload_url = f"https://inducks.org/sendscan.php?c={quote_plus(country_part)}&s={s_part}&i={i_part}&u={u_part}"
                 
                 dm_buttons = [[{"text": "Upload Scan", "url": upload_url}]]
-                
-            send_telegram(photo_url=cover_url, caption=dm_text, chat_id=admin_id, buttons=dm_buttons)
+
+            if "telegram" in NOTIFY_BACKENDS and admin_id:
+                send_telegram(photo_url=cover_url, caption=dm_text, chat_id=admin_id, buttons=dm_buttons)
+
+            if "discord" in NOTIFY_BACKENDS and DISCORD_ADMIN_WEBHOOK_URL:
+                dm_description = html_to_markdown(dm_text)
+                dm_links = build_link_line(dm_buttons)
+                if dm_links:
+                    dm_description += f"\n\n{dm_links}"
+                send_discord(
+                    description=dm_description,
+                    image_url=cover_url,
+                    webhook_url=DISCORD_ADMIN_WEBHOOK_URL,
+                )
 
 
 # ── PUBLIC NOTIFICATION FUNCTIONS ───────────────────────────────────────────────
@@ -369,17 +406,13 @@ def notify_magazine(info: dict, releve_date: str | None = None):
         summary="",
         buttons=buttons,
         cover_url=cover_url,
-        message_thread_id=TELEGRAM_THREAD_ID_FR,
         publication_type="magazine",
         raw_title=f"{name} {num}"
     )
 
 def _build_glenat_buttons(album: dict, raw_title: str) -> list:
     row1 = [{"text": "View Source", "url": album["url"]}]
-    if AMAZON_AFFILIATE_TAG:
-        asin = isbn13_to_isbn10(album.get("ean", ""))
-        if asin: row1.append({"text": "Buy on Amazon", "url": f"https://www.amazon.fr/dp/{asin}/?tag={AMAZON_AFFILIATE_TAG}"})
-    return [row1, [{"text": "Search on Inducks", "url": build_glenat_inducks_url(album)}]]
+    return [row1,[{"text": "Search on Inducks", "url": build_glenat_inducks_url(album)}]]
 
 def notify_glenat_announce(album: dict, state: dict | None = None):
     """Glénat announcement notification (upcoming album)."""
@@ -398,7 +431,6 @@ def notify_glenat_announce(album: dict, state: dict | None = None):
         summary=album.get("summary", ""),
         buttons=_build_glenat_buttons(album, raw_title),
         cover_url=album.get("cover_url"),
-        message_thread_id=TELEGRAM_THREAD_ID_FR,
         publication_type="glenat",
         raw_title=raw_title
     )
@@ -420,7 +452,6 @@ def notify_glenat_release(album: dict, state: dict | None = None):
         summary=album.get("summary", ""),
         buttons=_build_glenat_buttons(album, raw_title),
         cover_url=album.get("cover_url"),
-        message_thread_id=TELEGRAM_THREAD_ID_FR,
         publication_type="glenat",
         raw_title=raw_title
     )
@@ -430,183 +461,17 @@ def notify_international_comic(album: dict, state: dict | None = None, country: 
     title = html_lib.escape(album.get("title", f"{country.upper()} Disney Comic"))
     raw_title = album.get("title", f"{country.upper()} Disney Comic")
 
-    # Format strings based on country and event type
-    config = {
-        "us": {
-            "announce_title": f"<b>Announcement — {title}</b>",
-            "release_title": f"<b>{title}</b>",
-            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
-            "price_prefix": "💵 Price:",
-            "thread_id": TELEGRAM_THREAD_ID_US,
-        },
-        "de": {
-            "announce_title": f"<b>Announcement — {title}</b>",
-            "release_title": f"<b>{title}</b>",
-            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
-            "price_prefix": "💶 Price:",
-            "thread_id": TELEGRAM_THREAD_ID_DE,
-        },
-        "gr": {
-            "announce_title": f"<b>Announcement — {title}</b>",
-            "release_title": f"<b>{title}</b>",
-            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
-            "price_prefix": "💶 Price:",
-            "thread_id": TELEGRAM_THREAD_ID_GR,
-        },
-        "it": {
-            "announce_title": f"<b>Announcement — {title}</b>",
-            "release_title": f"<b>{title}</b>",
-            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
-            "price_prefix": "💶 Price:",
-            "thread_id": TELEGRAM_THREAD_ID_IT,
-        },
-        "br": {
-            "announce_title": f"<b>Announcement — {title}</b>",
-            "release_title": f"<b>{title}</b>",
-            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
-            "price_prefix": "💵 Price:",
-            "thread_id": TELEGRAM_THREAD_ID_BR,
-        },
-        "eg": {
-            "announce_title": f"<b>Announcement — {title}</b>",
-            "release_title": f"<b>{title}</b>",
-            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
-            "price_prefix": "EGP Price:",
-            "thread_id": TELEGRAM_THREAD_ID_EG,
-        },
-        "bg": {
-            "announce_title": f"<b>Announcement — {title}</b>",
-            "release_title": f"<b>{title}</b>",
-            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
-            "price_prefix": "Price:",
-            "thread_id": TELEGRAM_THREAD_ID_BG,
-        },
-        "hr": {
-            "announce_title": f"<b>Announcement — {title}</b>",
-            "release_title": f"<b>{title}</b>",
-            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
-            "price_prefix": "Price:",
-            "thread_id": TELEGRAM_THREAD_ID_HR,
-        },
-        "ee": {
-            "announce_title": f"<b>Announcement — {title}</b>",
-            "release_title": f"<b>{title}</b>",
-            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
-            "price_prefix": "Price:",
-            "thread_id": TELEGRAM_THREAD_ID_EE,
-        },
-        "lv": {
-            "announce_title": f"<b>Announcement — {title}</b>",
-            "release_title": f"<b>{title}</b>",
-            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
-            "price_prefix": "Price:",
-            "thread_id": TELEGRAM_THREAD_ID_LV,
-        },
-        "lt": {
-            "announce_title": f"<b>Announcement — {title}</b>",
-            "release_title": f"<b>{title}</b>",
-            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
-            "price_prefix": "Price:",
-            "thread_id": TELEGRAM_THREAD_ID_LT,
-        },
-        "pl": {
-            "announce_title": f"<b>Announcement — {title}</b>",
-            "release_title": f"<b>{title}</b>",
-            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
-            "price_prefix": "Price:",
-            "thread_id": TELEGRAM_THREAD_ID_PL,
-        },
-        "cz": {
-            "announce_title": f"<b>Announcement — {title}</b>",
-            "release_title": f"<b>{title}</b>",
-            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
-            "price_prefix": "Price:",
-            "thread_id": TELEGRAM_THREAD_ID_CZ,
-        },
-        "rs": {
-            "announce_title": f"<b>Announcement — {title}</b>",
-            "release_title": f"<b>{title}</b>",
-            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
-            "price_prefix": "Price:",
-            "thread_id": TELEGRAM_THREAD_ID_RS,
-        },
-        "si": {
-            "announce_title": f"<b>Announcement — {title}</b>",
-            "release_title": f"<b>{title}</b>",
-            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
-            "price_prefix": "Price:",
-            "thread_id": TELEGRAM_THREAD_ID_SI,
-        },
-        "cn": {
-            "announce_title": f"<b>Announcement — {title}</b>",
-            "release_title": f"<b>{title}</b>",
-            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
-            "price_prefix": "Price:",
-            "thread_id": TELEGRAM_THREAD_ID_CN,
-        },
-        "dk": {
-            "announce_title": f"<b>Announcement — {title}</b>",
-            "release_title": f"<b>{title}</b>",
-            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
-            "price_prefix": "Price:",
-            "thread_id": TELEGRAM_THREAD_ID_DK,
-        },
-        "es": {
-            "announce_title": f"<b>Announcement — {title}</b>",
-            "release_title": f"<b>{title}</b>",
-            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
-            "price_prefix": "Price:",
-            "thread_id": TELEGRAM_THREAD_ID_ES,
-        },
-        "fi": {
-            "announce_title": f"<b>Announcement — {title}</b>",
-            "release_title": f"<b>{title}</b>",
-            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
-            "price_prefix": "Price:",
-            "thread_id": TELEGRAM_THREAD_ID_FI,
-        },
-        "is": {
-            "announce_title": f"<b>Announcement — {title}</b>",
-            "release_title": f"<b>{title}</b>",
-            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
-            "price_prefix": "Price:",
-            "thread_id": TELEGRAM_THREAD_ID_IS,
-        },
-        "no": {
-            "announce_title": f"<b>Announcement — {title}</b>",
-            "release_title": f"<b>{title}</b>",
-            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
-            "price_prefix": "Price:",
-            "thread_id": TELEGRAM_THREAD_ID_NO,
-        },
-        "nl": {
-            "announce_title": f"<b>Announcement — {title}</b>",
-            "release_title": f"<b>{title}</b>",
-            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
-            "price_prefix": "Price:",
-            "thread_id": TELEGRAM_THREAD_ID_NL,
-        },
-        "uk": {
-            "announce_title": f"<b>Announcement — {title}</b>",
-            "release_title": f"<b>{title}</b>",
-            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
-            "price_prefix": "Price:",
-            "thread_id": TELEGRAM_THREAD_ID_UK,
-        },
-        "se": {
-            "announce_title": f"<b>Announcement — {title}</b>",
-            "release_title": f"<b>{title}</b>",
-            "date_prefix": "🗓 Expected release:" if event_type == "announce" else "🗓 Released:",
-            "price_prefix": "Price:",
-            "thread_id": TELEGRAM_THREAD_ID_SE,
-        },
+    # Only the price symbol varies per country; everything else is shared.
+    PRICE_PREFIX = {
+        "us": "💵 Price:", "br": "💵 Price:", "eg": "EGP Price:",
+        "de": "💶 Price:", "gr": "💶 Price:", "it": "💶 Price:",
     }
+    date_prefix  = "🗓 Expected release:" if event_type == "announce" else "🗓 Released:"
+    price_prefix = PRICE_PREFIX.get(country, "Price:")
 
-    cfg = config.get(country, config["us"])
-    
-    lines = [cfg["announce_title"] if event_type == "announce" else cfg["release_title"], ""]
-    if album.get("date"): lines.append(f"{cfg['date_prefix']} {album['date']}")
-    if album.get("price"): lines.append(f"{cfg['price_prefix']} {html_lib.escape(album['price'])}")
+    lines = [f"<b>Announcement — {title}</b>" if event_type == "announce" else f"<b>{title}</b>", ""]
+    if album.get("date"): lines.append(f"{date_prefix} {album['date']}")
+    if album.get("price"): lines.append(f"{price_prefix} {html_lib.escape(album['price'])}")
 
     row1 = []
     inducks_url = f"https://inducks.org/search.php?search={quote(raw_title)}"
@@ -617,13 +482,7 @@ def notify_international_comic(album: dict, state: dict | None = None, country: 
         else:
             inducks_url = f"https://inducks.org/publication.php?c={quote_plus(issue_path)}"
 
-    if country == "us":
-        row1.append({"text": "View Source", "url": album.get("url", "")})
-        if AMAZON_AFFILIATE_TAG and album.get("sku"):
-            asin = isbn13_to_isbn10(album.get("sku", ""))
-            if asin: row1.append({"text": "Buy on Amazon", "url": f"https://www.amazon.fr/dp/{asin}/?tag={AMAZON_AFFILIATE_TAG}"})
-    else:
-        row1.append({"text": "View Source", "url": album.get("url", "")})
+    row1.append({"text": "View Source", "url": album.get("url", "")})
 
     buttons = [row1, [{"text": "Search on Inducks", "url": inducks_url}]] if row1 else [[{"text": "Search on Inducks", "url": inducks_url}]]
 
@@ -633,7 +492,6 @@ def notify_international_comic(album: dict, state: dict | None = None, country: 
         summary=album.get("summary", ""),
         buttons=buttons,
         cover_url=album.get("cover_url"),
-        message_thread_id=cfg["thread_id"],
         publication_type=country,
         raw_title=raw_title
     )

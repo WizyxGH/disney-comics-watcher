@@ -7,7 +7,8 @@ from src.config import (
     NAHDET_MISR_EG_KEY_PREFIX, BG_KEY_PREFIX, HR_KEY_PREFIX, EE_KEY_PREFIX, LV_KEY_PREFIX,
     LT_KEY_PREFIX, PL_KEY_PREFIX, CZ_KEY_PREFIX, RS_KEY_PREFIX, SI_KEY_PREFIX, CN_KEY_PREFIX,
     DK_KEY_PREFIX, ES_KEY_PREFIX, FI_KEY_PREFIX, IS_KEY_PREFIX, NO_KEY_PREFIX, NL_KEY_PREFIX,
-    UK_KEY_PREFIX, SE_KEY_PREFIX, LTB_DE_KEY_PREFIX
+    UK_KEY_PREFIX, SE_KEY_PREFIX, LTB_DE_KEY_PREFIX,
+    NOTIFY_BACKENDS, DISCORD_WEBHOOK_URL, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID,
 )
 from src.utils import load_state, save_state, parse_date_fr
 from src.notifications import notify_magazine, notify_glenat_announce, notify_glenat_release, notify_international_comic
@@ -129,7 +130,32 @@ def _process_provider_books(
 
     return notif_count
 
+def check_delivery_config():
+    """Aborts unless every enabled backend can actually deliver.
+
+    State is committed per item regardless of whether the notification went
+    out, so a run with a misconfigured backend would mark new releases as seen
+    and lose them for good. Failing loudly here is the only safe option.
+    """
+    problems = []
+    if "discord" in NOTIFY_BACKENDS and not DISCORD_WEBHOOK_URL:
+        problems.append("discord enabled but DISCORD_WEBHOOK_URL is empty")
+    if "telegram" in NOTIFY_BACKENDS and not (TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID):
+        problems.append("telegram enabled but TELEGRAM_BOT_TOKEN/TELEGRAM_CHAT_ID is empty")
+    if not NOTIFY_BACKENDS:
+        problems.append("NOTIFY_BACKENDS is empty: nothing would be delivered")
+
+    if problems:
+        for p in problems:
+            print(f"  [FATAL] {p}")
+        sys.exit(
+            "Aborting before any scraping: releases would be marked as seen "
+            "without ever being announced."
+        )
+
+
 def main():
+    check_delivery_config()
     state = load_state()
     first_run = not state
 
@@ -205,7 +231,7 @@ def main():
     if first_run:
         print(f"[init] State initialized with {len(state)} entry(ies). Ready for the next run!")
     else:
-        print(f"[done] {notif_count} Telegram notification(s) sent.")
+        print(f"[done] {notif_count} notification(s) sent via {', '.join(sorted(NOTIFY_BACKENDS))}.")
 
     import glob
     from src.dbi.cleanup import cleanup_indexed_issues

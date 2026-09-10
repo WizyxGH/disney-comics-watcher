@@ -71,7 +71,12 @@ jobs:
           TELEGRAM_THREAD_ID_UK: ${{ secrets.TELEGRAM_THREAD_ID_UK }}
           TELEGRAM_THREAD_ID_SE: ${{ secrets.TELEGRAM_THREAD_ID_SE }}
           TELEGRAM_ADMIN_ID: ${{ secrets.TELEGRAM_ADMIN_ID }}
-          AMAZON_AFFILIATE_TAG: ${{ secrets.AMAZON_AFFILIATE_TAG }}
+          # Notification backends: "discord", "telegram", or "discord,telegram"
+          NOTIFY_BACKENDS: ${{ vars.NOTIFY_BACKENDS || 'telegram' }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_ADMIN_WEBHOOK_URL: ${{ secrets.DISCORD_ADMIN_WEBHOOK_URL }}
+          # Country role ids, e.g. "fr:123456789,us:987654321"
+          DISCORD_ROLE_IDS: ${{ secrets.DISCORD_ROLE_IDS }}
         run: python check_magazines.py
 
 

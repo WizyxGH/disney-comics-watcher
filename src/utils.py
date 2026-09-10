@@ -103,26 +103,6 @@ def truncate_summary(text: str, max_len: int = 400) -> str:
         truncated = truncated[:last_space]
     return truncated.strip() + "…"
 
-def isbn13_to_isbn10(isbn13: str) -> str | None:
-    """Converts an ISBN-13 (starting with 978) to an ISBN-10 (Amazon ASIN)."""
-    clean = "".join(filter(str.isdigit, isbn13))
-    if len(clean) != 13 or not clean.startswith("978"):
-        return None
-    
-    digits = clean[3:12]
-    
-    total = sum(int(digit) * (10 - i) for i, digit in enumerate(digits))
-    rem = total % 11
-    check = 11 - rem
-    if check == 10:
-        check_char = "X"
-    elif check == 11:
-        check_char = "0"
-    else:
-        check_char = str(check)
-        
-    return digits + check_char
-
 def is_fully_indexed_in_inducks(issue_code: str) -> bool:
     """Check if an issue is fully indexed in Inducks by querying the Turso DB."""
     if not issue_code:

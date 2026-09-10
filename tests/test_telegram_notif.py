@@ -19,7 +19,7 @@ telegram_chat = os.environ.get("TELEGRAM_CHAT_ID_FR") or os.environ.get("TELEGRA
 if not telegram_token or not telegram_chat:
     print("Error: TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID must be set in your environment.")
     print("You can run it like this in PowerShell:")
-    print('  $env:TELEGRAM_BOT_TOKEN="your_token"; $env:TELEGRAM_CHAT_ID="your_chat_id"; $env:AMAZON_AFFILIATE_TAG="your_tag"; python test_telegram_notif.py')
+    print('  $env:TELEGRAM_BOT_TOKEN="your_token"; $env:TELEGRAM_CHAT_ID="your_chat_id"; python test_telegram_notif.py')
     # sys.exit(1)
 
 from src.notifications import notify_international_comic, notify_magazine, notify_glenat_release

@@ -1,12 +1,6 @@
 import os
+import re
 from zoneinfo import ZoneInfo
-
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ImportError:
-    pass
-
 
 SUPPORTED_COUNTRIES = {
     "fr", "us", "de", "gr", "it", "br", "eg", "bg", "hr", "ee", "lv", "lt",
@@ -114,38 +108,71 @@ if os.path.exists(".env"):
             line = line.strip()
             if line and not line.startswith("#") and "=" in line:
                 key, val = line.split("=", 1)
-                os.environ[key.strip()] = val.strip().strip('"').strip("'")
+                val = val.strip().strip('"').strip("'")
+                # The real environment always wins: CI passes everything
+                # through it, and tests need to override a value without the
+                # local .env silently clobbering it back.
+                if val:
+                    os.environ.setdefault(key.strip(), val)
 
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID   = (
     os.environ.get("TELEGRAM_CHAT_ID_FR") or os.environ.get("TELEGRAM_CHAT_ID", "")
 )
-TELEGRAM_THREAD_ID_FR = os.environ.get("TELEGRAM_THREAD_ID_FR", "")
-TELEGRAM_THREAD_ID_US = os.environ.get("TELEGRAM_THREAD_ID_US", "")
-TELEGRAM_THREAD_ID_DE = os.environ.get("TELEGRAM_THREAD_ID_DE", "")
-TELEGRAM_THREAD_ID_GR = os.environ.get("TELEGRAM_THREAD_ID_GR", "")
-TELEGRAM_THREAD_ID_IT = os.environ.get("TELEGRAM_THREAD_ID_IT", "")
-TELEGRAM_THREAD_ID_BR = os.environ.get("TELEGRAM_THREAD_ID_BR", "")
-TELEGRAM_THREAD_ID_EG = os.environ.get("TELEGRAM_THREAD_ID_EG", "")
-TELEGRAM_THREAD_ID_BG = os.environ.get("TELEGRAM_THREAD_ID_BG", "")
-TELEGRAM_THREAD_ID_HR = os.environ.get("TELEGRAM_THREAD_ID_HR", "")
-TELEGRAM_THREAD_ID_EE = os.environ.get("TELEGRAM_THREAD_ID_EE", "")
-TELEGRAM_THREAD_ID_LV = os.environ.get("TELEGRAM_THREAD_ID_LV", "")
-TELEGRAM_THREAD_ID_LT = os.environ.get("TELEGRAM_THREAD_ID_LT", "")
-TELEGRAM_THREAD_ID_PL = os.environ.get("TELEGRAM_THREAD_ID_PL", "")
-TELEGRAM_THREAD_ID_CZ = os.environ.get("TELEGRAM_THREAD_ID_CZ", "")
-TELEGRAM_THREAD_ID_RS = os.environ.get("TELEGRAM_THREAD_ID_RS", "")
-TELEGRAM_THREAD_ID_SI = os.environ.get("TELEGRAM_THREAD_ID_SI", "")
-TELEGRAM_THREAD_ID_CN = os.environ.get("TELEGRAM_THREAD_ID_CN", "")
-TELEGRAM_THREAD_ID_DK = os.environ.get("TELEGRAM_THREAD_ID_DK", "")
-TELEGRAM_THREAD_ID_ES = os.environ.get("TELEGRAM_THREAD_ID_ES", "")
-TELEGRAM_THREAD_ID_FI = os.environ.get("TELEGRAM_THREAD_ID_FI", "")
-TELEGRAM_THREAD_ID_IS = os.environ.get("TELEGRAM_THREAD_ID_IS", "")
-TELEGRAM_THREAD_ID_NO = os.environ.get("TELEGRAM_THREAD_ID_NO", "")
-TELEGRAM_THREAD_ID_NL = os.environ.get("TELEGRAM_THREAD_ID_NL", "")
-TELEGRAM_THREAD_ID_UK = os.environ.get("TELEGRAM_THREAD_ID_UK", "")
-TELEGRAM_THREAD_ID_SE = os.environ.get("TELEGRAM_THREAD_ID_SE", "")
+# One Telegram topic per country, mirrored by one Discord role per country
+# below. Both are derived from SUPPORTED_COUNTRIES so that adding a country
+# stays a single-line change instead of touching three files.
+TELEGRAM_THREADS = {
+    cc: os.environ.get(f"TELEGRAM_THREAD_ID_{cc.upper()}", "")
+    for cc in SUPPORTED_COUNTRIES
+}
+
 TELEGRAM_API = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
 
+# ── Discord ─────────────────────────────────────────────────────────────────
+# Webhook of the single announcements channel; each message pings the country role.
+DISCORD_WEBHOOK_URL       = os.environ.get("DISCORD_WEBHOOK_URL", "")
+# Private channel receiving the DBI skeletons (webhook equivalent of the admin DM).
+DISCORD_ADMIN_WEBHOOK_URL = os.environ.get("DISCORD_ADMIN_WEBHOOK_URL", "")
+
+# 'fr:123', 'fr: <@&123>', 'FR : 123' — the country code, then the first run of
+# digits long enough to be a snowflake.
+_RE_ROLE_PAIR = re.compile(r"([A-Za-z]{2})\s*:\s*<?@?&?(\d{5,})")
+
+def _parse_role_ids(raw: str) -> dict[str, str]:
+    """Parses 'fr:123,us:456' into {'fr': '123', 'us': '456'}.
+
+    Kept as one variable instead of 25 so the GitHub secret list stays short;
+    a per-country DISCORD_ROLE_ID_XX env var still wins if set.
+
+    Pairs are extracted rather than split, so the id half may be a raw Discord
+    mention and the separators may be commas, spaces or newlines. That way the
+    output of typing '\@France' in a channel pastes in unedited.
+    """
+    roles = {
+        cc.lower(): role_id
+        for cc, role_id in _RE_ROLE_PAIR.findall(raw)
+    }
+    unknown = set(roles) - SUPPORTED_COUNTRIES
+    if unknown:
+        print(f"  [warn] DISCORD_ROLE_IDS: unsupported country code(s) {sorted(unknown)}")
+    return roles
+
+
+DISCORD_ROLE_IDS = _parse_role_ids(os.environ.get("DISCORD_ROLE_IDS", ""))
+for _cc in SUPPORTED_COUNTRIES:
+    _override = os.environ.get(f"DISCORD_ROLE_ID_{_cc.upper()}", "")
+    if _override:
+        DISCORD_ROLE_IDS[_cc] = _override
+
+# ── Notification backends ───────────────────────────────────────────────────
+# Comma-separated: "discord", "telegram", or "discord,telegram".
+# Defaults to telegram so that deploying never depends on Discord being
+# configured: switching over is a config change, not a code change.
+NOTIFY_BACKENDS = {
+    b.strip().lower()
+    for b in os.environ.get("NOTIFY_BACKENDS", "telegram").split(",")
+    if b.strip()
+}
+
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; DisneyComicsWatcher/1.0)"}
-AMAZON_AFFILIATE_TAG = os.environ.get("AMAZON_AFFILIATE_TAG", "")

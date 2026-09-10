@@ -59,6 +59,29 @@ Stay updated with all the latest Disney comics releases directly on your phone!
 
 Want to run your own instance of the Watcher? Follow these simple steps:
 
+### 0. Choose your notification backend
+
+The Watcher can post to **Discord**, **Telegram**, or both. Set `NOTIFY_BACKENDS`
+to `telegram` (default), `discord`, or `discord,telegram`.
+
+**Discord setup** (webhook-based, no bot to invite):
+1. In your server, open **Channel settings → Integrations → Webhooks → New Webhook**
+   on your announcements channel and copy the URL into `DISCORD_WEBHOOK_URL`.
+2. Do the same on a private staff channel for the generated DBI skeletons →
+   `DISCORD_ADMIN_WEBHOOK_URL`.
+3. Every announcement pings the role of the country it belongs to. Enable
+   **Developer Mode** (User Settings → Advanced), right-click each country role
+   → **Copy Role ID**, and list them in `DISCORD_ROLE_IDS`:
+   ```
+   DISCORD_ROLE_IDS=fr:123456789012345678,us:234567890123456789,it:345678901234567890
+   ```
+   Countries with no role listed simply get no mention. A single
+   `DISCORD_ROLE_ID_XX` variable (e.g. `DISCORD_ROLE_ID_FR`) overrides the list
+   for that country.
+
+Discord webhooks cannot send interactive buttons, so the source and Inducks
+buttons are rendered as inline links at the bottom of each embed.
+
 ### 1. Create the Telegram Bot
 1. Open Telegram and search for **@BotFather**
 2. Send `/newbot` and follow the instructions to create your bot
@@ -81,6 +104,10 @@ Want to run your own instance of the Watcher? Follow these simple steps:
    - `TELEGRAM_THREAD_ID_BR`: The thread ID for Brazilian releases (if using topics)
    - `TELEGRAM_THREAD_ID_EG`: The thread ID for Egyptian releases (if using topics)
    - `TELEGRAM_THREAD_ID_BG`, `_HR`, `_EE`, `_LV`, `_LT`, `_PL`, `_CZ`, `_RS`, `_SI`: Thread IDs for Eastern European releases
+
+   For Discord, add instead: `DISCORD_WEBHOOK_URL`, `DISCORD_ADMIN_WEBHOOK_URL`
+   and `DISCORD_ROLE_IDS` (see step 0), plus a `NOTIFY_BACKENDS` repository
+   *variable* set to `discord` (or `discord,telegram` to run both during a transition).
 3. Go to the **Actions** tab and enable workflows. The bot will now run hourly automatically!
 
 ---

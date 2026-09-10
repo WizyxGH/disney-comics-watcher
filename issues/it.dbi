@@ -7,7 +7,7 @@ PK 116       h3 Paperinik 116 Con Carte da Gioco [price:6.00 EUR] [inx:-]
 PK 116a     ?                 1 c
 
 ^^ Source: https://www.panini.it/shp_ita_it/paperinik-117-1wpnik11718-it08.html
-PK 117       h3 Paperinik 117 [price:4.50 EUR] [inx:-]
+PK 117       h3 Paperinik 117 [issdate:2026-09-04] [price:4.50 EUR] [inx:-]
 PK 117a     ?                 1 c
 
 ^^ Source: https://www.panini.it/shp_ita_it/i-viaggi-di-topolino-1-1wtrip001-it08.html
@@ -15,11 +15,11 @@ TL 1         h3 I Viaggi di Topolino 1 [price:5.50 EUR] [inx:-]
 TL 1a       ?              1  c
 
 ^^ Source: https://www.panini.it/shp_ita_it/i-viaggi-di-topolino-2-1wtrip002-it08.html
-TL 2         h3 I Viaggi di Topolino 2 [price:5.50 EUR] [inx:-]
+TL 2         h3 I Viaggi di Topolino 2 [issdate:2026-09-07] [price:5.50 EUR] [inx:-]
 TL 2a       ?                 1 c
 
 ^^ Source: https://www.panini.it/shp_ita_it/topolino-3d-1wspev061-it08.html
-TL 3         h3 Topolino 3D [price:5.90 EUR] [inx:-]
+TL 3         h3 Topolino 3D [issdate:2026-09-03] [price:5.90 EUR] [inx:-]
 TL 3a       ?                 1 c
 
 ^^ Source: https://www.panini.it/shp_ita_it/almanacco-topolino-27-1walma027-it08.html
@@ -62,12 +62,12 @@ TL 3691a    ?                 1 c
 TL 3692      h3 Topolino 3692 [price:8.50 EUR] [inx:-]
 TL 3692a    ?                 1 c
 
-^^ Source: https://www.panini.it/shp_ita_it/topolino-3693-1wtopo3693v-it08.html
-TL 3693      h3 Topolino 3693 [price:14.90 EUR] [inx:-]
+^^ Source: https://www.panini.it/shp_ita_it/topolino-3693-1wtopo3693-it08.html
+TL 3693      h3 Topolino 3693 [issdate:2026-09-02] [price:3.50 EUR] [inx:-]
 TL 3693a    ?                 1 c
 
-^^ Source: https://www.panini.it/shp_ita_it/topolino-3694-con-seconda-parte-modellino-f1-1wtopo3694v-it08.html
-TL 3694      h3 Topolino 3694 Con Seconda Parte Modellino F1 [price:10.90 EUR] [inx:-]
+^^ Source: https://www.panini.it/shp_ita_it/topolino-3694-1wtopo3694-it08.html
+TL 3694      h3 Topolino 3694 [issdate:2026-09-09] [price:3.50 EUR] [inx:-]
 TL 3694a    ?                 1 c
 
 ^^ Source: https://www.panini.it/shp_ita_it/topolino-3695-con-reggilibro-di-paperino-1wtopo3695v-it08.html
@@ -191,23 +191,23 @@ UNK_334988   h3 Bundle Voglia di Vacanze [price:29.80 EUR] [inx:-]
 UNK_334988a ?              1  c
 
 ^^ Source: https://www.panini.it/shp_ita_it/metopolis-1wdili057isbn-it08.html
-UNK_335491   h3 Metopolis [price:16.90 EUR] [inx:-]
+UNK_335491   h3 Metopolis [issdate:2026-09-10] [price:16.90 EUR] [inx:-]
 UNK_335491a ?                 1 c
 
-^^ Source: https://www.panini.it/shp_ita_it/pk-2-1wspev061sp-it08.html
-UNK_335494   h3 PK 2 [price:5.90 EUR] [inx:-]
+^^ Source: https://www.panini.it/shp_ita_it/pk-meno-due-all-alba-1wspev061sp-it08.html
+UNK_335494   h3 PK: Meno Due all'Alba [issdate:2026-09-10] [price:5.90 EUR] [inx:-]
 UNK_335494a ?                 1 c
 
 ^^ Source: https://www.panini.it/shp_ita_it/paperino-e-l-ombroso-1wtoex033-it08.html
 UNK_335500   h3 Paperino e L'Ombroso [price:13.00 EUR] [inx:-]
 UNK_335500a ?                 1 c
 
-^^ Source: https://www.panini.it/shp_ita_it/il-siciliano-nei-fumetti-di-topolino-1wbook099isbn-it08.html
-UNK_335536   h3 Il Siciliano nei Fumetti di Topolino [price:17.00 EUR] [inx:-]
+^^ Source: https://www.panini.it/shp_ita_it/il-siciliano-nelle-storie-di-topolino-1wbook099isbn-it08.html
+UNK_335536   h3 Il Siciliano nelle Storie di Topolino [issdate:2026-09-10] [price:17.00 EUR] [inx:-]
 UNK_335536a ?                 1 c
 
 ^^ Source: https://www.panini.it/shp_ita_it/100-topolino-e-gambadilegno-1wpast051-it08.html
-UNK_335539   h3 100% Topolino e Gambadilegno [price:5.00 EUR] [inx:-]
+UNK_335539   h3 100% Topolino e Gambadilegno [issdate:2026-09-04] [price:5.00 EUR] [inx:-]
 UNK_335539a ?                 1 c
 
 ^^ Source: https://www.panini.it/shp_ita_it/paperdetective-indagini-e-misteri-3-1wfant007-it08.html
@@ -218,8 +218,8 @@ UNK_335545a ?                 1 c
 UNK_335551   h3 Paperino Sport 14 [price:5.00 EUR] [inx:-]
 UNK_335551a ?                 1 c
 
-^^ Source: https://www.panini.it/shp_ita_it/paperino-in-team-1wsudi122-it08.html
-UNK_335557   h3 Paperino in Team [price:6.50 EUR] [inx:-]
+^^ Source: https://www.panini.it/shp_ita_it/paperino-in-team-paperino-lavori-in-corso-1wsudi122-it08.html
+UNK_335557   h3 Paperino in Team: Paperino, Lavori in Corso! [issdate:2026-09-03] [price:6.50 EUR] [inx:-]
 UNK_335557a ?                 1 c
 
 ^^ Source: https://www.panini.it/shp_ita_it/i-grandi-classici-128-1wgcla128-it08.html
@@ -227,7 +227,7 @@ UNK_335566   h3 I Grandi Classici 128 [price:5.50 EUR] [inx:-]
 UNK_335566a ?                 1 c
 
 ^^ Source: https://www.panini.it/shp_ita_it/scuolissima-1wtime128-it08.html
-UNK_335569   h3 Scuolissima [price:4.50 EUR] [inx:-]
+UNK_335569   h3 Scuolissima [issdate:2026-09-04] [price:4.50 EUR] [inx:-]
 UNK_335569a ?                 1 c
 
 ^^ Source: https://www.panini.it/shp_ita_it/disney-big-221-1wdbig221-it08.html
@@ -235,7 +235,7 @@ UNK_335572   h3 Disney Big 221 [price:6.90 EUR] [inx:-]
 UNK_335572a ?                 1 c
 
 ^^ Source: https://www.panini.it/shp_ita_it/paperino-555-1wpape555-it08.html
-UNK_335575   h3 Paperino 555 [price:3.90 EUR] [inx:-]
+UNK_335575   h3 Paperino 555 [issdate:2026-08-28] [price:3.90 EUR] [inx:-]
 UNK_335575a ?                 1 c
 
 ^^ Source: https://www.panini.it/shp_ita_it/superpippo-ai-confini-della-realt-1wclas553i-it08.html
@@ -243,7 +243,7 @@ UNK_337589   h3 Superpippo ai Confini della Realtà [price:5.90 EUR] [inx:-]
 UNK_337589a ?              1  c
 
 ^^ Source: https://www.panini.it/shp_ita_it/fantomius-8-1wseim027-it08.html
-UNK_338191   h3 Fantomius 8 [price:12.00 EUR] [inx:-]
+UNK_338191   h3 Fantomius 8 [issdate:2026-09-10] [price:12.00 EUR] [inx:-]
 UNK_338191a ?                 1 c
 
 ^^ Source: https://www.panini.it/shp_ita_it/paperino-sport-15-1wpasp015-it08.html
@@ -258,8 +258,8 @@ UNK_338281a ?                 1 c
 UNK_340916   h3 Accendete i Motori [price:7.00 EUR] [inx:-]
 UNK_340916a ?                 1 c
 
-^^ Source: https://www.panini.it/shp_ita_it/pk-meno-due-all-alba-cover-variant-di-fabio-celoni-1wspev061spv-it08.html
-UNK_342158   h3 PK: Meno Due all'Alba - Cover Variant di Fabio Celoni [price:8.90 EUR] [inx:-]
+^^ Source: https://www.panini.it/shp_ita_it/pk-meno-due-all-alba-variant-fabio-celoni-1wspev061spv-it08.html
+UNK_342158   h3 PK: Meno Due all'Alba - Variant Fabio Celoni [issdate:2026-09-10] [price:8.90 EUR] [inx:-]
 UNK_342158a ?                 1 c
 
 ^^ Source: https://www.panini.it/shp_ita_it/zio-paperone-97-con-notes-di-zio-paperone-1wzipa097v-it08.html

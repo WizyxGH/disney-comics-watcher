@@ -46,6 +46,14 @@ from src.scrapers.se import discover_se, fetch_se_details
 STALE_RELEASE_DAYS = 14
 
 
+def _release_date(book: dict):
+    """Release date of a book, whatever field its scraper fills."""
+    if book.get("pub_date"):
+        return book["pub_date"]
+    # Kiosk magazines carry their on-sale date as date_mise_en_vente.
+    return parse_date_fr(book.get("date") or book.get("date_mise_en_vente"))
+
+
 def _process_provider_books(
     state: dict, 
     first_run: bool, 
@@ -76,7 +84,7 @@ def _process_provider_books(
             key = f"{key_prefix}{book_id}"
             current = state.get(key)
 
-            pub_date = parse_date_fr(book.get("date")) if not book.get("pub_date") else book.get("pub_date")
+            pub_date = _release_date(book)
             is_released = book.get("released", False)
             if pub_date and pub_date <= today:
                 is_released = True
@@ -98,21 +106,23 @@ def _process_provider_books(
                 if fetch_details_func and not is_indexed:
                     book.update(fetch_details_func(book["url"]))
 
-                silent = False
-                if current is None:
-                    if target_status == "released":
-                        silent = (not first_run and default_status != "released") # Wait, if default_status == "released", not first_run -> notify
-                        # Actual silent condition in original code: if not first_run and default_status == "released" => notify. else silent.
-                        silent = not (not first_run and default_status == "released")
-                    else:
-                        silent = first_run
+                if current is None and target_status == "released":
+                    # A new item that is already out is only news for providers
+                    # listing actual releases; elsewhere it is backlog.
+                    silent = first_run or default_status != "released"
                 else:
-                    # current == "announced" and target_status == "released"
                     silent = first_run
-                    if pub_date and (today - pub_date).days > STALE_RELEASE_DAYS:
-                        silent = True
-                        print(f"  [{provider_name}-RELEASE-STALE] {book.get('title')} "
-                              f"(out since {pub_date}, not announced)")
+
+                # Whichever way an item reaches "released", one that has been out
+                # for weeks is catch-up (new scraper field, repaired filter...):
+                # record it without announcing it. The date is re-read because
+                # fetch_details_func may just have filled it in.
+                released_on = _release_date(book)
+                if (not silent and target_status == "released" and released_on
+                        and (today - released_on).days > STALE_RELEASE_DAYS):
+                    silent = True
+                    print(f"  [{provider_name}-RELEASE-STALE] {book.get('title')} "
+                          f"(out since {released_on}, not announced)")
 
                 event_str = "RELEASE" if target_status == "released" else "ANNOUNCE"
                 if silent:

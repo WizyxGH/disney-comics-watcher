@@ -66,8 +66,8 @@ TL 3692a    ?                 1 c
 TL 3693      h3 Topolino 3693 [issdate:2026-09-02] [price:3.50 EUR] [inx:-]
 TL 3693a    ?                 1 c
 
-^^ Source: https://www.panini.it/shp_ita_it/topolino-3694-1wtopo3694-it08.html
-TL 3694      h3 Topolino 3694 [issdate:2026-09-09] [price:3.50 EUR] [inx:-]
+^^ Source: https://www.panini.it/shp_ita_it/topolino-3694-1wtopo3694f-it08.html
+TL 3694      h3 Topolino 3694 [issdate:2026-09-17] [price:8.00 EUR] [inx:-]
 TL 3694a    ?                 1 c
 
 ^^ Source: https://www.panini.it/shp_ita_it/topolino-3695-con-reggilibro-di-paperino-1wtopo3695v-it08.html
@@ -78,6 +78,10 @@ TL 3695a    ?                 1 c
 UNK_289611   h3 Abbonamento a Topolino con Raccoglitore [price:182.00 EUR] [inx:-]
 UNK_289611a ?              1  c
 
+^^ Source: https://www.panini.it/shp_ita_it/zio-paperone-the-greatest-comics-collection-1wgrco003isbn-it08.html
+UNK_309939   h3 Zio Paperone: The Greatest Comics Collection [issdate:2026-09-17] [price:35.00 EUR] [inx:-]
+UNK_309939a ?                 1 c
+
 ^^ Source: https://www.panini.it/shp_ita_it/paperino-553-con-figurine-i-mondi-di-topolino-1wpape553v-it08.html
 UNK_314639   h3 Paperino 553 con Figurine "I Mondi di Topolino" [price:3.90 EUR] [inx:-]
 UNK_314639a ?              1  c
@@ -85,6 +89,10 @@ UNK_314639a ?              1  c
 ^^ Source: https://www.panini.it/shp_ita_it/oceania-2-finding-the-way-1wdisn003-it08.html
 UNK_314642   h3 Oceania 2: Finding The Way [price:5.00 EUR] [inx:-]
 UNK_314642a ?              1  c
+
+^^ Source: https://www.panini.it/shp_ita_it/ursula-1wvill003isbn-it08.html
+UNK_314654   h3 Ursula [issdate:2026-09-17] [price:8.90 EUR] [inx:-]
+UNK_314654a ?                 1 c
 
 ^^ Source: https://www.panini.it/shp_ita_it/topolino-in-giallo-19-1wtomi026-it08.html
 UNK_314906   h3 Topolino in Giallo 19 [price:5.00 EUR] [inx:-]

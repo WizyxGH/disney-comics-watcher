@@ -294,9 +294,9 @@ def _dispatch_notification(
         if link_line:
             description += f"\n\n{link_line}"
         send_discord(
-            description=description,
+            text=description,
             image_url=cover_url,
-            content=role_mention(country),
+            mention=role_mention(country),
         )
         time.sleep(1)
 
@@ -354,7 +354,7 @@ def _dispatch_notification(
                 if dm_links:
                     dm_description += f"\n\n{dm_links}"
                 send_discord(
-                    description=dm_description,
+                    text=dm_description,
                     image_url=cover_url,
                     webhook_url=DISCORD_ADMIN_WEBHOOK_URL,
                 )

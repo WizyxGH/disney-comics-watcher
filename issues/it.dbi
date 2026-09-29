@@ -14,6 +14,10 @@ PK 116a     ?                 1 c
 PK 117       h3 Paperinik 117 [issdate:2026-09-04] [price:4.50 EUR] [inx:-]
 PK 117a     ?                 1 c
 
+^^ Source: https://www.panini.it/shp_ita_it/paperinik-118-1wpnik11818-it08.html
+PK 118       h3 Paperinik 118 [issdate:2026-10-05] [price:4.50 EUR] [inx:-]
+PK 118a     ?                 1 c
+
 ^^ Source: https://www.panini.it/shp_ita_it/i-viaggi-di-topolino-1-1wtrip001-it08.html
 TL 1         h3 I Viaggi di Topolino 1 [price:5.50 EUR] [inx:-]
 TL 1a       ?              1  c
@@ -286,6 +290,14 @@ UNK_338191a ?                 1 c
 UNK_338194   h3 Lilo & Stitch 2 [issdate:2026-09-24] [price:7.50 EUR] [inx:-]
 UNK_338194a ?                 1 c
 
+^^ Source: https://www.panini.it/shp_ita_it/topolino-e-il-castello-sulla-luna-1wthri013-it08.html
+UNK_338197   h3 Topolino e il Castello sulla Luna [issdate:2026-10-01] [price:18.00 EUR] [inx:-]
+UNK_338197a ?                 1 c
+
+^^ Source: https://www.panini.it/shp_ita_it/the-best-of-topolinia-mistero-1wdiha052-it08.html
+UNK_338200   h3 The Best of Topolinia: Mistero [issdate:2026-10-05] [price:6.50 EUR] [inx:-]
+UNK_338200a ?                 1 c
+
 ^^ Source: https://www.panini.it/shp_ita_it/paperdetective-indagini-e-misteri-4-1wfant008-it08.html
 UNK_338203   h3 Paperdetective: Indagini e Misteri 4 [issdate:2026-09-25] [price:5.00 EUR] [inx:-]
 UNK_338203a ?                 1 c
@@ -297,6 +309,10 @@ UNK_338206a ?                 1 c
 ^^ Source: https://www.panini.it/shp_ita_it/paperino-sport-15-1wpasp015-it08.html
 UNK_338257   h3 Paperino Sport 15 [issdate:2026-09-11] [price:5.50 EUR] [inx:-]
 UNK_338257a ?                 1 c
+
+^^ Source: https://www.panini.it/shp_ita_it/brividissimi-1wtime128sp-it08.html
+UNK_338272   h3 Brividissimi [issdate:2026-10-05] [price:5.00 EUR] [inx:-]
+UNK_338272a ?                 1 c
 
 ^^ Source: https://www.panini.it/shp_ita_it/disney-big-222-1wdbig222-it08.html
 UNK_338275   h3 Disney Big 222 [issdate:2026-09-21] [price:6.90 EUR] [inx:-]

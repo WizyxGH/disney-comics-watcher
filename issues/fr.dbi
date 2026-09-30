@@ -46,6 +46,10 @@ JM 3872-73a ?                 1 c     FPt FPt      [isslet:B.L.A.C.K Studio]
 JM 3874-75   h3 Journal de Mickey [issdate:2026-09-16] [price:4.90 EUR] [pages:116] [inx:-]
 JM 3874-75a ?                 1 c     FPt FPt      [isslet:B.L.A.C.K Studio]
 
+^^ Source: https://direct-editeurs.fr/magazine/14067_le-journal-de-mickey_3876-3877
+JM 3876-77   h3 Journal de Mickey [issdate:2026-09-30] [price:4.90 EUR] [pages:116] [inx:-]
+JM 3876-77a ?                 1 c     FPt FPt      [isslet:B.L.A.C.K Studio]
+
 ^^ Source: https://direct-editeurs.fr/magazine/15935_le-meilleur-du-journal-de-mickey_26
 JMC 26       h3 Le Meilleur du Journal de Mickey [issdate:2026-07-01] [price:4.95 EUR] [inx:-]
 JMC 26a     ?              1  c
@@ -102,7 +106,7 @@ TP 75a      ?              1  c
 TP 76        h3 Les Trésors de Picsou [issdate:2026-09-18] [price:7.99 EUR] [inx:-]
 TP 76a      ?                 1 c
 
-^^ Source: https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=D887F32D4A3E48396716F44884044CAA
-UNK          h3 PICSOU HS LA NOUVELLE JEUNESSE DE PICSOU [issdate:2026-09-17] [price:12.95 EUR] [inx:-]
+^^ Source: https://direct-editeurs.fr/magazine/15528_mickey-junior_493
+UNK          h3 MICKEY JUNIOR [issdate:2026-09-30] [price:5.95 EUR] [inx:-]
 UNKa        ?                 1 c
 

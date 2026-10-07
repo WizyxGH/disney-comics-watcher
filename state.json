@@ -890,9 +890,9 @@
   "fr_kiosk:15528_493": "released",
   "kathi-gr:564490804": "released",
   "dynamite:61721": "announced",
-  "panini-it:338185": "announced",
-  "panini-it:340058": "announced",
-  "panini-it:340094": "announced",
+  "panini-it:338185": "released",
+  "panini-it:340058": "released",
+  "panini-it:340094": "released",
   "glenat:9782344079744": "announced",
   "glenat:9782344079751": "announced",
   "panini-br:422822": "announced",
@@ -906,5 +906,6 @@
   "dynamite:61733": "announced",
   "dynamite:61732": "announced",
   "dynamite:61731": "announced",
-  "panini-it:340466": "announced"
+  "panini-it:340466": "announced",
+  "fr_kiosk:15858_1": "released"
 }

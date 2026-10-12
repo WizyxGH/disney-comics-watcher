@@ -14,209 +14,51 @@ def _build_metadata(issue_path: str | None, name: str, info: dict, ean: str | No
         "ean": ean
     }
 
-ISSUE_NUM_PATTERN = r'(\d+(?:/\d+)?)'
+def resolve_comic_metadata(info: dict, country_code: str) -> dict:
+    """
+    Mappeur universel de métadonnées pour les comics internationaux.
+    S'appuie directement sur le moteur de recherche Inducks générique.
+    """
+    title = info.get("title", f"{country_code.upper()} Comic")
+    book_id = str(info.get("id") or info.get("sku") or "UNK")
+    clean_id = book_id.split('/')[-1]
 
-DE_MAPPINGS = [
-    (re.compile(rf'Lustiges Taschenbuch Young Comics (?:Nr\.\s*)?{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'de/LTBYC \1'),
-    (re.compile(rf'Lustiges Taschenbuch Weihnachtsgeschichten (?:Nr\.\s*)?{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'de/LTBWE \1'),
-    (re.compile(rf'Micky Maus Magazin (?:Nr\.\s*)?{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'de/MM \1'),
-    (re.compile(rf'Micky Maus Comics (?:Nr\.\s*)?{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'de/MMC \1'),
-    (re.compile(rf'Micky Maus Legacy Collection (?:Nr\.\s*)?{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'de/MMLC \1'),
-    (re.compile(rf'Donald Duck Sonderheft (?:Nr\.\s*)?{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'de/TGDD \1'),
-    (re.compile(rf'Die tollsten Geschichten von Donald Duck (?:Sonderheft)?.*?{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'de/TGDD \1'),
-    (re.compile(rf'Lustiges Taschenbuch (?:Nr\.\s*)?{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'de/LTB \1'),
-    (re.compile(rf'Entenhausener Ikonen (?:0*)?{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'de/EIB \1'),
-    (re.compile(rf'Enthologien (?:0*)?{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'de/ENT \1'),
-]
+    page_url = info.get("url")
+    cover_url = info.get("cover_url") or info.get("image")
+    publisher = info.get("publisher") or info.get("editeur") or info.get("editor")
 
-GR_MAPPINGS = [
-    (re.compile(rf'Super MIKY\s*(?:#|Nr\.\s*)?{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'gr/SM \1'),
-    (re.compile(rf'Μίκυ\s+Μάους\s*#{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'gr/MM \1'),
-    (re.compile(rf'Κόμιξ\s*#{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'gr/KX \1'),
-    (re.compile(rf'Ντόναλντ\s*#{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'gr/DD \1'),
-]
+    issue_path = search_publication_code(title, country_code, page_url=page_url, cover_url=cover_url, publisher=publisher)
 
-US_MAPPINGS = [
-    (re.compile(rf'The Complete Carl Barks Disney Library.*?Vol\.\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'us/CBL \1'),
-    (re.compile(rf'Disney Masters.*?Vol\.\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'us/DM \1'),
-    (re.compile(rf'Disney Afternoon Adventures.*?Vol\.\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'us/DAA \1'),
-    (re.compile(rf'Life and Times of Scrooge McDuck.*?Vol(?:ume|\.)\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'us/CLTS \1'),
-]
+    if not issue_path:
+        # Repli générique d'identification inconnue
+        issue_path = f"{country_code}/UNK_{clean_id[-6:]}"
 
-IT_MAPPINGS = [
-    (re.compile(rf'Topolino\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'it/TL \1'),
-    (re.compile(rf'Paperinik\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'it/PK \1'),
-    (re.compile(rf'Zio Paperone\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'it/ZP \1'),
-    (re.compile(rf'I Classici Disney\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'it/CWD \1'),
-]
+    return _build_metadata(issue_path, title, info)
 
-BR_MAPPINGS = [
-    (re.compile(rf'Mickey\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'br/MK \1'),
-    (re.compile(rf'Pato Donald\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'br/PD \1'),
-    (re.compile(rf'Zé Carioca\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'br/ZC \1'),
-    (re.compile(rf'Tio Patinhas\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'br/TP \1'),
-    (re.compile(r'\(BD Disney\)', re.IGNORECASE), r'br/BDD'),
-    (re.compile(rf'Grandes Sagas Disney.*?Vol\.\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'br/GSD \1'),
-    (re.compile(r'\(Graphic Disney\)', re.IGNORECASE), r'br/GD'),
-    (re.compile(rf'Coleção Carl Barks.*?Vol\.\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'br/CCB \1'),
-]
-
-EG_MAPPINGS = [
-    (re.compile(rf'ميكي\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'eg/M \1'), # Miki (Nahdet Misr)
-    (re.compile(rf'ميكي جيب\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'eg/MP \1'), # Miki Pocket
-    (re.compile(rf'سوبر ميكي\s*{ISSUE_NUM_PATTERN}', re.IGNORECASE), r'eg/SM \1'), # Super Miki
-]
-
-
-def resolve_magazine_metadata(info, overrides):
+def resolve_magazine_metadata(info: dict, overrides: dict) -> dict:
+    """Mappeur pour les magazines kiosque français."""
     codif   = info.get("codif", "")
     ov      = overrides.get(codif, {})
     inducks = ov.get("inducks")
     numero  = str(info.get("numero") or "").strip()
-    name    = ov.get("name") or info.get("site_name") or codif
+    name    = ov.get("name") or info.get("site_name") or info.get("titre") or info.get("title") or codif
     
     issue_path = build_inducks_path(inducks, numero) if inducks and numero else None
     if not issue_path:
+        raw_title = info.get("titre") or info.get("title") or name
+        issue_path = search_publication_code(
+            raw_title,
+            "fr",
+            page_url=info.get("url"),
+            cover_url=info.get("cover_url") or info.get("image")
+        )
+
+    if not issue_path:
         issue_path = "fr/UNK"
+
     return _build_metadata(issue_path, name, info)
 
-def resolve_us_metadata(info):
-    title = info.get("title", "US Comic")
-    sku   = str(info.get("sku") or info.get("id") or "UNK")
-    
-    issue_path = None
-    for pattern, repl in US_MAPPINGS:
-        m = pattern.search(title)
-        if m:
-            issue_path = m.expand(repl)
-            break
-            
-    if not issue_path:
-        issue_path = search_publication_code(title, "us")
-        
-    if not issue_path:
-        issue_path = f"us/UNK_{sku[-6:]}"
-        
-    return _build_metadata(issue_path, title, info)
-
-def resolve_de_metadata(info):
-    title = info.get("title", "DE Comic")
-    book_id = str(info.get("id") or "UNK")
-    clean_id = book_id.split('/')[-1]
-
-    # 1. DB lookup first (exact / contains / fuzzy)
-    issue_path = search_publication_code(title, "de")
-
-    # 2. Regex fallback for very well-known series (faster, no DB needed)
-    if not issue_path:
-        for pattern, repl in DE_MAPPINGS:
-            m = pattern.search(title)
-            if m:
-                issue_path = m.expand(repl)
-                break
-
-    # 3. Generic acronym fallback
-    if not issue_path:
-        m = re.search(r'([A-Za-z\s\.]+)(?:Nr\.\s*|0*)?(\d+(?:/\d+)?)', title)
-        if m:
-            text_part, num_part = m.group(1).strip(), m.group(2)
-            acronym = "".join([w[0].upper() for w in text_part.split() if w and w[0].isalpha()])
-            if acronym:
-                issue_path = f"de/{acronym} {num_part}"
-        if not issue_path:
-            issue_path = f"de/UNK_{clean_id[-6:]}"
-
-    # Bolderbast rules: MM/YYYY -> YYYY-MM (e.g. 03/2026 -> 2026-03)
-    # Also removes the space if it's just a prefix and date.
-    if issue_path:
-        m = re.search(r'( ?)(\d{1,2})/(\d{4})$', issue_path)
-        if m:
-            space, mm, yyyy = m.groups()
-            base = issue_path[:m.start()]
-            if base.startswith("de/") and " " not in base[3:]:
-                # If it's a simple prefix like 'de/DS', remove the space (e.g. de/DS2026-03)
-                issue_path = f"{base.strip()}{yyyy}-{mm.zfill(2)}"
-            else:
-                issue_path = f"{base.strip()} {yyyy}-{mm.zfill(2)}"
-
-    return _build_metadata(issue_path, title, info)
-
-def resolve_gr_metadata(info):
-    title = info.get("title", "GR Comic")
-    book_id = str(info.get("id") or "UNK")
-
-    # 1. DB lookup first
-    issue_path = search_publication_code(title, "gr")
-
-    # 2. Regex fallback
-    if not issue_path:
-        for pattern, repl in GR_MAPPINGS:
-            m = pattern.search(title)
-            if m:
-                issue_path = m.expand(repl)
-                break
-
-    # 3. Generic fallback using the article ID
-    if not issue_path:
-        issue_path = f"gr/UNK_{book_id[-6:]}"
-
-    return _build_metadata(issue_path, title, info)
-
-def resolve_it_metadata(info):
-    title = info.get("title", "IT Comic")
-    book_id = str(info.get("id") or "UNK")
-
-    issue_path = search_publication_code(title, "it")
-
-    if not issue_path:
-        for pattern, repl in IT_MAPPINGS:
-            m = pattern.search(title)
-            if m:
-                issue_path = m.expand(repl)
-                break
-
-    if not issue_path:
-        issue_path = f"it/UNK_{book_id[-6:]}"
-
-    return _build_metadata(issue_path, title, info)
-
-def resolve_br_metadata(info):
-    title = info.get("title", "BR Comic")
-    book_id = str(info.get("id") or "UNK")
-
-    issue_path = search_publication_code(title, "br")
-
-    if not issue_path:
-        for pattern, repl in BR_MAPPINGS:
-            m = pattern.search(title)
-            if m:
-                issue_path = m.expand(repl)
-                break
-
-    if not issue_path:
-        issue_path = f"br/UNK_{book_id[-6:]}"
-
-    return _build_metadata(issue_path, title, info)
-
-def resolve_eg_metadata(info):
-    title = info.get("title", "EG Comic")
-    book_id = str(info.get("id") or "UNK")
-
-    issue_path = search_publication_code(title, "eg")
-
-    if not issue_path:
-        for pattern, repl in EG_MAPPINGS:
-            m = pattern.search(title)
-            if m:
-                issue_path = m.expand(repl)
-                break
-
-    if not issue_path:
-        issue_path = f"eg/UNK_{book_id[-6:]}"
-
-    return _build_metadata(issue_path, title, info)
-
-def resolve_glenat_metadata(info):
+def resolve_glenat_metadata(info: dict) -> dict:
     title = info.get("title", "Album Disney")
     ean_val = info.get("ean", "")
     issue_path = _build_glenat_inducks_path(
@@ -307,29 +149,30 @@ def _build_glenat_inducks_path(title: str, ean: str | None = None, collection_la
 
     return "fr/UNK"
 
-def _resolve_generic_metadata(info: dict, country_code: str) -> dict:
-    title = info.get("title", f"{country_code.upper()} Comic")
-    book_id = str(info.get("id") or "UNK")
-    issue_path = search_publication_code(title, country_code)
-    if not issue_path:
-        issue_path = f"{country_code}/UNK_{book_id[-6:]}"
-    return _build_metadata(issue_path, title, info)
+# Mappeurs par pays (délégués directement au moteur universel pour éliminer toute duplication)
+resolve_us_metadata = lambda info: resolve_comic_metadata(info, "us")
+resolve_de_metadata = lambda info: resolve_comic_metadata(info, "de")
+resolve_gr_metadata = lambda info: resolve_comic_metadata(info, "gr")
+resolve_it_metadata = lambda info: resolve_comic_metadata(info, "it")
+resolve_br_metadata = lambda info: resolve_comic_metadata(info, "br")
+resolve_eg_metadata = lambda info: resolve_comic_metadata(info, "eg")
+resolve_bg_metadata = lambda info: resolve_comic_metadata(info, "bg")
+resolve_hr_metadata = lambda info: resolve_comic_metadata(info, "hr")
+resolve_ee_metadata = lambda info: resolve_comic_metadata(info, "ee")
+resolve_lv_metadata = lambda info: resolve_comic_metadata(info, "lv")
+resolve_lt_metadata = lambda info: resolve_comic_metadata(info, "lt")
+resolve_pl_metadata = lambda info: resolve_comic_metadata(info, "pl")
+resolve_cz_metadata = lambda info: resolve_comic_metadata(info, "cz")
+resolve_rs_metadata = lambda info: resolve_comic_metadata(info, "rs")
+resolve_si_metadata = lambda info: resolve_comic_metadata(info, "si")
+resolve_cn_metadata = lambda info: resolve_comic_metadata(info, "cn")
+resolve_dk_metadata = lambda info: resolve_comic_metadata(info, "dk")
+resolve_es_metadata = lambda info: resolve_comic_metadata(info, "es")
+resolve_fi_metadata = lambda info: resolve_comic_metadata(info, "fi")
+resolve_is_metadata = lambda info: resolve_comic_metadata(info, "is")
+resolve_no_metadata = lambda info: resolve_comic_metadata(info, "no")
+resolve_nl_metadata = lambda info: resolve_comic_metadata(info, "nl")
+resolve_uk_metadata = lambda info: resolve_comic_metadata(info, "uk")
+resolve_se_metadata = lambda info: resolve_comic_metadata(info, "se")
 
-def resolve_bg_metadata(info): return _resolve_generic_metadata(info, "bg")
-def resolve_hr_metadata(info): return _resolve_generic_metadata(info, "hr")
-def resolve_ee_metadata(info): return _resolve_generic_metadata(info, "ee")
-def resolve_lv_metadata(info): return _resolve_generic_metadata(info, "lv")
-def resolve_lt_metadata(info): return _resolve_generic_metadata(info, "lt")
-def resolve_pl_metadata(info): return _resolve_generic_metadata(info, "pl")
-def resolve_cz_metadata(info): return _resolve_generic_metadata(info, "cz")
-def resolve_rs_metadata(info): return _resolve_generic_metadata(info, "rs")
-def resolve_si_metadata(info): return _resolve_generic_metadata(info, "si")
-def resolve_cn_metadata(info): return _resolve_generic_metadata(info, "cn")
-def resolve_dk_metadata(info): return _resolve_generic_metadata(info, "dk")
-def resolve_es_metadata(info): return _resolve_generic_metadata(info, "es")
-def resolve_fi_metadata(info): return _resolve_generic_metadata(info, "fi")
-def resolve_is_metadata(info): return _resolve_generic_metadata(info, "is")
-def resolve_no_metadata(info): return _resolve_generic_metadata(info, "no")
-def resolve_nl_metadata(info): return _resolve_generic_metadata(info, "nl")
-def resolve_uk_metadata(info): return _resolve_generic_metadata(info, "uk")
-def resolve_se_metadata(info): return _resolve_generic_metadata(info, "se")
+_resolve_generic_metadata = resolve_comic_metadata

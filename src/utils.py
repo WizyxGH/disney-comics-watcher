@@ -104,9 +104,17 @@ def truncate_summary(text: str, max_len: int = 400) -> str:
     return truncated.strip() + "…"
 
 def is_fully_indexed_in_inducks(issue_code: str) -> bool:
-    """Check if an issue is fully indexed in Inducks by querying the Turso DB."""
+    """Check if an issue is fully indexed in Inducks (local universal resolver first, fallback to Turso DB)."""
     if not issue_code:
         return False
+
+    try:
+        from src.dbi.isv_search import _get_universal_resolver
+        resolver = _get_universal_resolver()
+        if resolver and hasattr(resolver, "is_issue_fully_indexed"):
+            return resolver.is_issue_fully_indexed(issue_code)
+    except Exception:
+        pass
         
     try:
         from src.db import query_db
@@ -127,10 +135,22 @@ def is_fully_indexed_in_inducks(issue_code: str) -> bool:
     return False
 
 def does_issue_exist_in_inducks(issue_code: str) -> bool:
-    """Check if an issue exists in Inducks by querying the Turso DB."""
+    """Check if an issue exists in Inducks (local universal resolver first, fallback to Turso DB)."""
     if not issue_code:
         return False
         
+    try:
+        from src.dbi.isv_search import _get_universal_resolver
+        resolver = _get_universal_resolver()
+        if resolver and "/" in issue_code:
+            parts = issue_code.strip().split(" ", 1)
+            pub_code = parts[0]
+            num = parts[1] if len(parts) > 1 else ""
+            if resolver.is_issue_valid_in_db(pub_code, num):
+                return True
+    except Exception:
+        pass
+
     try:
         from src.db import query_db
         clean_code = issue_code.replace(" ", "").lower()

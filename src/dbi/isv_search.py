@@ -5,10 +5,56 @@ Uses the inducks_publication and inducks_issue tables populated by setup_db.py.
 Falls back gracefully if the DB is unavailable.
 """
 
+import os
 import re
 import unicodedata
+import importlib.util
+from pathlib import Path
 
 from src.db import query_db
+
+_universal_resolver = None
+
+def _get_universal_resolver():
+    """Charge dynamiquement le moteur de résolution universel Inducks sans redondance."""
+    global _universal_resolver
+    if _universal_resolver is not None:
+        return _universal_resolver
+
+    candidates = []
+    env_path = os.environ.get("ARCHIVING_HELPER_PATH")
+    if env_path:
+        candidates.append(Path(env_path) / "src" / "core" / "inducks_resolver.py")
+
+    try:
+        sibling = (
+            Path(__file__).resolve().parents[4]
+            / "Automatisations"
+            / "Archiving-Helper"
+            / "src"
+            / "core"
+            / "inducks_resolver.py"
+        )
+        candidates.append(sibling)
+    except Exception:
+        pass
+
+    candidates.append(
+        Path(r"C:\Users\starl\Documents\Projets\Automatisations\Archiving-Helper\src\core\inducks_resolver.py")
+    )
+
+    for cand in candidates:
+        if cand.is_file():
+            try:
+                spec = importlib.util.spec_from_file_location("archiving_inducks_resolver", cand)
+                mod = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(mod)
+                _universal_resolver = mod
+                return _universal_resolver
+            except Exception as e:
+                print(f"[warn] Failed to load universal resolver from {cand}: {e}")
+
+    return None
 
 # In-memory cache: {country_code: {normalized_title: publicationcode}}
 _pub_cache: dict[str, dict[str, str]] = {}
@@ -184,17 +230,43 @@ def _find_issue_by_title(raw_title: str, country: str) -> str | None:
     return None
 
 
-def search_publication_code(raw_title: str, country: str) -> str | None:
+def search_publication_code(raw_title: str, country: str, page_url: str | None = None, cover_url: str | None = None, publisher: str | None = None) -> str | None:
     """
     Main entry point: given a raw title and country code, returns the full
-    Inducks issue path (e.g. 'de/MM 15') or None if not found.
+    Inducks issue path (e.g. 'de/MM 15' or 'de/MM 2026-15').
 
-    Search strategy:
-    1. Search issue titles directly (for pre-indexed issues that share a publication code)
-    2. Extract base title + issue number from the raw title
-    3. Look up the publication in the local DB cache (exact → contains → fuzzy)
-    4. Build and return the issue path
+    Delegates to the universal inducks_resolver engine if available,
+    avoiding all duplicate code.
     """
+    resolver = _get_universal_resolver()
+    if resolver:
+        try:
+            res = resolver.resolve_publication(
+                raw_title,
+                preferred_country=country,
+                page_url=page_url,
+                cover_url=cover_url,
+                publisher=publisher
+            )
+            if res and res.get("pub_code"):
+                pub_code = res["pub_code"]
+                num = res.get("issue_num")
+                if num:
+                    # Normalisation Bolderbast / dates
+                    m_date = re.match(r"^(\d{1,2})/(\d{4})$", num)
+                    if m_date:
+                        mm, yyyy = m_date.groups()
+                        num = f"{yyyy}-{mm.zfill(2)}"
+                    
+                    if pub_code.startswith("de/") and " " not in pub_code[3:]:
+                        if re.match(r"^\d{4}-\d{2}$", num):
+                            return f"{pub_code}{num}"
+                    return f"{pub_code} {num}"
+                return pub_code
+        except Exception as e:
+            print(f"[warn] Universal resolver error on '{raw_title}': {e}")
+
+    # Fallback si le moteur n'est pas accessible
     issue_path = _find_issue_by_title(raw_title, country)
     if issue_path:
         return issue_path

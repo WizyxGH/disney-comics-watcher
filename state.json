@@ -910,13 +910,13 @@
   "fr_kiosk:15858_1": "released",
   "fr_kiosk:12011_2": "released",
   "kathi-gr:564490819": "released",
-  "panini-it:345490": "announced",
+  "panini-it:345490": "released",
   "panini-it:340061": "released",
-  "panini-it:340427": "announced",
-  "panini-it:340448": "announced",
-  "panini-it:340454": "announced",
-  "panini-it:340457": "announced",
-  "panini-it:340622": "announced",
+  "panini-it:340427": "released",
+  "panini-it:340448": "released",
+  "panini-it:340454": "released",
+  "panini-it:340457": "released",
+  "panini-it:340622": "released",
   "egmont-de:200/03409": "released",
   "egmont-de:200/03457": "released",
   "panini-it:341357": "announced",
@@ -929,5 +929,6 @@
   "panini-it:340619": "announced",
   "egmont-de:200/03398": "released",
   "egmont-de:200/03503": "released",
-  "egmont-de:200/03378": "released"
+  "egmont-de:200/03378": "released",
+  "fantagraphics:10357602222326": "released"
 }

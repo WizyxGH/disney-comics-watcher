@@ -45,12 +45,14 @@ jobs:
 
       # 4. Dependencies
       - name: Install dependencies
-        run: pip install requests beautifulsoup4
+        run: pip install requests beautifulsoup4 libsql-client
 
       # 5. Run the watcher
       - name: Run the watcher
         env:
           ARCHIVING_HELPER_PATH: ${{ github.workspace }}/archiving_helper
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TELEGRAM_THREAD_ID_FR: ${{ secrets.TELEGRAM_THREAD_ID_FR }}

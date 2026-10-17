@@ -23,10 +23,12 @@ jobs:
 
       # 1b. Checkout Archiving-Helper for universal Inducks resolver
       - name: Checkout Archiving-Helper
+        continue-on-error: true
         uses: actions/checkout@v4
         with:
           repository: WizyxGH/Archiving-Helper
           path: archiving_helper
+          token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
 
       # 2. Retrieve state.json, issues/, and covers/ from the datas branch
       - name: Retrieve state, issues and covers
@@ -95,7 +97,11 @@ jobs:
         if: always() # Always save, even on partial error
         run: |
           # Save data to /tmp before switching branches
-          cp state.json /tmp/state_updated.json
+          if [ -f state.json ]; then
+            cp state.json /tmp/state_updated.json
+          else
+            echo '{}' > /tmp/state_updated.json
+          fi
           mkdir -p /tmp/issues_updated /tmp/covers_updated
           cp -r issues/* /tmp/issues_updated/ 2>/dev/null || true
           

@@ -15,7 +15,7 @@ from src.notifications import notify_magazine, notify_glenat_announce, notify_gl
 
 from src.scrapers.fr import discover_fr_kiosk, fetch_fr_kiosk_details, discover_glenat, fetch_glenat_details
 from src.scrapers.us import discover_fantagraphics, discover_marvel, discover_dynamite, fetch_dynamite_details
-from src.scrapers.de import discover_egmont_de, fetch_egmont_de_details, discover_lustiges_taschenbuch_de
+from src.scrapers.de import discover_egmont_de, fetch_egmont_de_details, discover_lustiges_taschenbuch_de, fetch_lustiges_taschenbuch_de_details
 from src.scrapers.gr import discover_kathimerini
 from src.scrapers.it import discover_panini_it, fetch_panini_it_details
 from src.scrapers.br import discover_panini_br, fetch_panini_br_details
@@ -185,7 +185,7 @@ def main():
         ("Marvel", MARVEL_KEY_PREFIX, discover_marvel, "us", "announced", None, False),
         ("Dynamite", DYNAMITE_KEY_PREFIX, discover_dynamite, "us", "announced", fetch_dynamite_details, False),
         ("Egmont DE", EGMONT_DE_KEY_PREFIX, discover_egmont_de, "de", "released", fetch_egmont_de_details, False),
-        ("LTB DE", LTB_DE_KEY_PREFIX, discover_lustiges_taschenbuch_de, "de", "announced", None, False),
+        ("LTB DE", LTB_DE_KEY_PREFIX, discover_lustiges_taschenbuch_de, "de", "announced", fetch_lustiges_taschenbuch_de_details, False),
         ("Kathimerini GR", KATHIMERINI_KEY_PREFIX, discover_kathimerini, "gr", "released", None, False),
         ("Panini IT", PANINI_IT_KEY_PREFIX, discover_panini_it, "it", "announced", fetch_panini_it_details, False),
         ("Panini BR", PANINI_BR_KEY_PREFIX, discover_panini_br, "br", "announced", fetch_panini_br_details, False),
@@ -202,7 +202,7 @@ def main():
         ("CN", CN_KEY_PREFIX, discover_cn, "cn", "announced", fetch_cn_details, False),
         ("DK", DK_KEY_PREFIX, discover_dk, "dk", "announced", fetch_dk_details, False),
         ("ES", ES_KEY_PREFIX, discover_es, "es", "announced", fetch_es_details, False),
-        ("FI", FI_KEY_PREFIX, discover_fi, "fi", "announced", fetch_fi_details, False),
+        ("FI", FI_KEY_PREFIX, discover_fi, "fi", "released", fetch_fi_details, False),
         ("IS", IS_KEY_PREFIX, discover_is, "is", "announced", fetch_is_details, False),
         ("NO", NO_KEY_PREFIX, discover_no, "no", "announced", fetch_no_details, False),
         ("NL", NL_KEY_PREFIX, discover_nl, "nl", "announced", fetch_nl_details, False),

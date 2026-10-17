@@ -55,6 +55,7 @@ ISV_TABLES = {
 INDEXES = [
     "CREATE INDEX IF NOT EXISTS idx_pub_country ON inducks_publication(countrycode)",
     "CREATE INDEX IF NOT EXISTS idx_issue_pub   ON inducks_issue(publicationcode)",
+    "CREATE INDEX IF NOT EXISTS idx_issue_clean ON inducks_issue(LOWER(REPLACE(issuecode, ' ', '')))",
 ]
 
 from src.config import SUPPORTED_COUNTRIES

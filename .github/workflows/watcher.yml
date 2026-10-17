@@ -21,6 +21,13 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
+      # 1b. Checkout Archiving-Helper for universal Inducks resolver
+      - name: Checkout Archiving-Helper
+        uses: actions/checkout@v4
+        with:
+          repository: WizyxGH/Archiving-Helper
+          path: archiving_helper
+
       # 2. Retrieve state.json, issues/, and covers/ from the datas branch
       - name: Retrieve state, issues and covers
         run: |
@@ -43,6 +50,7 @@ jobs:
       # 5. Run the watcher
       - name: Run the watcher
         env:
+          ARCHIVING_HELPER_PATH: ${{ github.workspace }}/archiving_helper
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TELEGRAM_THREAD_ID_FR: ${{ secrets.TELEGRAM_THREAD_ID_FR }}

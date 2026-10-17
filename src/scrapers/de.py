@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 import http.client
 http.client._MAXHEADERS = 1000
 
-from src.config import EGMONT_DE_URLS
+from src.config import EGMONT_DE_URLS, LTB_SITE_BASE, LTB_ALLE_AUSGABEN_URL, LTB_NEBENREIHEN_URL
 from src.utils import get_session
 
 
@@ -167,5 +167,90 @@ def fetch_egmont_de_details(url: str) -> dict:
 
 
 def discover_lustiges_taschenbuch_de():
-    """Placeholder for discovering LTB from lustiges-taschenbuch.de directly."""
-    return []
+    """Discovers LTB releases from lustiges-taschenbuch.de directly (alle-ausgaben + nebenreihen)."""
+    s = get_session()
+    results = []
+    seen = set()
+
+    # 1. Alle Ausgaben (main series)
+    try:
+        r = s.get(LTB_ALLE_AUSGABEN_URL, timeout=15)
+        if r.status_code == 200:
+            from bs4 import BeautifulSoup
+            soup = BeautifulSoup(r.text, "html.parser")
+            for a in soup.find_all("a", href=True):
+                href = a["href"]
+                m = re.search(r"/ausgaben/alle-ausgaben/ltb-(\d+)", href)
+                if m and href not in seen:
+                    seen.add(href)
+                    num = m.group(1)
+                    title_text = a.get_text(strip=True)
+                    full_url = LTB_SITE_BASE + href if href.startswith("/") else href
+                    img = a.find("img")
+                    cover_url = (LTB_SITE_BASE + img["src"]) if img and img.get("src") and img["src"].startswith("/") else (img["src"] if img and img.get("src") else None)
+                    results.append({
+                        "id": f"ltb_{num}",
+                        "title": f"Lustiges Taschenbuch {num}" + (f" - {title_text}" if title_text else ""),
+                        "url": full_url,
+                        "cover_url": cover_url,
+                        "numero": num,
+                        "price": "8,99 €"
+                    })
+    except Exception as e:
+        print(f"  [warn] discover_lustiges_taschenbuch_de alle-ausgaben: {e}")
+
+    # 2. Nebenreihen (subseries latest releases)
+    try:
+        r2 = s.get(LTB_NEBENREIHEN_URL, timeout=15)
+        if r2.status_code == 200:
+            from bs4 import BeautifulSoup
+            soup2 = BeautifulSoup(r2.text, "html.parser")
+            for a in soup2.find_all("a", href=True):
+                href = a["href"]
+                if "/ausgaben/nebenreihen/" in href and any(b in href.lower() for b in ["/band-", "/nr-"]):
+                    if href not in seen:
+                        seen.add(href)
+                        full_url = LTB_SITE_BASE + href if href.startswith("/") else href
+                        slug = href.strip("/").split("/")[-1]
+                        series_slug = href.strip("/").split("/")[-2]
+                        text = a.get_text(separator=" ", strip=True)
+                        # Clean up date prefix e.g. "13.10.2026 Nr. 23 Die Perle von Labuan"
+                        m_clean = re.search(r"(?:Nr\.?\s*\d+.*)$", text)
+                        clean_title = m_clean.group(0) if m_clean else text
+                        img = a.find("img")
+                        cover_url = (LTB_SITE_BASE + img["src"]) if img and img.get("src") and img["src"].startswith("/") else (img["src"] if img and img.get("src") else None)
+                        results.append({
+                            "id": f"{series_slug}_{slug}".replace("-", "_"),
+                            "title": f"{series_slug} - {clean_title}",
+                            "url": full_url,
+                            "cover_url": cover_url,
+                        })
+    except Exception as e:
+        print(f"  [warn] discover_lustiges_taschenbuch_de nebenreihen: {e}")
+
+    return results
+
+
+def fetch_lustiges_taschenbuch_de_details(url: str) -> dict:
+    """Fetches date and story details from a lustiges-taschenbuch.de page."""
+    if not url:
+        return {}
+    details = {}
+    try:
+        s = get_session()
+        r = s.get(url, timeout=15)
+        if r.status_code == 200:
+            from src.ltb_enricher import _parse_stories
+            cover_title, issue_date, stories = _parse_stories(r.text)
+            if issue_date:
+                details["date"] = issue_date
+            if cover_title:
+                details["name"] = cover_title
+            if stories:
+                details["stories"] = stories
+                last_story = stories[-1]
+                if "start_page" in last_story and "pages" in last_story:
+                    details["pages"] = last_story["start_page"] + last_story["pages"] - 1
+    except Exception as e:
+        print(f"  [warn] fetch_lustiges_taschenbuch_de_details failed for {url}: {e}")
+    return details

@@ -87,7 +87,8 @@ def discover_kathimerini() -> list[dict]:
                         "price": "N/A (Kiosk)",  # Usually distributed with Sunday newspaper
                         "cover_url": img_url,
                         "date": date_val,
-                        "summary": ""
+                        "summary": "",
+                        "publisher": "Kathimerini"
                     })
     except Exception as e:
         print(f"  [warn] discover_kathimerini failed: {e}")

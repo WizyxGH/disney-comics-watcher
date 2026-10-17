@@ -119,7 +119,7 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         h3_line = f"{issue_code_field} h3 {title_part}\n"
 
         cover_ec = dbi_issue_code + "a"
-        storycode = "?"
+        storycode = info.get("cover_code") or "?"
         
         storycode_field = storycode[:14].ljust(14)
         pages_field     = " " + "1".rjust(4)
@@ -179,16 +179,25 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
                 try: total_pages = int(str(pages_val).strip())
                 except: pass
 
-            current_page = 5 if "LTB " in dbi_issue_code else 1
+            current_page = 5 if "LTB" in dbi_issue_code else 1
+            # A source that knows story lengths but not where they sit in the
+            # printed issue (a digital edition drops pages) gets letter codes:
+            # positions summed from page 1 would be invented.
+            positions_known = not info.get("page_positions_unknown")
 
             for i, story in enumerate(stories, start=1):
+                start_p = story.get("start_page")
+                if start_p is not None:
+                    current_page = int(start_p)
+
                 page_len_str = str(story.get("pages", "")).strip()
-                if page_len_str.isdigit():
-                    if total_pages >= 100:
+                if positions_known and (page_len_str.isdigit() or start_p is not None):
+                    if total_pages >= 100 or current_page >= 100:
                         story_ec = f"{dbi_issue_code}p{str(current_page).zfill(3)}"
                     else:
                         story_ec = f"{dbi_issue_code}p{str(current_page).zfill(2)}"
-                    current_page += int(page_len_str)
+                    if page_len_str.isdigit():
+                        current_page += int(page_len_str)
                 else:
                     story_ec = f"{dbi_issue_code}{chr(97 + i)}"
                 

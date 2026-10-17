@@ -75,6 +75,21 @@ EGMONT_DE_KEY_PREFIX = "egmont-de:"
 EGMONT_BASE = "https://www.egmont-shop.de"
 LTB_DE_KEY_PREFIX = "ltb-de:"
 
+LTB_BASE = os.environ.get("LTB_BASE", "https://www.lustiges-taschenbuch.de/ausgaben/")
+LTB_SITE_BASE = os.environ.get("LTB_SITE_BASE", "https://www.lustiges-taschenbuch.de")
+LTB_ALLE_AUSGABEN_URL = f"{LTB_SITE_BASE}/ausgaben/alle-ausgaben"
+LTB_NEBENREIHEN_URL = f"{LTB_SITE_BASE}/ausgaben/nebenreihen"
+
+LTB_URL_PATTERNS: dict[str, str] = {
+    "de/EIB":    "nebenreihen/entenhausener-ikonen/band-{num}",
+    "de/ENT":    "nebenreihen/enthologien/band-{num}",
+    "de/LTB":    "alle-ausgaben/ltb-{num}",
+    "de/LTBBA":  "nebenreihen/ltb-camping/band-{num}",
+    "de/LTBWE":  "nebenreihen/weihnachtsgeschichten/band-{num}",
+    "de/LTBYC":  "nebenreihen/ltb-young-comics/band-{num}",
+    "de/MMLC":   "nebenreihen/micky-maus-legacy-collection/band-{num}",
+}
+
 KATHIMERINI_URL = "https://www.kathimerini.gr/k/disney/"
 KATHIMERINI_KEY_PREFIX = "kathi-gr:"
 
@@ -94,6 +109,14 @@ CN_KEY_PREFIX = "cn:"
 DK_KEY_PREFIX = "dk:"
 ES_KEY_PREFIX = "es:"
 FI_KEY_PREFIX = "fi:"
+# akuankka.fi (Sanoma) gives away the latest issue of each publication; its
+# JSON API then answers the table of contents, story slugs derived from the
+# Inducks codes.
+AKUANKKA_API_BASE = os.environ.get("AKUANKKA_API_BASE", "https://api.akuankka.fi/v1")
+AKUANKKA_SITE_BASE = os.environ.get("AKUANKKA_SITE_BASE", "https://www.akuankka.fi")
+# Publication slugs on akuankka.fi; they are the Inducks ones (aa -> fi/AA).
+# aatk (pocket books) also exists, but reaches the site months after release.
+AKUANKKA_PUBLICATIONS = ["aa"]
 IS_KEY_PREFIX = "is:"
 NO_KEY_PREFIX = "no:"
 NL_KEY_PREFIX = "nl:"

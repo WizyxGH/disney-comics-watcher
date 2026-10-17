@@ -13,28 +13,15 @@ import requests
 from bs4 import BeautifulSoup
 
 # ---------------------------------------------------------------------------
-# Configuration – extend here to support new sub-series
+# Configuration imported from centralized src.config
 # ---------------------------------------------------------------------------
-LTB_BASE = "https://www.lustiges-taschenbuch.de/ausgaben/"
+from src.config import LTB_BASE, LTB_URL_PATTERNS
 
-LTB_URL_PATTERNS: dict[str, str] = {
-    "de/EIB":    "nebenreihen/entenhausener-ikonen/band-{num}",
-    "de/ENT":    "nebenreihen/enthologien/band-{num}",
-    "de/LTB":    "alle-ausgaben/ltb-{num}",    
-    "de/LTBBA":  "nebenreihen/ltb-camping/band-{num}",
-    "de/LTBWE":  "nebenreihen/weihnachtsgeschichten/band-{num}",
-    "de/LTBYC":  "nebenreihen/ltb-young-comics/band-{num}",
-    "de/MMLC":   "nebenreihen/micky-maus-legacy-collection/band-{num}",
-}
-
-# Regex matching any known Inducks story code prefix:
-#   Italian:  I XX 1234-5
-#   Danish:   D 2025-078
-#   American: W XX 1234-56
-#   German:   D XXXX YYYY
+# Regex matching any Inducks story code (Italian, Danish, American, German, DPW books, etc.):
 _STORY_CODE_RE = re.compile(
     r'Code:\s*'
-    r'((?:[A-Z]{1,2}\s+)?[A-Z]{1,4}\s+[\w\-]+)',
+    r'([A-Za-z0-9][A-Za-z0-9\s\-_/]+?)'
+    r'(?=\s*(?:Originaltitel|Ursprung|Erstver|Seitenanzahl|$))',
     re.IGNORECASE
 )
 

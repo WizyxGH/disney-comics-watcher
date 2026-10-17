@@ -27,7 +27,8 @@ def resolve_comic_metadata(info: dict, country_code: str) -> dict:
     cover_url = info.get("cover_url") or info.get("image")
     publisher = info.get("publisher") or info.get("editeur") or info.get("editor")
 
-    issue_path = search_publication_code(title, country_code, page_url=page_url, cover_url=cover_url, publisher=publisher)
+    # A scraper whose source gives the Inducks code says so; the rest are searched.
+    issue_path = info.get("issue_path") or search_publication_code(title, country_code, page_url=page_url, cover_url=cover_url, publisher=publisher)
 
     if not issue_path:
         # Repli générique d'identification inconnue

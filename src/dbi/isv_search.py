@@ -21,14 +21,17 @@ def _get_universal_resolver():
     if _universal_resolver is not None:
         return _universal_resolver
 
-    candidates = []
+    candidates = [
+        Path("archiving_helper") / "src" / "core" / "inducks_resolver.py",
+        Path(__file__).resolve().parent.parent.parent / "archiving_helper" / "src" / "core" / "inducks_resolver.py",
+    ]
     env_path = os.environ.get("ARCHIVING_HELPER_PATH")
     if env_path:
-        candidates.append(Path(env_path) / "src" / "core" / "inducks_resolver.py")
+        candidates.insert(0, Path(env_path) / "src" / "core" / "inducks_resolver.py")
 
     try:
         sibling = (
-            Path(__file__).resolve().parents[4]
+            Path(__file__).resolve().parents[6]
             / "Automatisations"
             / "Archiving-Helper"
             / "src"
@@ -38,10 +41,6 @@ def _get_universal_resolver():
         candidates.append(sibling)
     except Exception:
         pass
-
-    candidates.append(
-        Path(r"C:\Users\starl\Documents\Projets\Automatisations\Archiving-Helper\src\core\inducks_resolver.py")
-    )
 
     for cand in candidates:
         if cand.is_file():

@@ -196,13 +196,16 @@ from src.dbi.generator import _RESOLVERS
 
 def get_issue_path_from_info(info: dict, pub_type: str) -> str:
     try:
-        from src.config import OVERRIDES
-        from src.dbi.mappers import resolve_magazine_metadata, resolve_glenat_metadata
-        if pub_type == "magazine":
+        from src.config import OVERRIDES, SUPPORTED_COUNTRIES
+        from src.dbi.mappers import resolve_magazine_metadata, resolve_glenat_metadata, resolve_comic_metadata
+        if pub_type in ("magazine", "fr_kiosk"):
             data = resolve_magazine_metadata(info, OVERRIDES)
+        elif pub_type == "glenat":
+            data = resolve_glenat_metadata(info)
+        elif pub_type in SUPPORTED_COUNTRIES:
+            data = resolve_comic_metadata(info, pub_type)
         else:
-            resolver = _RESOLVERS.get(pub_type, resolve_glenat_metadata)
-            data = resolver(info)
+            data = resolve_glenat_metadata(info)
         
         return data.get("issue_path") or ""
     except Exception:

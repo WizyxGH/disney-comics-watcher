@@ -25,12 +25,72 @@ def _get_headers():
     return _HEADERS
 
 
+from pathlib import Path
+import sqlite3
+
+_LOCAL_DB_PATH = None
+
+def _get_local_sqlite_path() -> str | None:
+    global _LOCAL_DB_PATH
+    if _LOCAL_DB_PATH is not None:
+        return _LOCAL_DB_PATH if _LOCAL_DB_PATH != "" else None
+
+    env_p = os.environ.get("LOCAL_INDUCKS_SQLITE")
+    if env_p and os.path.isfile(env_p):
+        _LOCAL_DB_PATH = env_p
+        return _LOCAL_DB_PATH
+
+    candidates = [
+        Path(__file__).resolve().parents[3] / "data" / "inducks-db" / "inducks.sqlite",
+        Path(__file__).resolve().parents[3] / "data" / "inducks.sqlite",
+        Path(__file__).resolve().parents[2] / "transcript" / "data" / "inducks-db" / "inducks.sqlite",
+        Path(__file__).resolve().parents[1] / "inducks.db",
+    ]
+    for c in candidates:
+        if c.is_file() and c.stat().st_size > 1024:
+            _LOCAL_DB_PATH = str(c)
+            return _LOCAL_DB_PATH
+
+    _LOCAL_DB_PATH = ""
+    return None
+
+
+def _query_local_sqlite(query: str, params: tuple = ()):
+    local_db = _get_local_sqlite_path()
+    if local_db:
+        try:
+            with sqlite3.connect(local_db) as conn:
+                cur = conn.cursor()
+                cur.execute(query, params)
+                return cur.fetchall()
+        except Exception as e:
+            print(f"[LOCAL DB ERROR] {e}")
+    return []
+
+
+_QUERY_CACHE: dict[tuple, list] = {}
+
+
 def query_db(query: str, params: tuple = ()):
-    """Executes a SQL query against the Turso database via HTTP API."""
+    """Executes a SQL query with local-first priority (0 quota used), in-memory caching, and Turso cloud fallback."""
+    cache_key = (query.strip(), params)
+    if cache_key in _QUERY_CACHE:
+        return _QUERY_CACHE[cache_key]
+
+    # 1. Local-first: if local SQLite is present and FORCE_TURSO is not set, use local DB (saves 100% of Turso quota locally)
+    if not os.environ.get("FORCE_TURSO"):
+        local_db = _get_local_sqlite_path()
+        if local_db:
+            res = _query_local_sqlite(query, params)
+            _QUERY_CACHE[cache_key] = res
+            return res
+
+    # 2. Remote Turso query (for CI / GitHub Actions or when explicitly forced)
     headers = _get_headers()
     if not headers:
-        print("[WARNING] TURSO_DATABASE_URL and/or TURSO_AUTH_TOKEN not set. Database queries will be disabled.")
-        return []
+        res = _query_local_sqlite(query, params)
+        _QUERY_CACHE[cache_key] = res
+        return res
 
     args = []
     for p in params:
@@ -51,19 +111,24 @@ def query_db(query: str, params: tuple = ()):
     }
 
     try:
-        r = requests.post(f"{DB_URL}/v2/pipeline", headers=headers, json=payload, timeout=15)
+        r = requests.post(f"{DB_URL}/v2/pipeline", headers=headers, json=payload, timeout=10)
         r.raise_for_status()
         data = r.json()
         result = data["results"][0]
         if result["type"] == "error":
             print(f"[DB ERROR] {result['error']['message']}")
-            return []
+            res = _query_local_sqlite(query, params)
+            _QUERY_CACHE[cache_key] = res
+            return res
         rows_raw = result["response"]["result"]["rows"]
-        # Return as list of tuples (same interface as before)
-        return [tuple(cell.get("value") for cell in row) for row in rows_raw]
+        res = [tuple(cell.get("value") for cell in row) for row in rows_raw]
+        _QUERY_CACHE[cache_key] = res
+        return res
     except Exception as e:
-        print(f"[DB ERROR] {e}")
-        return []
+        print(f"[DB WARN] Turso unreachable ({e}) — falling back to local SQLite.")
+        res = _query_local_sqlite(query, params)
+        _QUERY_CACHE[cache_key] = res
+        return res
 
 
 def execute_db(query: str, params: tuple = ()):

@@ -168,3 +168,16 @@ UNK_03509a  ?                 1 c
 UNK_36700    h3 Entenhausen-Edition Dagobert Nr. 100 [price:7.99 EUR] [inx:-]
 UNK_36700a  ?                 1 c
 
+^^ Source: https://www.lustiges-taschenbuch.de/ausgaben/alle-ausgaben/ltb-617
+UNK_tb_617   h3 Klondike Tagebuch [issdate:2023-10-18] [price:8.99 EUR] [pages:254] [inx:FGK,-]
+UNK_tb_617a ?                 1 c
+->          I TL 3543-1P     60                    K - Klondike Tagebuch [entrycode:UNK_tb_617p005]
+->          D 2026-012       21                    Neue Helden: Chaos im Kleinformat [entrycode:UNK_tb_617p065]
+->          I PM  334-1      23                    Mehr Schein als Reim [entrycode:UNK_tb_617p086]
+->          I TL 3649-3      38                    Supergoof: Eine Mütze voll Fantasie [entrycode:UNK_tb_617p109]
+->          I TL 3634-2      30                    Die Sparbüchse von König Krösus [entrycode:UNK_tb_617p147]
+->          I PPK  28-1      18                    Das doppelte Jöbchen [entrycode:UNK_tb_617p177]
+->          I TL 3661-3      10                    Der Stein des Anstoßens [entrycode:UNK_tb_617p195]
+->          978DPW1000716 D   25                    Micky x F1 - Boliden auf Höhenflug [entrycode:UNK_tb_617p205]
+->          978DPW1000716 E   25                    Micky x F1 - Auf zur letzten Disqualifikationsrunde [entrycode:UNK_tb_617p230]
+

@@ -934,11 +934,11 @@
   "panini-it:340064": "released",
   "panini-it:341270": "released",
   "fr_kiosk:14108_13": "released",
-  "panini-it:340358": "announced",
-  "panini-it:340361": "announced",
-  "panini-it:340436": "announced",
-  "panini-it:340439": "announced",
-  "panini-it:340451": "announced",
+  "panini-it:340358": "released",
+  "panini-it:340361": "released",
+  "panini-it:340436": "released",
+  "panini-it:340439": "released",
+  "panini-it:340451": "released",
   "fr_kiosk:12228_3": "released",
   "panini-br:423830": "announced",
   "panini-br:423626": "announced",
@@ -973,5 +973,8 @@
   "ltb-de:ltb_617": "announced",
   "panini-it:340067": "announced",
   "panini-it:340082": "announced",
-  "panini-it:340460": "announced"
+  "panini-it:340460": "announced",
+  "fantagraphics:10369487503606": "released",
+  "fantagraphics:10369488552182": "released",
+  "fantagraphics:10369488584950": "released"
 }

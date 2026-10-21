@@ -1,67 +1,96 @@
 """
-isv_search.py — DB-backed publication code lookup for the Inducks ISV.
+isv_search.py — Publication code and issue lookup for Inducks ISV.
 
-Uses the inducks_publication and inducks_issue tables populated by setup_db.py.
-Falls back gracefully if the DB is unavailable.
+Uses the local inducks.db / Inducks database tables.
+Provides canonical series mappings and smart fuzzy lookup for new comic releases.
 """
 
 import os
 import re
 import unicodedata
-import importlib.util
-from pathlib import Path
-
 from src.db import query_db
 
-_universal_resolver = None
+# Canonical mapping of known recurring publications monitored across countries.
+# Keys are normalized (lowercase, unaccented, punctuation-stripped).
+CANONICAL_SERIES: dict[str, dict[str, str]] = {
+    "it": {
+        "topolino holiday celebration": "it/TL",
+        "topolino variant": "it/TL",
+        "topolino": "it/TL",
+        "disney big": "it/DBIG",
+        "zio paperone": "it/ZP",
+        "i grandi classici disney": "it/GCD",
+        "grandi classici disney": "it/GCD",
+        "grandi classici": "it/GCD",
+        "disney mix speciale": "it/DMIX",
+        "disney mix": "it/DMIX",
+        "paperinik": "it/PK",
+        "paperino": "it/PA",
+    },
+    "de": {
+        "micky maus comics": "de/MMC",
+        "micky maus magazin": "de/MM",
+        "micky maus": "de/MM",
+        "lustiges taschenbuch young comics": "de/LTBYC",
+        "lustiges taschenbuch sonderband": "de/LTBSP",
+        "lustiges taschenbuch spezial": "de/LTBSP",
+        "lustiges taschenbuch": "de/LTB",
+        "ltb": "de/LTB",
+        "entenhausen edition dagobert": "de/EEDCB",
+        "entenhausen edition donald": "de/EEDCB",
+        "entenhausen edition": "de/EEDCB",
+        "disney stitch": "de/DS",
+        "donald duck & co": "de/DDCO",
+        "tollste geschichten von donald duck": "de/TGDD",
+    },
+    "gr": {
+        "super miky": "gr/SMB",
+        "σουπερ μικυ": "gr/SMB",
+        "μικυ μαους": "gr/MM",
+        "miky maoys": "gr/MM",
+        "micky mouse": "gr/MM",
+        "ντοναλντ": "gr/NTB",
+        "ntonalnt": "gr/NTB",
+        "donald": "gr/NTB",
+        "κομιξ": "gr/KX",
+        "komix": "gr/KX",
+    },
+    "us": {
+        "talespin": "us/TS",
+        "gargoyles": "us/GARD",
+        "ducktales": "us/DTCD",
+        "darkwing duck": "us/DWDD",
+        "uncle scrooge": "us/US",
+        "mickey mouse": "us/MM",
+        "donald duck": "us/DD",
+    },
+    "br": {
+        "graphic disney": "br/GRD",
+        "colecao carl barks": "br/CCBD",
+        "carl barks": "br/CCBD",
+        "mickey apresenta": "br/MIC",
+        "mickey": "br/MIC",
+        "tio patinhas": "br/TP",
+        "pato donald": "br/DON",
+    }
+}
 
-def _get_universal_resolver():
-    """Charge dynamiquement le moteur de résolution universel Inducks sans redondance."""
-    global _universal_resolver
-    if _universal_resolver is not None:
-        return _universal_resolver
+# Panini Italy URL SKU prefixes -> Inducks publication codes
+PANINI_SKU_MAP = {
+    "1wtopo": "it/TL",
+    "1wdbig": "it/DBIG",
+    "1wzipa": "it/ZP",
+    "1wdmix": "it/DMIX",
+    "1wspec": "it/SPD",
+    "1wspev": "it/SPEV",
+    "1wgcd": "it/GCD",
+    "1wpk": "it/PK",
+    "1wpap": "it/PA",
+}
 
-    candidates = [
-        Path("archiving_helper") / "src" / "core" / "inducks_resolver.py",
-        Path(__file__).resolve().parent.parent.parent / "archiving_helper" / "src" / "core" / "inducks_resolver.py",
-    ]
-    env_path = os.environ.get("ARCHIVING_HELPER_PATH")
-    if env_path:
-        candidates.insert(0, Path(env_path) / "src" / "core" / "inducks_resolver.py")
-
-    try:
-        sibling = (
-            Path(__file__).resolve().parents[6]
-            / "Automatisations"
-            / "Archiving-Helper"
-            / "src"
-            / "core"
-            / "inducks_resolver.py"
-        )
-        candidates.append(sibling)
-    except Exception:
-        pass
-
-    for cand in candidates:
-        if cand.is_file():
-            try:
-                spec = importlib.util.spec_from_file_location("archiving_inducks_resolver", cand)
-                mod = importlib.util.module_from_spec(spec)
-                spec.loader.exec_module(mod)
-                _universal_resolver = mod
-                return _universal_resolver
-            except Exception as e:
-                print(f"[warn] Failed to load universal resolver from {cand}: {e}")
-
-    return None
-
-# In-memory cache: {country_code: {normalized_title: publicationcode}}
-_pub_cache: dict[str, dict[str, str]] = {}
-_cache_loaded: set[str] = set()
-
-# In-memory cache for issues: {country_code: [(issuecode, title)]}
-_issue_cache: dict[str, list[tuple[str, str]]] = {}
-
+# In-memory publication cache: {country: [(pub_code, norm_title, clean_title, issue_count)]}
+_PUB_CACHE: dict[str, list[tuple[str, str, str, int]]] = {}
+_CACHE_LOADED: set[str] = set()
 
 
 def _normalize(s: str) -> str:
@@ -76,219 +105,137 @@ def _normalize(s: str) -> str:
     return s
 
 
-def _load_country(country: str):
-    """Loads all publications for a country into the in-memory cache."""
-    if country in _cache_loaded:
+def _extract_base_and_number(raw_title: str) -> tuple[str, str] | tuple[None, None]:
+    """Extracts (base_title, issue_number) from a raw title string."""
+    title = raw_title.strip()
+    if not title:
+        return None, None
+
+    # Pattern 1: Title with separator and number e.g. "Nr. 106", "#148", "Band 4", "Volume 3"
+    m = re.match(
+        r"^(.*?)\s*(?:(?:Nr\.?|#|- Band|Band|Volume|Vol\.?|Tome|Hors[- ]S[eé]rie)\s*)(\d[\d\-/]*)(?:[/\-]\d{4})?(?:\s.*)?$",
+        title,
+        re.IGNORECASE,
+    )
+    if m:
+        base, num = m.group(1).strip(), re.sub(r"[^\d\-/]", "", m.group(2))
+        if base and num:
+            return base, num
+
+    # Pattern 2: Trailing number or month/year e.g. "Topolino 3700", "Disney Stitch 05/2026", "Disney Big 223"
+    m2 = re.match(r"^(.*?)\s+(\d{1,4}(?:[/\-]\d{2,4})?)(?:\s.*)?$", title)
+    if m2:
+        base, num = m2.group(1).strip(), m2.group(2).strip()
+        if base and num:
+            return base, num
+
+    return None, None
+
+
+def _load_country_pubs(country: str):
+    """Loads publications and issue counts for a country into memory."""
+    if country in _CACHE_LOADED:
         return
-    _cache_loaded.add(country)
+    _CACHE_LOADED.add(country)
 
     rows = query_db(
-        "SELECT publicationcode, title FROM inducks_publication WHERE countrycode = ?",
+        "SELECT p.publicationcode, p.title, COUNT(i.issuecode) "
+        "FROM inducks_publication p "
+        "LEFT JOIN inducks_issue i ON p.publicationcode = i.publicationcode "
+        "WHERE p.countrycode = ? "
+        "GROUP BY p.publicationcode, p.title",
         (country,)
     )
     if not rows:
         return
 
-    _pub_cache[country] = {}
-    for pub_code, title in rows:
+    _PUB_CACHE[country] = []
+    for pub_code, title, count in rows:
         if title:
-            _pub_cache[country][_normalize(title)] = str(pub_code)
+            norm_title = _normalize(title)
+            # Remove text in parentheses for clean base matching: e.g. "Topolino (libretto)" -> "Topolino"
+            clean_title = re.sub(r"\(.*?\)", "", norm_title).strip()
+            _PUB_CACHE[country].append((str(pub_code), norm_title, clean_title, int(count or 0)))
 
 
-def _extract_base_and_number(raw_title: str) -> tuple[str, str] | tuple[None, None]:
-    """Extracts (base_title, issue_number) from a raw title string.
-
-    Examples:
-      "Micky Maus Magazin Nr. 15/2026" -> ("Micky Maus Magazin", "15")
-      "Lustiges Taschenbuch 613"        -> ("Lustiges Taschenbuch", "613")
-      "Mickey Mouse Legacy #331"        -> ("Mickey Mouse Legacy", "331")
-    """
-    # Pattern: title / Nr. / # / Band / volume followed by a number
-    m = re.match(
-        r"^(.*?)\s*(?:Nr\.?\s*|#\s*|- Band\s*|Volume\s*|Vol\.?\s*|Tome\s*|Hors[- ]S[eé]rie\s*)?(\d[\d\-/]*)(?:[/\-]\d{4})?(?:\s.*)?$",
-        raw_title.strip(),
-        re.IGNORECASE,
-    )
-    if m:
-        base = m.group(1).strip()
-        num = re.sub(r"[^\d\-/]", "", m.group(2))  # keep digits and separators
-        if base and num:
-            return base, num
-    return None, None
-
-
-def _find_publication(base_title: str, country: str) -> str | None:
-    """Searches the cache for a publication matching the base title."""
-    _load_country(country)
-    country_pubs = _pub_cache.get(country, {})
-    if not country_pubs:
-        return None
-
-    norm = _normalize(base_title)
-
-    # 1. Exact normalized match
-    if norm in country_pubs:
-        return country_pubs[norm]
-
-    # 2. Contains match (the DB title contains our query or vice versa)
-    for db_title, pub_code in country_pubs.items():
-        if norm in db_title or db_title in norm:
-            return pub_code
-
-    # 3. Significant word overlap (≥ 60% of words match)
-    query_words = set(norm.split())
-    best_score = 0.0
-    best_code = None
-    for db_title, pub_code in country_pubs.items():
-        db_words = set(db_title.split())
-        if not query_words or not db_words:
-            continue
-        overlap = len(query_words & db_words) / max(len(query_words), len(db_words))
-        if overlap > best_score:
-            best_score = overlap
-            best_code = pub_code
-
-    if best_score >= 0.6:
-        return best_code
-
-    return None
-
-
-def _roman_to_int(s: str) -> str | None:
-    rom_val = {'i': 1, 'v': 5, 'x': 10, 'l': 50, 'c': 100, 'd': 500, 'm': 1000}
-    int_val = 0
-    s = s.lower()
-    for i in range(len(s)):
-        if s[i] not in rom_val: return None
-        if i > 0 and rom_val[s[i]] > rom_val[s[i - 1]]:
-            int_val += rom_val[s[i]] - 2 * rom_val[s[i - 1]]
-        else:
-            int_val += rom_val[s[i]]
-    return str(int_val)
-
-
-def _convert_romans(s: str) -> str:
-    words = s.split()
-    for i, w in enumerate(words):
-        val = _roman_to_int(w)
-        if val: words[i] = val
-    return ' '.join(words)
-
-
-def _load_country_issues(country: str):
-    if country in _issue_cache:
-        return
-    rows = query_db(
-        "SELECT issuecode, title FROM inducks_issue WHERE publicationcode LIKE ? AND title IS NOT NULL AND title != ''",
-        (f"{country}/%",)
-    )
-    _issue_cache[country] = rows if rows else []
-
-
-def _find_issue_by_title(raw_title: str, country: str) -> str | None:
-    """Searches the issue cache for an issue whose title words are all contained in the raw_title."""
-    _load_country_issues(country)
-    issues = _issue_cache.get(country, [])
-    if not issues:
-        return None
-
-    norm_raw = _normalize(raw_title)
-    if not norm_raw:
-        return None
-        
-    norm_raw_converted = _convert_romans(norm_raw)
-    raw_words = set(norm_raw_converted.split())
-    if not raw_words:
-        return None
-
-    best_score = 0
-    best_code = None
-
-    for issuecode, title in issues:
-        norm_title = _normalize(title)
-        if not norm_title:
-            continue
-            
-        norm_title_converted = _convert_romans(norm_title)
-        title_words = set(norm_title_converted.split())
-        
-        if not title_words:
-            continue
-            
-        # Check if ALL words in the issue title are present in the raw title
-        if title_words.issubset(raw_words):
-            # Prefer longer titles
-            score = len(title_words)
-            if score > best_score:
-                best_score = score
-                best_code = issuecode
-                
-    if best_score > 0:
-        return " ".join(best_code.split())
-        
-    return None
-
-
-def search_publication_code(raw_title: str, country: str, page_url: str | None = None, cover_url: str | None = None, publisher: str | None = None) -> str | None:
+def search_publication_code(
+    raw_title: str,
+    country: str,
+    page_url: str | None = None,
+    cover_url: str | None = None,
+    publisher: str | None = None
+) -> str | None:
     """
     Main entry point: given a raw title and country code, returns the full
-    Inducks issue path (e.g. 'de/MM 15' or 'de/MM 2026-15').
-
-    Delegates to the universal inducks_resolver engine if available,
-    avoiding all duplicate code.
+    Inducks issue path (e.g. 'it/TL 3700', 'de/MMC 106', 'gr/SMB 134').
     """
-    resolver = _get_universal_resolver()
-    if resolver:
-        try:
-            res = resolver.resolve_publication(
-                raw_title,
-                preferred_country=country,
-                page_url=page_url,
-                cover_url=cover_url,
-                publisher=publisher
-            )
-            if res and res.get("pub_code"):
-                pub_code = res["pub_code"]
-                num = res.get("issue_num")
-                if num:
-                    # Normalisation Bolderbast / dates
-                    m_date = re.match(r"^(\d{1,2})/(\d{4})$", num)
-                    if m_date:
-                        mm, yyyy = m_date.groups()
-                        num = f"{yyyy}-{mm.zfill(2)}"
-                    
-                    if pub_code.startswith("de/") and " " not in pub_code[3:]:
-                        if re.match(r"^\d{4}-\d{2}$", num):
-                            return f"{pub_code}{num}"
-                    return f"{pub_code} {num}"
-                return pub_code
-        except Exception as e:
-            print(f"[warn] Universal resolver error on '{raw_title}': {e}")
-
-    # Fallback si le moteur n'est pas accessible
-    issue_path = _find_issue_by_title(raw_title, country)
-    if issue_path:
-        return issue_path
-
-    base_title, num = _extract_base_and_number(raw_title)
-    if not base_title or not num:
+    if not raw_title:
         return None
 
-    pub_code = _find_publication(base_title, country)
-    if pub_code:
-        # The publicationcode already contains the country prefix
-        return f"{pub_code} {num}"
+    # 1. Italian Panini URL SKU identification
+    if page_url and country == "it":
+        url_lower = page_url.lower()
+        for sku_prefix, pub_code in PANINI_SKU_MAP.items():
+            if sku_prefix in url_lower:
+                # First try to find explicit SKU number (e.g. 1wspec113 -> 113)
+                m_sku = re.search(re.escape(sku_prefix) + r"(\d+)", url_lower)
+                # Next try to find issue number from title
+                m_num = re.search(r"\b(\d{1,4})\b", raw_title)
+                num = m_num.group(1) if m_num else (m_sku.group(1) if m_sku else None)
+                if num:
+                    return f"{pub_code} {int(num)}"
+                return pub_code
 
+    base, num = _extract_base_and_number(raw_title)
+    if not base:
+        base = raw_title
+    norm_base = _normalize(base)
+
+    # Normalize dates e.g. 05/2026 -> 2026-05
+    if num:
+        m_date = re.match(r"^(\d{1,2})/(\d{4})$", num)
+        if m_date:
+            mm, yyyy = m_date.groups()
+            num = f"{yyyy}-{mm.zfill(2)}"
+
+    # 2. Canonical mapping lookup (prioritizing longer matches first)
+    country_canon = CANONICAL_SERIES.get(country, {})
+    sorted_canon_keys = sorted(country_canon.keys(), key=len, reverse=True)
+    for key in sorted_canon_keys:
+        norm_key = _normalize(key)
+        if norm_base == norm_key or norm_base.startswith(norm_key) or norm_key in norm_base:
+            pub_code = country_canon[key]
+            if num:
+                return f"{pub_code} {num}"
+            return pub_code
+
+    # 3. Database search with ranking by relevance and historical issue count
+    _load_country_pubs(country)
+    pubs = _PUB_CACHE.get(country, [])
+    if pubs:
+        candidates = []
+        for pub_code, norm_title, clean_title, count in pubs:
+            if norm_base == clean_title or norm_base == norm_title:
+                candidates.append((100, count, pub_code))
+            elif norm_base.startswith(clean_title) or clean_title.startswith(norm_base):
+                candidates.append((70, count, pub_code))
+            elif clean_title in norm_base or norm_base in clean_title:
+                candidates.append((40, count, pub_code))
+
+        if candidates:
+            # Sort by score descending, then by issue count descending
+            candidates.sort(reverse=True)
+            best_pub = candidates[0][2]
+            if num:
+                return f"{best_pub} {num}"
+            return best_pub
+
+    # 4. Fallback: if issue number exists and title contains known single-word hints
     return None
 
 
 def lookup_issue_code(pub_code: str, issue_number: str) -> str | None:
-    """
-    Given a publication code and issue number, returns the exact Inducks
-    issue code (e.g. 'de/MM   15') by querying the DB directly.
-
-    Useful for verifying if an issue already exists in Inducks.
-    """
+    """Returns the exact Inducks issue code if present in the database."""
     rows = query_db(
         "SELECT issuecode FROM inducks_issue WHERE publicationcode = ? AND issuenumber = ?",
         (pub_code, issue_number),
@@ -313,3 +260,8 @@ def get_latest_inducks_issue_number(publication_code: str) -> int:
                 if n > max_num:
                     max_num = n
     return max_num
+
+
+def _find_issue_by_title(raw_title: str, country: str) -> str | None:
+    """Preserved for compatibility."""
+    return search_publication_code(raw_title, country)

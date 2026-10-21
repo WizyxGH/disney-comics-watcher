@@ -122,6 +122,92 @@ def batch_insert_rows(table: str, columns: list[str], rows: list[tuple], batch_s
     print(f"\r    {table}: {inserted}/{total} rows (100%) ✓")
 
 
+def sync_diff():
+    """Incremental sync: only inserts NEW publications and issues into Turso.
+    Saves 99.99% of Turso write quota compared to a full re-import.
+    """
+    print("[diff-sync] Starting incremental update...")
+
+    # 1. Publications
+    print("\n[diff-sync] Checking inducks_publication...")
+    pub_rows_raw = download_isv("inducks_publication")
+    if pub_rows_raw and pub_rows_raw[0][0].lower() == "publicationcode":
+        pub_rows_raw = pub_rows_raw[1:]
+
+    cfg_pub = ISV_TABLES["inducks_publication"]
+    idx_pub = cfg_pub["insert_idx"]
+    country_col = 1
+
+    filtered_pubs = []
+    all_pub_codes = set()
+    for row in pub_rows_raw:
+        if len(row) < max(idx_pub) + 1:
+            continue
+        country = row[country_col].strip().lower()
+        if country not in TARGET_COUNTRIES:
+            continue
+        values = tuple(row[i].strip() or None for i in idx_pub)
+        filtered_pubs.append(values)
+        all_pub_codes.add(row[0].strip())
+
+    existing_pubs = set()
+    rows = query_db("SELECT publicationcode FROM inducks_publication")
+    if rows:
+        existing_pubs = {r[0] for r in rows if r and r[0]}
+    print(f"  Existing in Turso: {len(existing_pubs)} publications | Target ISV: {len(filtered_pubs)}")
+
+    new_pubs = [p for p in filtered_pubs if p[0] not in existing_pubs]
+    if new_pubs:
+        print(f"  -> Found {len(new_pubs)} new publications to insert.")
+        batch_insert_rows("inducks_publication", cfg_pub["insert_cols"], new_pubs)
+    else:
+        print("  -> Publications are already up to date (0 writes).")
+
+    # 2. Issues
+    print("\n[diff-sync] Checking inducks_issue...")
+    issue_rows_raw = download_isv("inducks_issue")
+    if issue_rows_raw and issue_rows_raw[0][0].lower() == "issuecode":
+        issue_rows_raw = issue_rows_raw[1:]
+
+    cfg_iss = ISV_TABLES["inducks_issue"]
+    idx_iss = cfg_iss["insert_idx"]
+    pub_col = 2
+
+    filtered_issues = []
+    for row in issue_rows_raw:
+        if len(row) < max(idx_iss) + 1:
+            continue
+        pub_code = row[pub_col].strip()
+        if pub_code not in all_pub_codes:
+            continue
+        values = tuple(row[i].strip() or None for i in idx_iss)
+        filtered_issues.append(values)
+
+    existing_issues = set()
+    offset = 0
+    chunk_size = 50000
+    while True:
+        rows = query_db(f"SELECT issuecode FROM inducks_issue LIMIT {chunk_size} OFFSET {offset}")
+        if not rows:
+            break
+        for r in rows:
+            if r and r[0]:
+                existing_issues.add(r[0])
+        if len(rows) < chunk_size:
+            break
+        offset += chunk_size
+    print(f"  Existing in Turso: {len(existing_issues)} issues | Target ISV: {len(filtered_issues)}")
+
+    new_issues = [iss for iss in filtered_issues if iss[0] not in existing_issues]
+    if new_issues:
+        print(f"  -> Found {len(new_issues)} new issues to insert.")
+        batch_insert_rows("inducks_issue", cfg_iss["insert_cols"], new_issues)
+    else:
+        print("  -> Issues are already up to date (0 writes).")
+
+    print("\n[diff-sync] Incremental update completed successfully!")
+
+
 def main():
     print("[setup] Creating tables and indexes...")
     stmts = [ISV_TABLES["inducks_publication"]["create"],
@@ -137,9 +223,11 @@ def main():
     print(f"  inducks_issue:       {issue_count} rows")
 
     if pub_count > 500 and issue_count > 5000:
-        print("[setup] Database already populated. Use --force to reimport.")
         if "--force" not in sys.argv:
+            print("[setup] Database already populated. Running smart incremental diff sync...")
+            sync_diff()
             return
+        print("[setup] --force specified. Performing full re-import...")
 
     # --- inducks_publication ---
     print("\n[setup] Processing inducks_publication...")

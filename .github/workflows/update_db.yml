@@ -1,9 +1,8 @@
 name: Update Turso DB
 
 on:
-  schedule:
-    # Every day at 02:00 UTC
-    - cron: "0 2 * * *"
+  # schedule:
+  #   - cron: "0 2 * * *"  # Disabled to preserve Turso free tier quotas; watcher builds local SQLite
   workflow_dispatch: # Manual trigger
 
 jobs:

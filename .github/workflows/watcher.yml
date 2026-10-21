@@ -21,15 +21,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
-      # 1b. Checkout Archiving-Helper for universal Inducks resolver
-      - name: Checkout Archiving-Helper
-        continue-on-error: true
-        uses: actions/checkout@v4
-        with:
-          repository: WizyxGH/Archiving-Helper
-          path: archiving_helper
-          token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-
       # 2. Retrieve state.json, issues/, and covers/ from the datas branch
       - name: Retrieve state, issues and covers
         run: |
@@ -49,10 +40,13 @@ jobs:
       - name: Install dependencies
         run: pip install requests beautifulsoup4 libsql-client
 
+      # 4b. Build local Inducks DB (saves 100% Turso quota and eliminates rate limits)
+      - name: Build local Inducks DB
+        run: python build_sqlite.py
+
       # 5. Run the watcher
       - name: Run the watcher
         env:
-          ARCHIVING_HELPER_PATH: ${{ github.workspace }}/archiving_helper
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}

@@ -2,10 +2,6 @@
 __pycache__/
 *.pyc
 *.pyo
-# Fichiers générés / temporaires
-__pycache__/
-*.pyc
-*.pyo
 *.pyd
 .Python
 
@@ -30,3 +26,6 @@ issues/
 covers/
 tests_cache/
 local_tests/
+inducks.db
+*.db
+*.tmp

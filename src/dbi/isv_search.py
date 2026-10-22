@@ -10,6 +10,17 @@ import re
 import unicodedata
 from src.db import query_db
 
+def _normalize(s: str) -> str:
+    """Lowercase, strip accents, collapse whitespace and strip punctuation."""
+    if not s:
+        return ""
+    s = s.lower().strip()
+    s = unicodedata.normalize("NFKD", s)
+    s = "".join(c for c in s if not unicodedata.combining(c))
+    s = re.sub(r"[^\w\s]", " ", s)  # punctuation -> space
+    s = re.sub(r"\s+", " ", s).strip()
+    return s
+
 # Canonical mapping of known recurring publications monitored across countries.
 # Keys are normalized (lowercase, unaccented, punctuation-stripped).
 CANONICAL_SERIES: dict[str, dict[str, str]] = {
@@ -75,6 +86,12 @@ CANONICAL_SERIES: dict[str, dict[str, str]] = {
     }
 }
 
+# Pre-normalized and sorted canonical entries for O(1) loop lookups
+_SORTED_CANONICAL: dict[str, list[tuple[str, str]]] = {
+    c: sorted([(_normalize(k), code) for k, code in mapping.items()], key=lambda x: len(x[0]), reverse=True)
+    for c, mapping in CANONICAL_SERIES.items()
+}
+
 # Panini Italy URL SKU prefixes -> Inducks publication codes
 PANINI_SKU_MAP = {
     "1wtopo": "it/TL",
@@ -93,16 +110,6 @@ _PUB_CACHE: dict[str, list[tuple[str, str, str, int]]] = {}
 _CACHE_LOADED: set[str] = set()
 
 
-def _normalize(s: str) -> str:
-    """Lowercase, strip accents, collapse whitespace and strip punctuation."""
-    if not s:
-        return ""
-    s = s.lower().strip()
-    s = unicodedata.normalize("NFKD", s)
-    s = "".join(c for c in s if not unicodedata.combining(c))
-    s = re.sub(r"[^\w\s]", " ", s)  # punctuation -> space
-    s = re.sub(r"\s+", " ", s).strip()
-    return s
 
 
 def _extract_base_and_number(raw_title: str) -> tuple[str, str] | tuple[None, None]:
@@ -139,13 +146,21 @@ def _load_country_pubs(country: str):
     _CACHE_LOADED.add(country)
 
     rows = query_db(
-        "SELECT p.publicationcode, p.title, COUNT(i.issuecode) "
-        "FROM inducks_publication p "
-        "LEFT JOIN inducks_issue i ON p.publicationcode = i.publicationcode "
-        "WHERE p.countrycode = ? "
-        "GROUP BY p.publicationcode, p.title",
+        "SELECT publicationcode, title, issuescount "
+        "FROM inducks_publication "
+        "WHERE countrycode = ?",
         (country,)
     )
+    if not rows:
+        # Fallback for legacy DB schemas without issuescount column
+        rows = query_db(
+            "SELECT p.publicationcode, p.title, COUNT(i.issuecode) "
+            "FROM inducks_publication p "
+            "LEFT JOIN inducks_issue i ON p.publicationcode = i.publicationcode "
+            "WHERE p.countrycode = ? "
+            "GROUP BY p.publicationcode, p.title",
+            (country,)
+        )
     if not rows:
         return
 
@@ -198,13 +213,9 @@ def search_publication_code(
             mm, yyyy = m_date.groups()
             num = f"{yyyy}-{mm.zfill(2)}"
 
-    # 2. Canonical mapping lookup (prioritizing longer matches first)
-    country_canon = CANONICAL_SERIES.get(country, {})
-    sorted_canon_keys = sorted(country_canon.keys(), key=len, reverse=True)
-    for key in sorted_canon_keys:
-        norm_key = _normalize(key)
+    # 2. Canonical mapping lookup (prioritizing longer matches first, pre-sorted)
+    for norm_key, pub_code in _SORTED_CANONICAL.get(country, []):
         if norm_base == norm_key or norm_base.startswith(norm_key) or norm_key in norm_base:
-            pub_code = country_canon[key]
             if num:
                 return f"{pub_code} {num}"
             return pub_code
@@ -248,18 +259,12 @@ def lookup_issue_code(pub_code: str, issue_number: str) -> str | None:
 def get_latest_inducks_issue_number(publication_code: str) -> int:
     """Returns the highest numeric issue number for a publication code from the DB."""
     rows = query_db(
-        "SELECT issuenumber FROM inducks_issue WHERE publicationcode = ?",
+        "SELECT MAX(CAST(issuenumber AS INTEGER)) FROM inducks_issue WHERE publicationcode = ? AND issuenumber GLOB '[0-9]*'",
         (publication_code,)
     )
-    max_num = 0
-    for (issue_num_str,) in rows:
-        if issue_num_str:
-            digits = re.sub(r"\D", "", str(issue_num_str))
-            if digits:
-                n = int(digits)
-                if n > max_num:
-                    max_num = n
-    return max_num
+    if rows and rows[0][0] is not None:
+        return int(rows[0][0])
+    return 0
 
 
 def _find_issue_by_title(raw_title: str, country: str) -> str | None:

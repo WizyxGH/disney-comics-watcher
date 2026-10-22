@@ -22,7 +22,8 @@ def build():
     cur.execute("""CREATE TABLE inducks_publication (
         publicationcode TEXT PRIMARY KEY,
         countrycode     TEXT NOT NULL,
-        title           TEXT
+        title           TEXT,
+        issuescount     INTEGER DEFAULT 0
     )""")
     cur.execute("""CREATE TABLE inducks_issue (
         issuecode       TEXT PRIMARY KEY,
@@ -39,7 +40,7 @@ def build():
     r = requests.get("https://inducks.org/inducks/isv/inducks_publication.isv", timeout=45)
     lines = [l.split("^") for l in r.text.splitlines() if l.strip()]
     pubs = [(l[0], l[1], l[3] if len(l) > 3 else "") for l in lines[1:] if len(l) > 1]
-    cur.executemany("INSERT OR REPLACE INTO inducks_publication VALUES (?, ?, ?)", pubs)
+    cur.executemany("INSERT OR REPLACE INTO inducks_publication (publicationcode, countrycode, title) VALUES (?, ?, ?)", pubs)
     con.commit()
     print(f"  -> {len(pubs)} publications imported.")
 
@@ -54,9 +55,23 @@ def build():
     con.commit()
     print(f"  -> {len(issues)} issues imported.")
 
+    print("Computing publication issue counts ...")
+    cur.execute("""
+        CREATE TEMP TABLE _issue_counts AS
+        SELECT publicationcode, COUNT(*) AS cnt FROM inducks_issue GROUP BY publicationcode
+    """)
+    cur.execute("""
+        UPDATE inducks_publication
+        SET issuescount = COALESCE((
+            SELECT cnt FROM _issue_counts WHERE _issue_counts.publicationcode = inducks_publication.publicationcode
+        ), 0)
+    """)
+    cur.execute("DROP TABLE _issue_counts")
+
     print("Creating indexes ...")
     cur.execute("CREATE INDEX idx_pub_country ON inducks_publication(countrycode)")
     cur.execute("CREATE INDEX idx_issue_pub   ON inducks_issue(publicationcode)")
+    cur.execute("CREATE INDEX idx_issue_pub_num ON inducks_issue(publicationcode, issuenumber)")
     cur.execute("CREATE INDEX idx_issue_clean ON inducks_issue(LOWER(REPLACE(issuecode, ' ', '')))")
     con.commit()
     con.close()

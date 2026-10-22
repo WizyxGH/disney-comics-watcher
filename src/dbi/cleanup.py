@@ -83,7 +83,7 @@ def cleanup_indexed_issues(dbi_paths: list[str]):
         for i in range(0, len(query_list), batch_size):
             batch = query_list[i:i+batch_size]
             placeholders = ','.join(['?'] * len(batch))
-            query = f"SELECT issuecode, fullyindexed FROM inducks_issue WHERE LOWER(REPLACE(REPLACE(issuecode, ' ', ''), '_', '')) IN ({placeholders})"
+            query = f"SELECT issuecode, fullyindexed FROM inducks_issue WHERE LOWER(REPLACE(issuecode, ' ', '')) IN ({placeholders})"
             res = query_db(query, tuple(batch))
             for row in res:
                 issuecode_clean = row[0].replace(" ", "").replace("_", "").lower()

@@ -10,8 +10,8 @@ from src.config import (
     UK_KEY_PREFIX, SE_KEY_PREFIX, LTB_DE_KEY_PREFIX,
     NOTIFY_BACKENDS, DISCORD_WEBHOOK_URL, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID,
 )
-from src.utils import load_state, save_state, parse_date_fr
-from src.notifications import notify_magazine, notify_glenat_announce, notify_glenat_release, notify_international_comic
+from src.utils import load_state, save_state, parse_date_fr, is_fully_indexed_in_inducks
+from src.notifications import notify_magazine, notify_glenat_announce, notify_glenat_release, notify_international_comic, get_issue_path_from_info
 
 from src.scrapers.fr import discover_fr_kiosk, fetch_fr_kiosk_details, discover_glenat, fetch_glenat_details
 from src.scrapers.us import discover_fantagraphics, discover_marvel, discover_dynamite, fetch_dynamite_details
@@ -95,9 +95,6 @@ def _process_provider_books(
 
             if current is None or (current == "announced" and target_status == "released"):
                 is_indexed = False
-                from src.notifications import get_issue_path_from_info
-                from src.utils import is_fully_indexed_in_inducks
-
                 # Identify path and check indexing to skip heavy fetching
                 issue_path = get_issue_path_from_info(book, country)
                 if issue_path and issue_path != "unknown":

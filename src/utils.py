@@ -1,3 +1,4 @@
+from functools import lru_cache
 import os
 import re
 import json
@@ -99,6 +100,7 @@ def truncate_summary(text: str, max_len: int = 400) -> str:
         truncated = truncated[:last_space]
     return truncated.strip() + "…"
 
+@lru_cache(maxsize=2048)
 def is_fully_indexed_in_inducks(issue_code: str) -> bool:
     """Check if an issue is fully indexed in Inducks."""
     if not issue_code:
@@ -122,6 +124,7 @@ def is_fully_indexed_in_inducks(issue_code: str) -> bool:
         
     return False
 
+@lru_cache(maxsize=2048)
 def does_issue_exist_in_inducks(issue_code: str) -> bool:
     """Check if an issue exists in Inducks."""
     if not issue_code:

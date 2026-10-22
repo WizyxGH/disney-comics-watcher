@@ -12,7 +12,7 @@ from src.config import (
 from src.discord import send_discord, role_mention, build_link_line, html_to_markdown
 from src.utils import format_price_fr, get_session, truncate_summary, is_fully_indexed_in_inducks
 from src.dbi.generator import generate_dbi_skeleton
-from src.dbi.mappers import build_inducks_path
+from src.dbi.mappers import build_inducks_path, resolve_magazine_metadata, resolve_glenat_metadata, resolve_comic_metadata
 from src.gemini_analyzer import analyze_cover_with_gemini
 
 # One pooled connection to api.telegram.org, mirroring the one in src/discord.py.
@@ -196,8 +196,6 @@ from src.dbi.generator import _RESOLVERS
 
 def get_issue_path_from_info(info: dict, pub_type: str) -> str:
     try:
-        from src.config import OVERRIDES, SUPPORTED_COUNTRIES
-        from src.dbi.mappers import resolve_magazine_metadata, resolve_glenat_metadata, resolve_comic_metadata
         if pub_type in ("magazine", "fr_kiosk"):
             data = resolve_magazine_metadata(info, OVERRIDES)
         elif pub_type == "glenat":

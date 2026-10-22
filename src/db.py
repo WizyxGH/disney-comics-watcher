@@ -55,14 +55,35 @@ def _get_local_sqlite_path() -> str | None:
     return None
 
 
-def _query_local_sqlite(query: str, params: tuple = ()):
+_LOCAL_CONN = None
+
+def _get_local_connection():
+    global _LOCAL_CONN
+    if _LOCAL_CONN is not None:
+        return _LOCAL_CONN
     local_db = _get_local_sqlite_path()
-    if local_db:
+    if not local_db:
+        return None
+    try:
+        uri_path = f"file:{Path(local_db).as_posix()}?mode=ro"
+        _LOCAL_CONN = sqlite3.connect(uri_path, uri=True, check_same_thread=False)
+        return _LOCAL_CONN
+    except Exception:
         try:
-            with sqlite3.connect(local_db) as conn:
-                cur = conn.cursor()
-                cur.execute(query, params)
-                return cur.fetchall()
+            _LOCAL_CONN = sqlite3.connect(local_db, check_same_thread=False)
+            return _LOCAL_CONN
+        except Exception as e:
+            print(f"[LOCAL DB ERROR] Cannot open {local_db}: {e}")
+            return None
+
+
+def _query_local_sqlite(query: str, params: tuple = ()):
+    conn = _get_local_connection()
+    if conn:
+        try:
+            cur = conn.cursor()
+            cur.execute(query, params)
+            return cur.fetchall()
         except Exception as e:
             print(f"[LOCAL DB ERROR] {e}")
     return []

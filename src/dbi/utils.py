@@ -66,21 +66,25 @@ def sort_dbi_file(dbi_path: str):
                 cleaned_blocks.append('\n'.join(lines))
 
         def parse_issue_code_from_block(block: str) -> str:
-            m = re.search(r'\[entrycode:([^\]]+)\]', block)
-            if m:
-                ec = m.group(1).strip()
-                if ec.endswith('a'):
-                    return ec[:-1].strip()
-                return ec
-
             for line in block.split('\n'):
                 line = line.strip()
                 if not line or line.startswith('^^'):
                     continue
                 if ' h3 ' in line:
                     code_part = line.split(' h3 ')[0].strip()
-                    if code_part != '->':
+                    if code_part and code_part != '->':
                         return code_part
+
+            m = re.search(r'\[entrycode:([^\s\]]+)a\]', block)
+            if m:
+                return m.group(1).strip()
+
+            m = re.search(r'\[entrycode:([^\s\]]+)\]', block)
+            if m:
+                ec = m.group(1).strip()
+                if ec.endswith('a'):
+                    return ec[:-1].strip()
+                return ec
             return ""
 
         def natural_sort_key(s: str):

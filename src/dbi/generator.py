@@ -98,7 +98,7 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         if len(dbi_issue_code) <= 12:
             issue_code_field = dbi_issue_code.ljust(12)
         else:
-            issue_code_field = "->" + " " * 10 
+            issue_code_field = dbi_issue_code + " "
 
         fields = []
         if issdate: fields.append(f"[issdate:{issdate}]")

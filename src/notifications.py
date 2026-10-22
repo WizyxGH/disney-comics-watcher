@@ -261,23 +261,23 @@ def _dispatch_notification(
     if cover_url and not is_fully_indexed:
         download_cover(cover_url, cover_filename)
 
-    # 4. Process buttons dynamically based on Turso DB
+    # 4. Process buttons dynamically based on Turso / local Inducks DB
     from src.utils import does_issue_exist_in_inducks
     final_buttons = []
     if buttons:
         for row in buttons:
             new_row = []
             for btn in row:
-                if btn.get("text") == "Search on Inducks":
+                text = btn.get("text")
+                if text in ("Search on Inducks", "Search Inducks"):
                     if issue_path and "UNK" not in issue_path:
                         if does_issue_exist_in_inducks(issue_path):
                             new_row.append({"text": "View on Inducks", "url": f"https://inducks.org/issue.php?c={quote_plus(issue_path)}"})
                         else:
                             pub_code = issue_path.split(" ")[0] if " " in issue_path else issue_path
                             new_row.append({"text": "View Publication", "url": f"https://inducks.org/publication.php?c={quote_plus(pub_code)}"})
-                            new_row.append({"text": "Search Inducks", "url": f"https://inducks.org/search.php?search={quote_plus(raw_title)}"})
                     else:
-                        new_row.append(btn)
+                        new_row.append({"text": "Search Inducks", "url": btn.get("url")})
                 else:
                     new_row.append(btn)
             final_buttons.append(new_row)
@@ -382,7 +382,7 @@ def notify_magazine(info: dict, releve_date: str | None = None):
     if releve_date: lines.append(f"📅 On newsstands until: {releve_date}")
     
     inducks_url = build_inducks_url(ov.get("inducks"), num) or f"https://inducks.org/search.php?search={quote(f'{name} {num}')}"
-    buttons = [[{"text": "View Source", "url": url}], [{"text": "Search on Inducks", "url": inducks_url}]]
+    buttons = [[{"text": "View Source", "url": url}], [{"text": "Search Inducks", "url": inducks_url}]]
 
     cover_url = None
     if info.get("slug"):
@@ -415,7 +415,7 @@ def notify_magazine(info: dict, releve_date: str | None = None):
 
 def _build_glenat_buttons(album: dict, raw_title: str) -> list:
     row1 = [{"text": "View Source", "url": album["url"]}]
-    return [row1,[{"text": "Search on Inducks", "url": build_glenat_inducks_url(album)}]]
+    return [row1,[{"text": "Search Inducks", "url": build_glenat_inducks_url(album)}]]
 
 def notify_glenat_announce(album: dict, state: dict | None = None):
     """Glénat announcement notification (upcoming album)."""
@@ -487,7 +487,7 @@ def notify_international_comic(album: dict, state: dict | None = None, country: 
 
     row1.append({"text": "View Source", "url": album.get("url", "")})
 
-    buttons = [row1, [{"text": "Search on Inducks", "url": inducks_url}]] if row1 else [[{"text": "Search on Inducks", "url": inducks_url}]]
+    buttons = [row1, [{"text": "Search Inducks", "url": inducks_url}]] if row1 else [[{"text": "Search Inducks", "url": inducks_url}]]
 
     _dispatch_notification(
         info=album,

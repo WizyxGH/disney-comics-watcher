@@ -17,6 +17,9 @@ def cleanup_indexed_issues(dbi_paths: list[str]):
                 code_part = line.split(' h3 ')[0].strip()
                 if code_part and code_part != '->':
                     return code_part
+                m = re.search(r'\[entrycode:([^\s\]]+)\]', line)
+                if m:
+                    return m.group(1).strip()
 
         m = re.search(r'\[entrycode:([^\s\]]+)a\]', block)
         if m:

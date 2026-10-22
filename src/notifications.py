@@ -261,23 +261,24 @@ def _dispatch_notification(
     if cover_url and not is_fully_indexed:
         download_cover(cover_url, cover_filename)
 
-    # 4. Process buttons dynamically based on Turso / local Inducks DB
-    from src.utils import does_issue_exist_in_inducks
+    # 4. Process buttons dynamically based on Inducks
     final_buttons = []
     if buttons:
         for row in buttons:
             new_row = []
             for btn in row:
                 text = btn.get("text")
-                if text in ("Search on Inducks", "Search Inducks"):
+                if text in ("Search on Inducks", "Search Inducks", "View on Inducks", "View Publication"):
                     if issue_path and "UNK" not in issue_path:
-                        if does_issue_exist_in_inducks(issue_path):
+                        # Si le numéro précis est reconnu (ex: "it/TL 3700"), lien direct vers le numéro (pas besoin de View Publication)
+                        if " " in issue_path:
                             new_row.append({"text": "View on Inducks", "url": f"https://inducks.org/issue.php?c={quote_plus(issue_path)}"})
                         else:
-                            pub_code = issue_path.split(" ")[0] if " " in issue_path else issue_path
-                            new_row.append({"text": "View Publication", "url": f"https://inducks.org/publication.php?c={quote_plus(pub_code)}"})
+                            # Seule la publication/série est connue sans numéro précis
+                            new_row.append({"text": "View Publication", "url": f"https://inducks.org/publication.php?c={quote_plus(issue_path)}"})
                     else:
-                        new_row.append({"text": "Search Inducks", "url": btn.get("url")})
+                        search_url = f"https://inducks.org/search.php?search={quote_plus(raw_title)}" if raw_title else btn.get("url")
+                        new_row.append({"text": "Search Inducks", "url": search_url})
                 else:
                     new_row.append(btn)
             final_buttons.append(new_row)

@@ -95,11 +95,6 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
             if not pages_val: pages_val = 116
             isslet_val = "B.L.A.C.K Studio"
 
-        if len(dbi_issue_code) <= 12:
-            issue_code_field = dbi_issue_code.ljust(12)
-        else:
-            issue_code_field = dbi_issue_code + " "
-
         fields = []
         if issdate: fields.append(f"[issdate:{issdate}]")
         if price: fields.append(f"[price:{price}]")
@@ -113,10 +108,17 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         else:
             fields.append("[inx:-]")
 
+        # Bolderbast DBI spec: position 1..12 is issue code or '->          ' with [entrycode:xx]
+        if len(dbi_issue_code) <= 12:
+            issue_code_field = dbi_issue_code.ljust(12)
+        else:
+            issue_code_field = "->          "
+            fields.append(f"[entrycode:{dbi_issue_code}]")
+
         fields_str = " ".join(fields)
         title_part = f"{name} {fields_str}".strip()
 
-        h3_line = f"{issue_code_field} h3 {title_part}\n"
+        h3_line = f"{issue_code_field}  h3 {title_part}\n"
 
         cover_ec = dbi_issue_code + "a"
         storycode = info.get("cover_code") or "?"

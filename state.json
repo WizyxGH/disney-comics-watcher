@@ -983,7 +983,7 @@
   "fr_kiosk:14513_15": "released",
   "dynamite:61885": "released",
   "dynamite:61884": "released",
-  "dynamite:61880": "announced",
+  "dynamite:61880": "released",
   "dynamite:61879": "announced",
   "dynamite:61870": "announced",
   "panini-it:314885": "announced",
@@ -999,5 +999,12 @@
   "panini-it:340421": "announced",
   "panini-it:340424": "announced",
   "panini-it:340430": "announced",
-  "panini-it:340445": "announced"
+  "panini-it:340445": "announced",
+  "egmont-de:200/03458": "released",
+  "panini-it:340268": "announced",
+  "panini-it:340271": "announced",
+  "panini-it:340274": "announced",
+  "panini-it:340277": "announced",
+  "panini-it:340286": "announced",
+  "panini-it:340316": "announced"
 }

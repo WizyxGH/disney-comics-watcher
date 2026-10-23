@@ -22,6 +22,10 @@ JMHSC 2a    ?                 1 c
 JMHSN 13     h3 Journal de Mickey HS [issdate:2026-10-15] [price:6.99 EUR] [inx:-]
 JMHSN 13a   ?                 1 c
 
+^^ Source: https://direct-editeurs.fr/magazine/14513_mickey-junior-hs-jeux_15
+MJU           h3 MICKEY JUNIOR HS JEUX [issdate:2026-10-23] [price:6.95 EUR] [inx:-]
+MJUa        ?                 1 c
+
 ^^ Source: https://direct-editeurs.fr/magazine/12011_le-journal-de-mickey-hs-bd-collector_1
 TODO_12011 1 h3 LE JOURNAL DE MICKEY HS BD COLLECTOR [issdate:2026-07-08] [price:6.95 EUR] [inx:-]
 ->          ?              1  c                     [entrycode:TODO_12011 1a]

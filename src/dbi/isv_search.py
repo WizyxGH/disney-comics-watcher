@@ -145,20 +145,33 @@ def _extract_base_and_number(raw_title: str) -> tuple[str, str] | tuple[None, No
     return None, None
 
 
+_DB_HAS_ISSUESCOUNT: bool | None = None
+
+def _check_db_has_issuescount() -> bool:
+    global _DB_HAS_ISSUESCOUNT
+    if _DB_HAS_ISSUESCOUNT is None:
+        try:
+            info = query_db("PRAGMA table_info(inducks_publication)")
+            _DB_HAS_ISSUESCOUNT = any(row[1] == "issuescount" for row in (info or []))
+        except Exception:
+            _DB_HAS_ISSUESCOUNT = False
+    return _DB_HAS_ISSUESCOUNT
+
+
 def _load_country_pubs(country: str):
-    """Loads publications and issue counts for a country into memory."""
+    """Loads publications, alternative names, and issue counts for a country into memory."""
     if country in _CACHE_LOADED:
         return
     _CACHE_LOADED.add(country)
 
-    rows = query_db(
-        "SELECT publicationcode, title, issuescount "
-        "FROM inducks_publication "
-        "WHERE countrycode = ?",
-        (country,)
-    )
-    if not rows:
-        # Fallback for legacy DB schemas without issuescount column
+    if _check_db_has_issuescount():
+        rows = query_db(
+            "SELECT publicationcode, title, issuescount "
+            "FROM inducks_publication "
+            "WHERE countrycode = ?",
+            (country,)
+        )
+    else:
         rows = query_db(
             "SELECT p.publicationcode, p.title, COUNT(i.issuecode) "
             "FROM inducks_publication p "

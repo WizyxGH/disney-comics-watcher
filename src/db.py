@@ -67,10 +67,16 @@ def _get_local_connection():
     try:
         uri_path = f"file:{Path(local_db).as_posix()}?mode=ro"
         _LOCAL_CONN = sqlite3.connect(uri_path, uri=True, check_same_thread=False)
+        _LOCAL_CONN.execute("PRAGMA mmap_size = 268435456")
+        _LOCAL_CONN.execute("PRAGMA cache_size = -64000")
+        _LOCAL_CONN.execute("PRAGMA temp_store = MEMORY")
         return _LOCAL_CONN
     except Exception:
         try:
             _LOCAL_CONN = sqlite3.connect(local_db, check_same_thread=False)
+            _LOCAL_CONN.execute("PRAGMA mmap_size = 268435456")
+            _LOCAL_CONN.execute("PRAGMA cache_size = -64000")
+            _LOCAL_CONN.execute("PRAGMA temp_store = MEMORY")
             return _LOCAL_CONN
         except Exception as e:
             print(f"[LOCAL DB ERROR] Cannot open {local_db}: {e}")

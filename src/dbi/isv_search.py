@@ -83,6 +83,11 @@ CANONICAL_SERIES: dict[str, dict[str, str]] = {
         "mickey": "br/MIC",
         "tio patinhas": "br/TP",
         "pato donald": "br/DON",
+    },
+    "bg": {
+        "макрокомикс": "bg/MAC",
+        "мики маус": "bg/MM",
+        "доналд дак": "bg/DD",
     }
 }
 
@@ -173,6 +178,64 @@ def _load_country_pubs(country: str):
             _PUB_CACHE[country].append((str(pub_code), norm_title, clean_title, int(count or 0)))
 
 
+def _disambiguate_homonyms(candidates: list[tuple], num: str, country: str) -> str | None:
+    """When multiple publications share the same title, pick the one whose
+    numbering scheme matches the detected issue number.
+
+    For instance, Bulgarian 'Макрокомикс' maps to bg/MA (issues 1-30),
+    bg/MAC (issues 2025-01..2026-09, YYYY-MM format), and bg/MACRO (issues 1-4).
+    A number like '2026-10' clearly belongs to bg/MAC, not bg/MA.
+    """
+    top_score = candidates[0][0]
+    tied = [c for c in candidates if c[0] >= top_score - 10]
+    if len(tied) <= 1:
+        return None
+
+    is_year_month = bool(re.match(r'^\d{4}-\d{2}$', num))
+
+    if is_year_month:
+        # Prefer the publication that uses YYYY-MM issue numbering
+        for _, _, pub_code in tied:
+            sample = query_db(
+                "SELECT issuenumber FROM inducks_issue WHERE publicationcode = ? ORDER BY issuecode DESC LIMIT 1",
+                (pub_code,)
+            )
+            if sample and sample[0][0] and re.match(r'^\d{4}-\d{2}$', str(sample[0][0])):
+                return pub_code
+
+    # For plain numeric issues, prefer the publication with the closest max issue number
+    if num.isdigit():
+        target_num = int(num)
+        best_match = None
+        best_distance = float('inf')
+        for _, count, pub_code in tied:
+            max_issue = _get_max_numeric_issue(pub_code)
+            if max_issue > 0:
+                distance = abs(target_num - max_issue)
+                if distance < best_distance and target_num <= max_issue + 5:
+                    best_distance = distance
+                    best_match = pub_code
+        if best_match:
+            return best_match
+
+    return None
+
+
+_MAX_ISSUE_CACHE: dict[str, int] = {}
+
+def _get_max_numeric_issue(pub_code: str) -> int:
+    if pub_code in _MAX_ISSUE_CACHE:
+        return _MAX_ISSUE_CACHE[pub_code]
+    rows = query_db(
+        "SELECT MAX(CAST(issuenumber AS INTEGER)) FROM inducks_issue "
+        "WHERE publicationcode = ? AND issuenumber GLOB '[0-9]*'",
+        (pub_code,)
+    )
+    val = int(rows[0][0]) if rows and rows[0][0] is not None else 0
+    _MAX_ISSUE_CACHE[pub_code] = val
+    return val
+
+
 def search_publication_code(
     raw_title: str,
     country: str,
@@ -206,12 +269,17 @@ def search_publication_code(
         base = raw_title
     norm_base = _normalize(base)
 
-    # Normalize dates e.g. 05/2026 -> 2026-05
+    # Normalize dates e.g. 05/2026 -> 2026-05, or 10/26 -> 2026-10
     if num:
         m_date = re.match(r"^(\d{1,2})/(\d{4})$", num)
         if m_date:
             mm, yyyy = m_date.groups()
             num = f"{yyyy}-{mm.zfill(2)}"
+        else:
+            m_date2 = re.match(r"^(\d{1,2})/(\d{2})$", num)
+            if m_date2:
+                issue_part, yy = m_date2.groups()
+                num = f"20{yy}-{issue_part.zfill(2)}"
 
     # 2. Canonical mapping lookup (prioritizing longer matches first, pre-sorted)
     for norm_key, pub_code in _SORTED_CANONICAL.get(country, []):
@@ -234,7 +302,14 @@ def search_publication_code(
                 candidates.append((40, count, pub_code))
 
         if candidates:
-            # Sort by score descending, then by issue count descending
+            # When multiple publications share the same title (homonyms),
+            # disambiguate using the issue number format and recency.
+            if num and len(candidates) > 1:
+                best = _disambiguate_homonyms(candidates, num, country)
+                if best:
+                    return f"{best} {num}"
+
+            # Default: sort by score descending, then by issue count descending
             candidates.sort(reverse=True)
             best_pub = candidates[0][2]
             if num:

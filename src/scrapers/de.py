@@ -100,6 +100,8 @@ def discover_egmont_de():
                         cover = "https://www.egmont-shop.de" + cover.split('?')[0]
                     else:
                         cover = cover.split('?')[0]
+                    if any(ph in cover.lower() for ph in ('coverabbildung-nicht-verfugbar', 'nicht-verfuegbar', 'placeholder', 'coming_soon', 'coming-soon')):
+                        cover = None
                     
                 # Egmont cards do not easily expose dates in this view.
                 # If they are on the page, they are available now.
@@ -142,7 +144,8 @@ def fetch_egmont_de_details(url: str) -> dict:
             img_url = og['content']
             if '?' in img_url:
                 img_url = img_url.split('?')[0]
-            details['cover_url'] = img_url
+            if not any(ph in img_url.lower() for ph in ('coverabbildung-nicht-verfugbar', 'nicht-verfuegbar', 'placeholder', 'coming_soon', 'coming-soon')):
+                details['cover_url'] = img_url
             
         # Look for the script data state
         script = soup.find('script', attrs={'data-state': 'product-details-product', 'type': 'application/json'})

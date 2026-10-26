@@ -209,6 +209,17 @@ def get_issue_path_from_info(info: dict, pub_type: str) -> str:
     except Exception:
         return "unknown"
 
+def _is_placeholder_cover(url: str | None) -> bool:
+    """Returns True if the cover URL is a known placeholder / 'coming soon' image."""
+    if not url:
+        return True
+    url_lower = url.lower()
+    return any(p in url_lower for p in (
+        'placeholder/default/', 'placeholder_1.jpg', 'placeholder.jpg',
+        'coming-soon', 'coming_soon', 'comingsoon', 'no-image', 'no_image',
+        'coverabbildung-nicht-verfugbar',
+    ))
+
 def _dispatch_notification(
     info: dict,
     base_caption: str,
@@ -220,6 +231,10 @@ def _dispatch_notification(
 ):
     """Internal helper to dispatch the notification to the enabled backends,
     download the cover, and analyze it with Gemini."""
+    # Nullify placeholder / "coming soon" covers so they aren't sent
+    if _is_placeholder_cover(cover_url):
+        cover_url = None
+
 # Calculate the official cover_filename
     issue_path = get_issue_path_from_info(info, publication_type)
     issue_code = issue_path.split("/", 1)[-1] if "/" in issue_path else issue_path

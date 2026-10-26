@@ -46,6 +46,10 @@ def discover_bg():
                 if cover_url and not cover_url.startswith('http'):
                     cover_url = "https://egmontbulgaria.com" + cover_url
                     
+                # Upgrade thumbnail to full-resolution original
+                if cover_url and '/media/cache/small_product_image_thumb/' in cover_url:
+                    cover_url = cover_url.replace('/media/cache/small_product_image_thumb/', '/media/cache/product_original/')
+
                 result.append({
                     "id": id_elem,
                     "title": title,

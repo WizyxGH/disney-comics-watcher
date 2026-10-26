@@ -2,6 +2,26 @@ import re
 from bs4 import BeautifulSoup
 from src.utils import get_session
 
+_PANINI_PLACEHOLDER_PATTERNS = (
+    'placeholder/default/',
+    'placeholder_1.jpg',
+    'placeholder.jpg',
+    'coming-soon',
+    'coming_soon',
+    'comingsoon',
+    'no_selection',
+    'no-image',
+    'no_image',
+    'coverabbildung-nicht-verfugbar',
+)
+
+def _is_panini_placeholder(url: str) -> bool:
+    """Returns True if the cover URL is a generic placeholder / 'coming soon' image."""
+    if not url:
+        return True
+    url_lower = url.lower()
+    return any(pattern in url_lower for pattern in _PANINI_PLACEHOLDER_PATTERNS)
+
 PANINI_MONTHS = {
     # Italian
     "gen": 1, "gennaio": 1,
@@ -114,6 +134,18 @@ def discover_panini_magento(url: str, country_code: str) -> list[dict]:
             raw_date = date_elem.get_text(strip=True) if date_elem else None
             parsed_date = parse_panini_date(raw_date, country_code) if raw_date else None
             
+            # Detect Panini placeholder/coming-soon covers
+            if cover_url and _is_panini_placeholder(cover_url):
+                cover_url = None
+
+            # Strip Magento image-resize query params for higher resolution
+            if cover_url and '?' in cover_url and '/media/catalog/product/' in cover_url:
+                cover_url = cover_url.split('?')[0]
+
+            # Panini BR CloudFront: upgrade thumbnail to high-res
+            if cover_url and 'cloudfront.net/' in cover_url and '-S170-' in cover_url:
+                cover_url = cover_url.replace('-S170-', '-S1200-')
+
             result.append({
                 "id": sku,
                 "title": title,
@@ -148,7 +180,8 @@ def fetch_panini_magento_details(url: str, country_code: str = "IT") -> dict:
             # Remove query parameters to get the uncompressed image
             if '?' in img_url:
                 img_url = img_url.split('?')[0]
-            details['cover_url'] = img_url
+            if not _is_panini_placeholder(img_url):
+                details['cover_url'] = img_url
             
         # Fallback to Magento gallery script if og:image wasn't resolved/wanted
         if 'cover_url' not in details:
@@ -159,7 +192,8 @@ def fetch_panini_magento_details(url: str, country_code: str = "IT") -> dict:
                         img_url = m.group(1).replace(r'\/', '/')
                         if '?' in img_url:
                             img_url = img_url.split('?')[0]
-                        details['cover_url'] = img_url
+                        if not _is_panini_placeholder(img_url):
+                            details['cover_url'] = img_url
                         break
                         
         # Extract release date

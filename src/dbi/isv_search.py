@@ -36,7 +36,8 @@ CANONICAL_SERIES: dict[str, dict[str, str]] = {
         "disney mix speciale": "it/DMIX",
         "disney mix": "it/DMIX",
         "paperinik": "it/PK",
-        "paperino": "it/PA",
+        "paperino mese": "it/PM",
+        "paperino": "it/PM",
     },
     "de": {
         "micky maus comics": "de/MMC",
@@ -107,7 +108,7 @@ PANINI_SKU_MAP = {
     "1wspev": "it/SPEV",
     "1wgcd": "it/GCD",
     "1wpk": "it/PK",
-    "1wpap": "it/PA",
+    "1wpap": "it/PM",
 }
 
 # In-memory publication cache: {country: [(pub_code, norm_title, clean_title, issue_count)]}
@@ -169,10 +170,31 @@ def _load_country_pubs(country: str):
     if not rows:
         return
 
+    # Load alternative publication names from inducks_publicationname if available
+    alt_map: dict[str, list[str]] = {}
+    try:
+        alt_rows = query_db(
+            "SELECT pn.publicationcode, pn.publicationname "
+            "FROM inducks_publicationname pn "
+            "JOIN inducks_publication p ON pn.publicationcode = p.publicationcode "
+            "WHERE p.countrycode = ?",
+            (country,)
+        )
+        for pub_code, alt_name in (alt_rows or []):
+            if alt_name:
+                alt_map.setdefault(pub_code, []).append(alt_name)
+    except Exception:
+        pass
+
     _PUB_CACHE[country] = []
     for pub_code, title, count in rows:
-        if title:
-            norm_title = _normalize(title)
+        titles = [title] if title else []
+        for alt in alt_map.get(pub_code, []):
+            if alt not in titles:
+                titles.append(alt)
+
+        for t in titles:
+            norm_title = _normalize(t)
             # Remove text in parentheses for clean base matching: e.g. "Topolino (libretto)" -> "Topolino"
             clean_title = re.sub(r"\(.*?\)", "", norm_title).strip()
             _PUB_CACHE[country].append((str(pub_code), norm_title, clean_title, int(count or 0)))
@@ -203,7 +225,7 @@ def _disambiguate_homonyms(candidates: list[tuple], num: str, country: str) -> s
             if sample and sample[0][0] and re.match(r'^\d{4}-\d{2}$', str(sample[0][0])):
                 return pub_code
 
-    # For plain numeric issues, prefer the publication with the closest max issue number
+    # For plain numeric issues, prefer the publication with the closest max issue number (active continuation)
     if num.isdigit():
         target_num = int(num)
         best_match = None
@@ -212,7 +234,8 @@ def _disambiguate_homonyms(candidates: list[tuple], num: str, country: str) -> s
             max_issue = _get_max_numeric_issue(pub_code)
             if max_issue > 0:
                 distance = abs(target_num - max_issue)
-                if distance < best_distance and target_num <= max_issue + 5:
+                # Pick the series whose last published number is closest to target_num
+                if distance < best_distance:
                     best_distance = distance
                     best_match = pub_code
         if best_match:

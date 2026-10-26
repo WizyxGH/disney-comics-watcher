@@ -25,6 +25,10 @@ def build():
         title           TEXT,
         issuescount     INTEGER DEFAULT 0
     )""")
+    cur.execute("""CREATE TABLE inducks_publicationname (
+        publicationcode TEXT NOT NULL,
+        publicationname TEXT NOT NULL
+    )""")
     cur.execute("""CREATE TABLE inducks_issue (
         issuecode       TEXT PRIMARY KEY,
         publicationcode TEXT NOT NULL,
@@ -43,6 +47,17 @@ def build():
     cur.executemany("INSERT OR REPLACE INTO inducks_publication (publicationcode, countrycode, title) VALUES (?, ?, ?)", pubs)
     con.commit()
     print(f"  -> {len(pubs)} publications imported.")
+
+    print("Downloading inducks_publicationname.isv ...")
+    try:
+        r_pn = requests.get("https://inducks.org/inducks/isv/inducks_publicationname.isv", timeout=30)
+        lines_pn = [l.split("^") for l in r_pn.text.splitlines() if l.strip()]
+        pubnames = [(l[0], l[1]) for l in lines_pn[1:] if len(l) > 1]
+        cur.executemany("INSERT INTO inducks_publicationname VALUES (?, ?)", pubnames)
+        con.commit()
+        print(f"  -> {len(pubnames)} alternative publication names imported.")
+    except Exception as e:
+        print(f"  [warn] Failed to download inducks_publicationname.isv: {e}")
 
     print("Downloading inducks_issue.isv ...")
     r = requests.get("https://inducks.org/inducks/isv/inducks_issue.isv", timeout=90)
@@ -73,6 +88,8 @@ def build():
     cur.execute("CREATE INDEX idx_issue_pub   ON inducks_issue(publicationcode)")
     cur.execute("CREATE INDEX idx_issue_pub_num ON inducks_issue(publicationcode, issuenumber)")
     cur.execute("CREATE INDEX idx_issue_clean ON inducks_issue(LOWER(REPLACE(issuecode, ' ', '')))")
+    cur.execute("CREATE INDEX idx_pubname_code ON inducks_publicationname(publicationcode)")
+    cur.execute("CREATE INDEX idx_pubname_name ON inducks_publicationname(LOWER(publicationname))")
     con.commit()
     con.close()
 

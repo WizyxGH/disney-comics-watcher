@@ -55,15 +55,15 @@ def sort_dbi_file(dbi_path: str):
         # Remove any occurrence of "^^ Pre-index..." comment lines from the content
         content = re.sub(r'^\^\^\s*Pre-index.*?\n', '', content, flags=re.MULTILINE)
 
-        # Split blocks by "^^ Source:"
-        blocks = re.split(r'(?=\^\^ Source:)', content)
+        # Split blocks by h3 header or legacy "^^ Source:"
+        blocks = re.split(r'(?=\n?(?:^[A-Za-z0-9\-_/]+\s+h3\s|^->\s+h3\s|^\^\^ Source:))', content, flags=re.MULTILINE)
         cleaned_blocks = []
         for b in blocks:
             b_str = b.strip()
-            if b_str and "^^ Source:" in b_str:
-                # Remove trailing whitespace from each line in the block
-                lines = [line.rstrip() for line in b_str.split('\n')]
-                cleaned_blocks.append('\n'.join(lines))
+            lines = [line.rstrip() for line in b_str.split('\n') if not line.startswith('^^ Source:')]
+            cleaned_b = '\n'.join(lines).strip()
+            if cleaned_b and (' h3 ' in cleaned_b):
+                cleaned_blocks.append(cleaned_b)
 
         def parse_issue_code_from_block(block: str) -> str:
             for line in block.split('\n'):

@@ -169,13 +169,6 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         cover_line = f"{prefix}{suffix_str}".rstrip() + "\n"
         
         body_parts = []
-        
-        src_url = info.get("url") or info.get("link") or ""
-        if src_url:
-            body_parts.append(f"\n^^ Source: {src_url}\n")
-        else:
-            body_parts.append(f"\n^^ Source:\n")
-            
         body_parts.append(h3_line)
         body_parts.append(cover_line)
 

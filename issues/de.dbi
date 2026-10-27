@@ -1,64 +1,48 @@
-^^ Source:  https://www.egmont-shop.de/phineas-und-ferb-band-2/
 B 2          h3 Phineas und Ferb - Band 2 [price:14.99 EUR] [inx:-]
 B 2a        ?              1 c
 
-^^ Source:  https://www.egmont-shop.de/lustiges-taschenbuch-fubballgeschichten/
 DE_41167     h3 Lustiges Taschenbuch Fußballgeschichten [price:15.99 EUR] [inx:-]
 DE_41167a   ?              1 c
 
-^^ Source:  https://www.egmont-shop.de/entenhausener-weihnachtsklassiker/
 DE_41233     h3 Entenhausener Weihnachtsklassiker [price:35.00 EUR] [inx:-]
 DE_41233a   ?              1 c
 
-^^ Source:  https://www.egmont-shop.de/der-duck-clan-die-abenteuer-der-vorfahren/
 DE_41248     h3 Der Duck-Clan - Die Abenteuer der Vorfahren [price:35.00 EUR] [inx:-]
 DE_41248a   ?              1 c
 
-^^ Source:  https://www.egmont-shop.de/willkommen-in-gravity-falls-das-buch-bill/
 DE_41254     h3 Willkommen in Gravity Falls - Das Buch Bill [price:30.00 EUR] [inx:-]
 DE_41254a   ?              1 c
 
-^^ Source:  https://www.egmont-shop.de/robin-hood/
 DE_41256     h3 Robin Hood [price:14.99 EUR] [inx:-]
 DE_41256a   ?              1 c
 
-^^ Source:  https://www.egmont-shop.de/mickys-haus/
 DE_41304     h3 Mickys Haus [price:35.00 EUR] [inx:-]
 DE_41304a   ?              1 c
 
-^^ Source:  https://www.egmont-shop.de/disney-die-eiskonigin-nr-072026/
 DMN 7        h3 Disney Die Eiskönigin - Das Magazin Nr. 07/2026 [price:5.99 EUR] [inx:-]
 DMN 7a      ?              1 c
 
-^^ Source:  https://www.egmont-shop.de/entenhausen-edition-dagobert-nr-98/
 EDN 98       h3 Entenhausen-Edition Dagobert Nr. 98 [price:7.99 EUR] [inx:-]
 EDN 98a     ?              1 c
 
-^^ Source:  https://www.egmont-shop.de/entenhausener-ikonen-micky-maus-ii-heisses-pflaster-entenhausen/
 EIB 6        h3 Entenhausener Ikonen 06 - Micky Maus II - Heißes Pflaster Entenhausen [price:39.00 EUR] [inx:-]
 EIB 6a      ?              1 c
 
-^^ Source:  https://www.egmont-shop.de/entenhausener-ikonen-07/
 EIB 7        h3 Entenhausener Ikonen 07 - Donald Duck III - Der Held der Arbeit [price:39.00 EUR] [inx:-]
 EIB 7a      ?              1 c
 
-^^ Source:  https://www.egmont-shop.de/entenhausener-ikonen-08/
 EIB 8        h3 Entenhausener Ikonen 08 - Onkel Dagobert III - Der Stolz von Entenhausen [price:39.00 EUR] [inx:-]
 EIB 8a      ?              1 c
 
-^^ Source:  https://www.egmont-shop.de/enthologien-68-zappenduster-nachts-in-entenhausen/
 ENT 68       h3 Enthologien 68 - Zappenduster - Nachts in Entenhausen [price:20.00 EUR] [inx:-]
 ENT 68a     ?              1 c
 
-^^ Source:  https://www.egmont-shop.de/enthologien-69---skandal---duck-dir-deine-meinung/
 ENT 69       h3 Enthologien 69 - SKANDAL! - Duck dir deine Meinung [price:20.00 EUR] [inx:-]
 ENT 69a     ?              1 c
 
-^^ Source:  https://www.egmont-shop.de/enthologien-70-dr-duck-entensivstation/
 ENT 70       h3 Enthologien 70 - Dr. Duck - ENTEnsivstation [price:20.00 EUR] [inx:-]
 ENT 70a     ?              1 c
 
-^^ Source:  https://lustiges-taschenbuch.de
 LTB 613      h3 Strandgetümmel [issdate:2026-07-28] [price:7.99 EUR] [pages:256] [inx:FGK,-]
 LTB 613a    ?              1 c
 LTB 613p005 D 2025-078     21                       Das All-Inclusive-Urlaubs-Abenteuer
@@ -71,7 +55,6 @@ LTB 613p163 I TL 3651-4    14                       Unsere kleine Chaosfarm
 LTB 613p177 I TL 3642-4    28                       Der Pechbringer
 LTB 613p205 I TL 3644-2    52                       Das Viertel im Visier
 
-^^ Source: https://www.lustiges-taschenbuch.de/ausgaben/nebenreihen/LTB-Europareise/Band-7
 LTBER 7      h3 Osteuropa [issdate:2026-10-27] [price:8.99 EUR] [pages:316] [inx:FGK,-]
 LTBER 7a    ?              1 c
 LTBER 7p005 978DPW800027  25                        Die Suche nach dem Glück
@@ -86,7 +69,6 @@ LTBER 7p227 I TL 2879-3   17                        Spezialität des Hauses
 LTBER 7p244 I TL 3379-01   1                        König des Chaos: Gegenschlag
 LTBER 7p245 I TL 2945-1P  72                        Graf Pantula
 
-^^ Source: https://www.lustiges-taschenbuch.de/ausgaben/nebenreihen/LTB-Phantomias-Collection/Band-6
 LTBPC 6      h3 LTB Phantomias Collection 6 [issdate:2026-10-27] [price:10.99 EUR] [pages:623] [inx:FGK,-]
 LTBPC 6a    ?              1 c
 LTBPC 6p005 I TL 1832-C   45                        Der Schmutzgeier schlägt zu
@@ -108,35 +90,61 @@ LTBPC 6p517 I PK   27-1   40                        Das weiße Schaf der Familie
 LTBPC 6p557 I PK   30-1   33                        Phantomias enttarnt?
 LTBPC 6p590 I TL 1733-C   34                        Fieses Fußballchaos
 
-^^ Source:  https://www.egmont-shop.de/lustiges-taschenbuch-weihnachtsgeschichten-13/
 LTBWE 13     h3 Lustiges Taschenbuch Weihnachtsgeschichten 13 [price:15.99 EUR] [inx:-]
 LTBWE 13a   ?              1 c
 
-^^ Source:  https://www.egmont-shop.de/micky-maus-magazin-nr-092026/
 MM 09        h3 Micky Maus Magazin Nr. 09/2026 [price:4.99 EUR] [inx:-]
 MM 09a      ?              1 c
 
-^^ Source:  https://www.egmont-shop.de/micky-maus-comics-nr-104/
 MMCN 104     h3 Micky Maus Comics Nr. 104 [price:4.99 EUR] [inx:-]
 MMCN 104a   ?              1  c
 
-^^ Source:  https://www.egmont-shop.de/micky-maus-legacy-collection-nr-1-4-deluxe-box/
 MMLC 1       h3 Micky Maus Legacy Collection Nr. 1-4 + Deluxe Box [price:66.99 EUR] [inx:-]
 MMLC 1a     ?              1 c
 
-^^ Source:  https://www.egmont-shop.de/micky-maus-legacy-collection-nr-02/
 MMLC 02      h3 Micky Maus Legacy Collection Nr. 02 [price:12.99 EUR] [inx:-]
 MMLC 02a    ?              1 c
 
-^^ Source:  https://www.egmont-shop.de/micky-maus-legacy-collection-nr-03/
 MMLC 03      h3 Micky Maus Legacy Collection Nr. 03 [price:12.99 EUR] [inx:-]
 MMLC 03a    ?              1 c
 
-^^ Source:  https://www.egmont-shop.de/micky-maus-legacy-collection-nr-04/
 MMLC 04      h3 Micky Maus Legacy Collection Nr. 04 [price:12.99 EUR] [inx:-]
 MMLC 04a    ?              1 c
 
-^^ Source:  https://www.egmont-shop.de/disney-die-eiskonigin-spezial-nr-032026/
 NSN 3        h3 Disney Die Eiskönigin Spezial Nr. 03/2026 [price:5.99 EUR] [inx:-]
 NSN 3a      ?              1 c
+LTBER 7      h3 Osteuropa [issdate:2026-10-27] [price:8.99 EUR] [pages:316] [inx:FGK,-]
+LTBER 7a    ?              1 c
+LTBER 7p005 978DPW800027  25                        Die Suche nach dem Glück
+LTBER 7p030 I TL 3011-01   1                        Dumm gelaufen
+LTBER 7p031 I TL 2439-2   28                        Alles auf den Kopf gestellt
+LTBER 7p059 I TL 3556-1P  44                        Die Nebel von Meyrink
+LTBER 7p103 I TL 1356-A   34                        Die transsilvanische Truhe
+LTBER 7p137 I TL 2006-4   26                        Der Traum der Alchemisten
+LTBER 7p163 I GM   25-1   28                        Das Lehmmonster
+LTBER 7p191 D 98387       36                        Das Erbe der Dragoofs
+LTBER 7p227 I TL 2879-3   17                        Spezialität des Hauses
+LTBER 7p244 I TL 3379-01   1                        König des Chaos: Gegenschlag
+LTBER 7p245 I TL 2945-1P  72                        Graf Pantula
+
+LTBPC 6      h3 LTB Phantomias Collection 6 [issdate:2026-10-27] [price:10.99 EUR] [pages:623] [inx:FGK,-]
+LTBPC 6a    ?              1 c
+LTBPC 6p005 I TL 1832-C   45                        Der Schmutzgeier schlägt zu
+LTBPC 6p050 I TL 1855-A   29                        Auge in Auge mit Spectaculus
+LTBPC 6p079 I TL 1868-C   29                        Unerwünschte Helfer
+LTBPC 6p108 I TL 1903-A   17                        So gut wie neu
+LTBPC 6p125 I TL 1956-A   43                        Phantomias auf Abwegen?
+LTBPC 6p168 I TL 1970-A   30                        Albträume aus der Traumfabrik
+LTBPC 6p198 I TL 2020-4   26                        Ein Superheld macht Urlaub
+LTBPC 6p224 I PK   22-1   26                        Was für ein toller Hecht
+LTBPC 6p250 I PK   24-2   30                        Im Blitzlichtgewitter
+LTBPC 6p280 I AT  332-A   34                        Diva in Not
+LTBPC 6p314 I TL 1864-B   53                        Der Schmutzgeier ist wieder da!
+LTBPC 6p367 I TL 1964-B   30                        Spectaculus schlägt wieder zu
+LTBPC 6p397 I TL 2015-4   27                        Phantomias auf Freiersfüßen? - Ein Eifersuchtsdrama
+LTBPC 6p424 I PK   18-1   35                        Räuber & Gendarm
+LTBPC 6p459 I PK   21-1   58                        Klein, aber oho!
+LTBPC 6p517 I PK   27-1   40                        Das weiße Schaf der Familie
+LTBPC 6p557 I PK   30-1   33                        Phantomias enttarnt?
+LTBPC 6p590 I TL 1733-C   34                        Fieses Fußballchaos
 

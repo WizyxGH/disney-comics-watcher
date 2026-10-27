@@ -40,15 +40,15 @@ def cleanup_indexed_issues(dbi_paths: list[str]):
             with open(path, "r", encoding="utf-8") as f:
                 content = f.read()
             content = re.sub(r'^\^\^\s*Pre-index.*?\n', '', content, flags=re.MULTILINE)
-            blocks = re.split(r'(?=\^\^ Source:)', content)
+            blocks = re.split(r'(?=\n?(?:^[A-Za-z0-9\-_/]+\s+h3\s|^->\s+h3\s|^\^\^ Source:))', content, flags=re.MULTILINE)
             
             country_prefix = os.path.basename(path).replace(".dbi", "").lower()
             parsed_blocks = []
             for b in blocks:
                 b_str = b.strip()
-                if b_str and "^^ Source:" in b_str:
-                    lines = [line.rstrip() for line in b_str.split('\n')]
-                    cleaned_block = '\n'.join(lines)
+                lines = [line.rstrip() for line in b_str.split('\n') if not line.startswith('^^ Source:')]
+                cleaned_block = '\n'.join(lines).strip()
+                if cleaned_block and (' h3 ' in cleaned_block):
                     code = parse_issue_code_from_block(cleaned_block)
                     if code:
                         clean_code = code.replace(" ", "").replace("_", "").lower()

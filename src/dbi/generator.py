@@ -118,15 +118,16 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         fields_str = " ".join(fields)
         title_part = f"{name} {fields_str}".strip()
 
-        h3_line = f"{issue_code_field}  h3 {title_part}\n"
+        # Bolderbast DBI spec: 'h' must be exactly on position 14
+        h3_line = f"{issue_code_field} h3 {title_part}\n"
 
         cover_ec = dbi_issue_code + "a"
         storycode = info.get("cover_code") or "?"
         
-        storycode_field = storycode[:14].ljust(14)
-        pages_field     = " " + "1".rjust(4)
+        storycode_field = storycode[:12].ljust(12)
+        pages_field     = "1".rjust(4)
         brokpg          = " "
-        pagel           = "c "
+        pagel           = "c"
         
         plot_val, writ_val, art_val, ink_val, hero_val = "", "", "", "", ""
 
@@ -138,13 +139,17 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         if dbi_issue_code.startswith("JM "):
             writ_val, art_val = "FPt", "FPt"
 
-        rest = plot_val.ljust(4) + writ_val.ljust(4) + art_val.ljust(4) + ink_val.ljust(4) + hero_val.ljust(1)
-        rest = rest[:17].ljust(17)
+        c_plot = plot_val[:4].ljust(4)
+        c_writ = writ_val[:4].ljust(4)
+        c_art  = art_val[:4].ljust(4)
+        c_ink  = ink_val[:4].ljust(4)
+        c_hero = hero_val[:2].ljust(2)
+        credits_field = f"  {c_plot}{c_writ}{c_art}{c_ink}{c_hero}  "
 
         if len(cover_ec) <= 12:
-            prefix = f"{cover_ec.ljust(12)}{storycode_field}{pages_field}{brokpg}{pagel}{rest}"
+            prefix = f"{cover_ec.ljust(12)}{storycode_field}{pages_field}{brokpg}{pagel}{credits_field}"
         else:
-            prefix = f"->          {storycode_field}{pages_field}{brokpg}{pagel}{rest}"
+            prefix = f"->          {storycode_field}{pages_field}{brokpg}{pagel}{credits_field}"
 
         cover_title = info.get("cover_title") or ""
         suffixes = []
@@ -203,20 +208,28 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
                 else:
                     story_ec = f"{dbi_issue_code}{chr(97 + i)}"
                 
-                story_code = story.get("story_code", "") or story.get("code", "")
-                
-                pages_str = str(story.get("pages", "")).strip()
-                st_pages_block = " " + pages_str.rjust(4)
-                    
+                story_code = (story.get("story_code", "") or story.get("code", ""))[:12].ljust(12)
+                pages_str = str(story.get("pages", "")).strip()[:4].rjust(4)
                 brokpg = " "
-                pagel = "  "
+                pagel = " "
                 
-                story_rest = " " * 17
+                c_hero = ""
+                if story.get("characters"):
+                    for c in story["characters"]:
+                        if c.get("code"):
+                            c_hero = c["code"]
+                            break
+                c_hero = (story.get("hero") or c_hero)[:2].ljust(2)
+                c_plot = str(story.get("plot", ""))[:4].ljust(4)
+                c_writ = str(story.get("writ", ""))[:4].ljust(4)
+                c_art  = str(story.get("art", ""))[:4].ljust(4)
+                c_ink  = str(story.get("ink", ""))[:4].ljust(4)
+                st_credits = f"  {c_plot}{c_writ}{c_art}{c_ink}{c_hero}  "
                 
                 if len(story_ec) <= 12:
-                    st_prefix = f"{story_ec.ljust(12)}{story_code.ljust(14)}{st_pages_block}{brokpg}{pagel}{story_rest}"
+                    st_prefix = f"{story_ec.ljust(12)}{story_code}{pages_str}{brokpg}{pagel}{st_credits}"
                 else:
-                    st_prefix = f"->          {story_code.ljust(14)}{st_pages_block}{brokpg}{pagel}{story_rest}"
+                    st_prefix = f"->          {story_code}{pages_str}{brokpg}{pagel}{st_credits}"
 
                 st_title = _sanitize_bolderbast(story.get("title", "").strip())
                 st_suffixes = []

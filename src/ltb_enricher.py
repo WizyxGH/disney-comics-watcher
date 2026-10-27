@@ -53,17 +53,18 @@ def _parse_issue_title(soup) -> str | None:
 
 
 def _parse_issue_date(soup) -> str | None:
-    """Extract the issue publication date from the time tag."""
-    time_tag = soup.find('time', class_='datetime')
-    if time_tag and time_tag.has_attr('datetime'):
-        # Format is '2026-07-28T12:00:00Z', we just want '2026-07-28'
-        m = re.match(r'(\d{4}-\d{2}-\d{2})', time_tag['datetime'])
-        if m:
-            # We can format it as 'DD/MM/YYYY' so the generator understands it,
-            # or the generator will handle YYYY-MM-DD.
-            # Generator uses parse_date_fr which handles DD/MM/YYYY.
-            y, m_str, d = m.group(1).split('-')
-            return f"{d}/{m_str}/{y}"
+    """Extract the issue publication date from the aside/metadata time tag."""
+    aside = soup.find('aside')
+    candidates = aside.find_all('time') if aside else []
+    if not candidates:
+        candidates = [t for t in soup.find_all('time') if not t.find_parent('div', class_='accordion-content')]
+    if candidates:
+        time_tag = candidates[-1]
+        if time_tag.has_attr('datetime'):
+            m = re.match(r'(\d{4}-\d{2}-\d{2})', time_tag['datetime'])
+            if m:
+                y, m_str, d = m.group(1).split('-')
+                return f"{d}/{m_str}/{y}"
     return None
 
 def _parse_stories(html: str) -> tuple[str | None, str | None, list[dict]]:

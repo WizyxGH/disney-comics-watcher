@@ -71,48 +71,46 @@ LTB 613p163 I TL 3651-4    14                       Unsere kleine Chaosfarm
 LTB 613p177 I TL 3642-4    28                       Der Pechbringer
 LTB 613p205 I TL 3644-2    52                       Das Viertel im Visier
 
-^^ Source:  https://www.lustiges-taschenbuch.de/ausgaben/nebenreihen/LTB-Mystery/Band-4
-LTBMY 4      h3 Die mysteriösesten Fälle von Entenhausen 4 [issdate:2026-07-14] [inx:FGK,-]
-LTBMY 4a    ?              1 c
-LTBMY 4p005 I TL 2122-5      30                       Die Jagd auf das Sumpfmonster
-LTBMY 4p035 I TL 2328-3      11                       Überraschungsgäste
-LTBMY 4p046 I TL 2304-02      1                       Das Zauberbuch
-LTBMY 4p047 I TL 3578-1P    151                       Die verborgene Insel
-LTBMY 4p077 I TL 2524-2      20                       Invasion der Puschelmonster
-LTBMY 4p125 I TL 1905-A      52                       Die Rätselhaften Zwillingsvölker
-LTBMY 4p207 W DD  175-01     13                       Onkel Donald und das Geheimnis der Pyramide
-LTBMY 4p251 I TL 2413-3       4                       Doktor Goofylls Trank
-LTBMY 4p255 D 2010-124       30                       Ich werd zum Hirsch!
+^^ Source: https://www.lustiges-taschenbuch.de/ausgaben/nebenreihen/LTB-Europareise/Band-7
+LTBER 7      h3 Osteuropa [issdate:2026-10-27] [price:8.99 EUR] [pages:316] [inx:FGK,-]
+LTBER 7a    ?              1 c
+LTBER 7p005 978DPW800027  25                        Die Suche nach dem Glück
+LTBER 7p030 I TL 3011-01   1                        Dumm gelaufen
+LTBER 7p031 I TL 2439-2   28                        Alles auf den Kopf gestellt
+LTBER 7p059 I TL 3556-1P  44                        Die Nebel von Meyrink
+LTBER 7p103 I TL 1356-A   34                        Die transsilvanische Truhe
+LTBER 7p137 I TL 2006-4   26                        Der Traum der Alchemisten
+LTBER 7p163 I GM   25-1   28                        Das Lehmmonster
+LTBER 7p191 D 98387       36                        Das Erbe der Dragoofs
+LTBER 7p227 I TL 2879-3   17                        Spezialität des Hauses
+LTBER 7p244 I TL 3379-01   1                        König des Chaos: Gegenschlag
+LTBER 7p245 I TL 2945-1P  72                        Graf Pantula
 
-^^ Source:  https://www.lustiges-taschenbuch.de/ausgaben/nebenreihen/spezial/band-131
-LTBSP 131    h3 Einfach tierisch [issdate:2007-03-13] [pages:256] [inx:FGK,-]
-LTBSP 131a  ?              1 c
-->          I TL 2676-2    20                       Die Herausforderung [entrycode:LTBSP 131p001]
-->          I TL  787-A    32                       Die Panzerknacker-Safari [entrycode:LTBSP 131p021]
-->          I TL 2325-3    12                       Walpurga, der Wuchtwaran [entrycode:LTBSP 131p053]
-->          I TL 1792-A    31                       Wilderer im Dschungel [entrycode:LTBSP 131p065]
-->          D  6126        23                       Die Straußeninsel-Safari [entrycode:LTBSP 131p096]
-->          I TL  917-B    19                       Die Stunde des Assistenten [entrycode:LTBSP 131p119]
-->          I TL 2538-03    1                       Das Leben ist ein Abenteuer: Blinde Passagiere [entrycode:LTBSP 131p138]
-->          I TL 1158-A    34                       Die Jagd nach dem Phönix [entrycode:LTBSP 131p139]
-->          I TL  190-AP   58                       Die Insel der betrübten Affen [entrycode:LTBSP 131p173]
-->          I TL 1175-A    34                       Gorilla mit Heimweh [entrycode:LTBSP 131p231]
-->          D 2004-257     33                       Das geheime Tal der Elefanten [entrycode:LTBSP 131p265]
-->          I TL 2609-02    1                       Dussels Dienste: Der Fernsehtechniker [entrycode:LTBSP 131p298]
-->          I TL 1200-A    37                       Tarzonald und das Molken-Per [entrycode:LTBSP 131p299]
-->          I TL 2839-1P   61                       Tutors Welt [entrycode:LTBSP 131p336]
-->          S 75090        10                       Die Foto-Safari [entrycode:LTBSP 131p397]
-->          S 76121        16                       Ein Bär hat's schwer [entrycode:LTBSP 131p407]
-->          D 96258        31                       Der Herr des Dschungels [entrycode:LTBSP 131p423]
-LTBSP 131s  D 95208        -201                       Heiße Tage in Afrika
+^^ Source: https://www.lustiges-taschenbuch.de/ausgaben/nebenreihen/LTB-Phantomias-Collection/Band-6
+LTBPC 6      h3 LTB Phantomias Collection 6 [issdate:2026-10-27] [price:10.99 EUR] [pages:623] [inx:FGK,-]
+LTBPC 6a    ?              1 c
+LTBPC 6p005 I TL 1832-C   45                        Der Schmutzgeier schlägt zu
+LTBPC 6p050 I TL 1855-A   29                        Auge in Auge mit Spectaculus
+LTBPC 6p079 I TL 1868-C   29                        Unerwünschte Helfer
+LTBPC 6p108 I TL 1903-A   17                        So gut wie neu
+LTBPC 6p125 I TL 1956-A   43                        Phantomias auf Abwegen?
+LTBPC 6p168 I TL 1970-A   30                        Albträume aus der Traumfabrik
+LTBPC 6p198 I TL 2020-4   26                        Ein Superheld macht Urlaub
+LTBPC 6p224 I PK   22-1   26                        Was für ein toller Hecht
+LTBPC 6p250 I PK   24-2   30                        Im Blitzlichtgewitter
+LTBPC 6p280 I AT  332-A   34                        Diva in Not
+LTBPC 6p314 I TL 1864-B   53                        Der Schmutzgeier ist wieder da!
+LTBPC 6p367 I TL 1964-B   30                        Spectaculus schlägt wieder zu
+LTBPC 6p397 I TL 2015-4   27                        Phantomias auf Freiersfüßen? - Ein Eifersuchtsdrama
+LTBPC 6p424 I PK   18-1   35                        Räuber & Gendarm
+LTBPC 6p459 I PK   21-1   58                        Klein, aber oho!
+LTBPC 6p517 I PK   27-1   40                        Das weiße Schaf der Familie
+LTBPC 6p557 I PK   30-1   33                        Phantomias enttarnt?
+LTBPC 6p590 I TL 1733-C   34                        Fieses Fußballchaos
 
 ^^ Source:  https://www.egmont-shop.de/lustiges-taschenbuch-weihnachtsgeschichten-13/
 LTBWE 13     h3 Lustiges Taschenbuch Weihnachtsgeschichten 13 [price:15.99 EUR] [inx:-]
 LTBWE 13a   ?              1 c
-
-^^ Source:  https://www.egmont-shop.de/lustiges-taschenbuch-young-comics-nr-22/
-LTBYC 22     h3 Lustiges Taschenbuch Young Comics Nr. 22 [price:8.99 EUR] [inx:-]
-LTBYC 22a   ?              1 c
 
 ^^ Source:  https://www.egmont-shop.de/micky-maus-magazin-nr-092026/
 MM 09        h3 Micky Maus Magazin Nr. 09/2026 [price:4.99 EUR] [inx:-]

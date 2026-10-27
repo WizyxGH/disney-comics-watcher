@@ -59,13 +59,18 @@ def send_telegram(photo_url: str | None, caption: str, buttons: list | None = No
     Returns the Telegram message_id (int) if successful, None otherwise."""
     delay = 2
     reply_markup = {"inline_keyboard": buttons} if buttons else None
+
+    # Telegram sendPhoto caption limit is 1024 characters. Fall back to sendMessage if exceeded.
+    if photo_url and len(caption) > 1024:
+        photo_url = None
+
     for attempt in range(retries):
         try:
             if photo_url:
                 payload = {
                     "chat_id":    chat_id,
                     "photo":      photo_url,
-                    "caption":    caption,
+                    "caption":    caption[:1024],
                     "parse_mode": "HTML",
                 }
                 if message_thread_id:
@@ -73,12 +78,12 @@ def send_telegram(photo_url: str | None, caption: str, buttons: list | None = No
                 if reply_markup:
                     payload["reply_markup"] = reply_markup
                 resp = _tg_session.post(f"{TELEGRAM_API}/sendPhoto", json=payload, timeout=15)
-                # Text fallback if image is inaccessible
+                # Text fallback if image is inaccessible or caption is too long
                 if resp.status_code == 400:
                      print(f"  [debug] Telegram 400 error: {resp.text}")
                      desc = resp.json().get("description", "").lower()
-                     if any(k in desc for k in ("photo", "wrong url", "failed to get", "url", "web page content")):
-                        print(f"  [warn] Photo inaccessible -> fallback to text")
+                     if any(k in desc for k in ("photo", "wrong url", "failed to get", "url", "web page content", "caption is too long", "caption too long")):
+                        print(f"  [warn] Photo/caption issue ({desc}) -> fallback to text")
                         photo_url = None
                         continue
             else:
@@ -259,8 +264,11 @@ def _dispatch_notification(
     # 1. Truncate summary if necessary
     if summary:
         available = 1024 - len(base_caption) - 40
-        truncated = truncate_summary(summary, max_len=max(50, available))
-        caption = base_caption + f"\n\n<i>{html_lib.escape(truncated)}</i>"
+        if available > 50:
+            truncated = truncate_summary(summary, max_len=available)
+            caption = base_caption + f"\n\n<i>{html_lib.escape(truncated)}</i>"
+        else:
+            caption = base_caption
     else:
         caption = base_caption
 
@@ -363,7 +371,8 @@ def _dispatch_notification(
                 dm_buttons = [[{"text": "Upload Scan", "url": upload_url}]]
 
             if "telegram" in NOTIFY_BACKENDS and admin_id:
-                send_telegram(photo_url=cover_url, caption=dm_text, chat_id=admin_id, buttons=dm_buttons)
+                # Send DBI skeleton as formatted pre text to avoid caption length limit
+                send_telegram(photo_url=cover_url if len(dm_text) <= 1024 else None, caption=dm_text, chat_id=admin_id, buttons=dm_buttons)
 
             if "discord" in NOTIFY_BACKENDS and DISCORD_ADMIN_WEBHOOK_URL:
                 dm_description = html_to_markdown(dm_text)

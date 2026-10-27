@@ -109,14 +109,14 @@ def is_fully_indexed_in_inducks(issue_code: str) -> bool:
     try:
         from src.db import query_db
         clean_code = issue_code.replace(" ", "").lower()
-        res = query_db("SELECT fullyindexed FROM inducks_issue WHERE LOWER(REPLACE(issuecode, ' ', '')) = ?", (clean_code,))
+        res = query_db("SELECT fullyindexed FROM inducks_issue WHERE LOWER(REPLACE(issuecode, ' ', '')) IN (?, ?, ?) ORDER BY fullyindexed DESC", (clean_code, f"{clean_code}a", f"{clean_code}1"))
         if res and len(res) > 0:
             return res[0][0] == 'Y'
             
         # Fallback for double issues (e.g. fr/JM 3864-65 -> check fr/JM 3864)
         if '-' in clean_code:
             first_part = clean_code.split('-')[0]
-            res = query_db("SELECT fullyindexed FROM inducks_issue WHERE LOWER(REPLACE(issuecode, ' ', '')) = ?", (first_part,))
+            res = query_db("SELECT fullyindexed FROM inducks_issue WHERE LOWER(REPLACE(issuecode, ' ', '')) IN (?, ?, ?) ORDER BY fullyindexed DESC", (first_part, f"{first_part}a", f"{first_part}1"))
             if res and len(res) > 0:
                 return res[0][0] == 'Y'
     except Exception as e:
@@ -133,13 +133,13 @@ def does_issue_exist_in_inducks(issue_code: str) -> bool:
     try:
         from src.db import query_db
         clean_code = issue_code.replace(" ", "").lower()
-        res = query_db("SELECT 1 FROM inducks_issue WHERE LOWER(REPLACE(issuecode, ' ', '')) = ?", (clean_code,))
+        res = query_db("SELECT 1 FROM inducks_issue WHERE LOWER(REPLACE(issuecode, ' ', '')) IN (?, ?, ?) LIMIT 1", (clean_code, f"{clean_code}a", f"{clean_code}1"))
         if res and len(res) > 0:
             return True
             
         if '-' in clean_code:
             first_part = clean_code.split('-')[0]
-            res = query_db("SELECT 1 FROM inducks_issue WHERE LOWER(REPLACE(issuecode, ' ', '')) = ?", (first_part,))
+            res = query_db("SELECT 1 FROM inducks_issue WHERE LOWER(REPLACE(issuecode, ' ', '')) IN (?, ?, ?) LIMIT 1", (first_part, f"{first_part}a", f"{first_part}1"))
             if res and len(res) > 0:
                 return True
     except Exception as e:

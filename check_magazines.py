@@ -104,9 +104,12 @@ def _process_provider_books(
                     book.update(fetch_details_func(book["url"]))
 
                 if current is None and target_status == "released":
-                    # A new item that is already out is only news for providers
-                    # listing actual releases; elsewhere it is backlog.
-                    silent = first_run or default_status != "released"
+                    # A new item that is already out is news for providers listing releases,
+                    # OR if it carries a recent release date (within STALE_RELEASE_DAYS).
+                    # Otherwise it is old backlog.
+                    released_on = _release_date(book)
+                    is_recent = bool(released_on and 0 <= (today - released_on).days <= STALE_RELEASE_DAYS)
+                    silent = first_run or (default_status != "released" and not is_recent)
                 else:
                     silent = first_run
 
@@ -182,7 +185,7 @@ def main():
         ("Marvel", MARVEL_KEY_PREFIX, discover_marvel, "us", "announced", None, False),
         ("Dynamite", DYNAMITE_KEY_PREFIX, discover_dynamite, "us", "announced", fetch_dynamite_details, False),
         ("Egmont DE", EGMONT_DE_KEY_PREFIX, discover_egmont_de, "de", "released", fetch_egmont_de_details, False),
-        ("LTB DE", LTB_DE_KEY_PREFIX, discover_lustiges_taschenbuch_de, "de", "announced", fetch_lustiges_taschenbuch_de_details, False),
+        ("LTB DE", LTB_DE_KEY_PREFIX, discover_lustiges_taschenbuch_de, "de", "released", fetch_lustiges_taschenbuch_de_details, False),
         ("Kathimerini GR", KATHIMERINI_KEY_PREFIX, discover_kathimerini, "gr", "released", None, False),
         ("Panini IT", PANINI_IT_KEY_PREFIX, discover_panini_it, "it", "announced", fetch_panini_it_details, False),
         ("Panini BR", PANINI_BR_KEY_PREFIX, discover_panini_br, "br", "announced", fetch_panini_br_details, False),

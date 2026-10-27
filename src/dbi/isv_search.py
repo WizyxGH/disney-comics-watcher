@@ -43,9 +43,66 @@ CANONICAL_SERIES: dict[str, dict[str, str]] = {
         "micky maus comics": "de/MMC",
         "micky maus magazin": "de/MM",
         "micky maus": "de/MM",
+        "lustiges taschenbuch europareise": "de/LTBER",
+        "ltb europareise": "de/LTBER",
+        "europareise": "de/LTBER",
+        "lustiges taschenbuch phantomias collection": "de/LTBPC",
+        "ltb phantomias collection": "de/LTBPC",
+        "phantomias collection": "de/LTBPC",
+        "lustiges taschenbuch ultimate phantomias": "de/LTBUP",
+        "ltb ultimate phantomias": "de/LTBUP",
+        "ultimate phantomias": "de/LTBUP",
+        "lustiges taschenbuch classic edition": "de/LTBCE",
+        "ltb classic edition": "de/LTBCE",
+        "lustiges taschenbuch crime": "de/LTBCR",
+        "ltb crime": "de/LTBCR",
+        "lustiges taschenbuch premium plus": "de/LTBPRP",
+        "ltb premium plus": "de/LTBPRP",
+        "lustiges taschenbuch premium": "de/LTBPR",
+        "ltb premium": "de/LTBPR",
+        "lustiges taschenbuch abenteuer": "de/LTBAT",
+        "ltb abenteuer": "de/LTBAT",
+        "lustiges taschenbuch history": "de/LTBHI",
+        "ltb history": "de/LTBHI",
+        "lustiges taschenbuch galaxy": "de/LTBGA",
+        "ltb galaxy": "de/LTBGA",
+        "lustiges taschenbuch fantasy": "de/LTBFY",
+        "ltb fantasy": "de/LTBFY",
+        "lustiges taschenbuch enten edition": "de/LTBE",
+        "ltb enten edition": "de/LTBE",
+        "enten edition": "de/LTBE",
+        "lustiges taschenbuch maus edition": "de/LTBM",
+        "ltb maus edition": "de/LTBM",
+        "maus edition": "de/LTBM",
+        "lustiges taschenbuch sonderedition": "de/LTBSE",
+        "ltb sonderedition": "de/LTBSE",
+        "lustiges taschenbuch extra": "de/LTBX",
+        "ltb extra": "de/LTBX",
         "lustiges taschenbuch young comics": "de/LTBYC",
+        "ltb young comics": "de/LTBYC",
         "lustiges taschenbuch sonderband": "de/LTBSP",
         "lustiges taschenbuch spezial": "de/LTBSP",
+        "ltb spezial": "de/LTBSP",
+        "lustiges taschenbuch sonderband freizeit": "de/LTBBA",
+        "lustiges taschenbuch camping": "de/LTBBA",
+        "ltb camping": "de/LTBBA",
+        "lustiges taschenbuch sonderband weihnachten": "de/LTBSB",
+        "lustiges taschenbuch weihnachtsgeschichten": "de/LTBSB",
+        "ltb weihnachten": "de/LTBSB",
+        "lustiges taschenbuch sonderband winter": "de/LTBW",
+        "ltb winter": "de/LTBW",
+        "lustiges taschenbuch sonderband ostern": "de/LTBOS",
+        "ltb ostern": "de/LTBOS",
+        "lustiges taschenbuch sonderband halloween": "de/LTBHA",
+        "ltb halloween": "de/LTBHA",
+        "lustiges taschenbuch sonderband sommer": "de/LTBSO",
+        "ltb sommer": "de/LTBSO",
+        "lustiges taschenbuch ducktales": "de/LTBDT",
+        "ltb ducktales": "de/LTBDT",
+        "lustiges taschenbuch english edition": "de/LTBENG",
+        "ltb english edition": "de/LTBENG",
+        "lustiges taschenbuch mini pocket": "de/LTBMP",
+        "ltb mini pocket": "de/LTBMP",
         "lustiges taschenbuch": "de/LTB",
         "ltb": "de/LTB",
         "entenhausen edition dagobert": "de/EEDCB",
@@ -132,6 +189,7 @@ def _extract_base_and_number(raw_title: str) -> tuple[str, str] | tuple[None, No
     )
     if m:
         base, num = m.group(1).strip(), re.sub(r"[^\d\-/]", "", m.group(2))
+        base = re.sub(r"[\s\-:]+$", "", base).strip()
         if base and num:
             return base, num
 
@@ -317,9 +375,9 @@ def search_publication_code(
                 issue_part, yy = m_date2.groups()
                 num = f"20{yy}-{issue_part.zfill(2)}"
 
-    # 2. Canonical mapping lookup (prioritizing longer matches first, pre-sorted)
+    # 2. Canonical mapping lookup: EXACT match first (e.g. "topolino" -> it/TL, "ltb" -> de/LTB)
     for norm_key, pub_code in _SORTED_CANONICAL.get(country, []):
-        if norm_base == norm_key or norm_base.startswith(norm_key) or norm_key in norm_base:
+        if norm_base == norm_key:
             if num:
                 return f"{pub_code} {num}"
             return pub_code
@@ -328,14 +386,20 @@ def search_publication_code(
     _load_country_pubs(country)
     pubs = _PUB_CACHE.get(country, [])
     if pubs:
+        # Also try expanding German abbreviations e.g. "ltb ..." -> "lustiges taschenbuch ..."
+        search_terms = [norm_base]
+        if country == "de" and (norm_base.startswith("ltb ") or norm_base.startswith("ltb-")):
+            search_terms.append(re.sub(r"^ltb[\s\-]+", "lustiges taschenbuch ", norm_base))
+
         candidates = []
-        for pub_code, norm_title, clean_title, count in pubs:
-            if norm_base == clean_title or norm_base == norm_title:
-                candidates.append((100, count, pub_code))
-            elif norm_base.startswith(clean_title) or clean_title.startswith(norm_base):
-                candidates.append((70, count, pub_code))
-            elif clean_title in norm_base or norm_base in clean_title:
-                candidates.append((40, count, pub_code))
+        for term in search_terms:
+            for pub_code, norm_title, clean_title, count in pubs:
+                if term == clean_title or term == norm_title:
+                    candidates.append((100, count, pub_code))
+                elif term.startswith(clean_title) or clean_title.startswith(term):
+                    candidates.append((70, count, pub_code))
+                elif clean_title in term or term in clean_title:
+                    candidates.append((40, count, pub_code))
 
         if candidates:
             # When multiple publications share the same title (homonyms),
@@ -351,6 +415,13 @@ def search_publication_code(
             if num:
                 return f"{best_pub} {num}"
             return best_pub
+
+    # 4. Fallback canonical prefix/word match (for subtitles: e.g. "Topolino - La grande sfida")
+    for norm_key, pub_code in _SORTED_CANONICAL.get(country, []):
+        if norm_base.startswith(norm_key + " ") or norm_base.startswith(norm_key) or norm_key in norm_base:
+            if num:
+                return f"{pub_code} {num}"
+            return pub_code
 
     # 4. Fallback: if issue number exists and title contains known single-word hints
     return None

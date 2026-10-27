@@ -30,7 +30,7 @@ us_comic = {'id': '123456', 'title': 'Uncle Scrooge #1', 'date': '15/07/2026', '
 notify_international_comic(us_comic, country="us", event_type="release")
 
 print('\nSending test notification for DE Comic...')
-de_comic = {'id': 'MM26-15', 'title': 'Micky Maus Magazin Nr. 15', 'date': '20/07/2026', 'price': '4,50 ', 'url': 'https://egmont.de', 'cover_url': 'https://www.egmont-shop.de/globalassets/04_produkte/produktbilder/comics/coverabbildung-nicht-verfugbar_allgemein.png'}
+de_comic = {'id': 'MM26-23', 'title': 'Micky Maus Magazin Nr. 23/2026', 'date': '24/10/2026', 'price': '4,99 €', 'url': 'https://www.egmont-shop.de/micky-maus-magazin-nr.-23-2026/', 'cover_url': 'https://www.egmont-shop.de/globalassets/04_produkte/produktbilder/comics/coverabbildung-nicht-verfugbar_allgemein.png'}
 notify_international_comic(de_comic, country="de", event_type="release")
 
 print('\nSending test notification for DE LTB Comic...')

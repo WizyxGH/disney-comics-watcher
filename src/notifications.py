@@ -281,14 +281,14 @@ def _dispatch_notification(
             new_row = []
             for btn in row:
                 text = btn.get("text")
-                if text in ("Search on Inducks", "Search Inducks", "View on Inducks", "View Publication"):
+                if text in ("Search on Inducks", "Search Inducks", "View on Inducks", "View Publication", "View issues"):
                     if issue_path and "UNK" not in issue_path:
-                        # Si le numéro précis est reconnu (ex: "it/TL 3700"), lien direct vers le numéro (pas besoin de View Publication)
-                        if " " in issue_path:
+                        # Si le numéro précis est reconnu (ex: "it/TL 3700", "fi/AA2026-44", "nl/DD1985-01"), lien direct vers le numéro
+                        if re.search(r"\d", issue_path):
                             new_row.append({"text": "View on Inducks", "url": f"https://inducks.org/issue.php?c={quote_plus(issue_path)}"})
                         else:
                             # Seule la publication/série est connue sans numéro précis
-                            new_row.append({"text": "View Publication", "url": f"https://inducks.org/publication.php?c={quote_plus(issue_path)}"})
+                            new_row.append({"text": "View issues", "url": f"https://inducks.org/publication.php?c={quote_plus(issue_path)}"})
                     else:
                         search_url = f"https://inducks.org/search.php?search={quote_plus(raw_title)}" if raw_title else btn.get("url")
                         new_row.append({"text": "Search Inducks", "url": search_url})
@@ -492,16 +492,19 @@ def notify_international_comic(album: dict, state: dict | None = None, country: 
 
     row1 = []
     inducks_url = f"https://inducks.org/search.php?search={quote(raw_title)}"
+    inducks_btn_text = "Search Inducks"
     issue_path = album.get("issue_path")
     if issue_path and "UNK" not in issue_path:
-        if " " in issue_path:
+        if re.search(r"\d", issue_path):
             inducks_url = f"https://inducks.org/issue.php?c={quote_plus(issue_path)}"
+            inducks_btn_text = "View on Inducks"
         else:
             inducks_url = f"https://inducks.org/publication.php?c={quote_plus(issue_path)}"
+            inducks_btn_text = "View issues"
 
     row1.append({"text": "View Source", "url": album.get("url", "")})
 
-    buttons = [row1, [{"text": "Search Inducks", "url": inducks_url}]] if row1 else [[{"text": "Search Inducks", "url": inducks_url}]]
+    buttons = [row1, [{"text": inducks_btn_text, "url": inducks_url}]] if row1 else [[{"text": inducks_btn_text, "url": inducks_url}]]
 
     _dispatch_notification(
         info=album,

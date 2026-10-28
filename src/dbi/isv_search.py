@@ -21,6 +21,13 @@ def _normalize(s: str) -> str:
     s = re.sub(r"\s+", " ", s).strip()
     return s
 
+# Leading articles carry no identity: "The Disney Afternoon Adventures" is the
+# series a shop lists as "Disney Afternoon Adventures".
+_LEADING_ARTICLES = re.compile(r"^(?:the|il|lo|la|le|les|der|die|das|el|los|las|het)\s+")
+
+def _strip_article(s: str) -> str:
+    return _LEADING_ARTICLES.sub("", s)
+
 # Canonical mapping of known recurring publications monitored across countries.
 # Keys are normalized (lowercase, unaccented, punctuation-stripped).
 CANONICAL_SERIES: dict[str, dict[str, str]] = {
@@ -181,9 +188,10 @@ def _extract_base_and_number(raw_title: str) -> tuple[str, str] | tuple[None, No
     if not title:
         return None, None
 
-    # Pattern 1: Title with separator and number e.g. "Nr. 106", "#148", "Band 4", "Volume 3"
+    # Pattern 1: Title with separator and number e.g. "Nr. 106", "#148", "Band 4", "Volume 3".
+    # The number may be followed by a subtitle after a colon: "Legacy #464: The Klondike Years".
     m = re.match(
-        r"^(.*?)\s*(?:(?:Nr\.?|#|- Band|Band|Volume|Vol\.?|Tome|Hors[- ]S[eé]rie)\s*)(\d[\d\-/]*)(?:[/\-]\d{4})?(?:\s.*)?$",
+        r"^(.*?)\s*(?:(?:(?<!\w)(?:Nr\.?|Band|Volume|Vol\.?|Tome)|#|- Band|Hors[- ]S[eé]rie)\s*)(\d[\d\-/]*)(?:[/\-]\d{4})?(?:[\s:;,.!?].*)?$",
         title,
         re.IGNORECASE,
     )
@@ -266,68 +274,119 @@ def _load_country_pubs(country: str):
 
         for t in titles:
             norm_title = _normalize(t)
-            # Remove text in parentheses for clean base matching: e.g. "Topolino (libretto)" -> "Topolino"
-            clean_title = re.sub(r"\(.*?\)", "", norm_title).strip()
+            # Drop the parenthesised qualifier for base matching, before
+            # _normalize turns the brackets into spaces: "Topolino (libretto)"
+            # and "Μίκυ Μάους (Περίοδος Β')" share their base with the plain title.
+            clean_title = _strip_article(_normalize(re.sub(r"\(.*?\)", "", t)))
             _PUB_CACHE[country].append((str(pub_code), norm_title, clean_title, int(count or 0)))
 
 
-def _disambiguate_homonyms(candidates: list[tuple], num: str, country: str) -> str | None:
-    """When multiple publications share the same title, pick the one whose
-    numbering scheme matches the detected issue number.
+def _pick_publication(pub_codes: list[str], num: str | None) -> str:
+    """Among publications sharing a title, the one an issue number belongs to.
 
-    For instance, Bulgarian 'Макрокомикс' maps to bg/MA (issues 1-30),
-    bg/MAC (issues 2025-01..2026-09, YYYY-MM format), and bg/MACRO (issues 1-4).
-    A number like '2026-10' clearly belongs to bg/MAC, not bg/MA.
+    Inducks splits a relaunched magazine into periods with the same title
+    (gr/MM until 2013, then gr/MMB), so the title alone is ambiguous:
+      - a YYYY-MM number goes to the series numbered that way (bg/MAC, not bg/MA);
+      - otherwise a series still running wins over a dead one, "running" being
+        judged against the newest of them, so a stale dump does not matter;
+      - then the series whose last number is closest to the issue's.
     """
-    top_score = candidates[0][0]
-    tied = [c for c in candidates if c[0] >= top_score - 10]
-    if len(tied) <= 1:
-        return None
+    pub_codes = list(dict.fromkeys(pub_codes))
+    if len(pub_codes) == 1:
+        return pub_codes[0]
+    stats = {p: _pub_stats(p) for p in pub_codes}
 
-    is_year_month = bool(re.match(r'^\d{4}-\d{2}$', num))
+    if num and re.match(r"^\d{4}-\d{2}$", num):
+        dated = [p for p in pub_codes if stats[p]["year_month"]]
+        if dated:
+            pub_codes = dated
 
-    if is_year_month:
-        # Prefer the publication that uses YYYY-MM issue numbering
-        for _, _, pub_code in tied:
-            sample = query_db(
-                "SELECT issuenumber FROM inducks_issue WHERE publicationcode = ? ORDER BY issuecode DESC LIMIT 1",
-                (pub_code,)
-            )
-            if sample and sample[0][0] and re.match(r'^\d{4}-\d{2}$', str(sample[0][0])):
-                return pub_code
+    years = [stats[p]["last_year"] for p in pub_codes if stats[p]["last_year"]]
+    newest = max(years) if years else 0
 
-    # For plain numeric issues, prefer the publication with the closest max issue number (active continuation)
-    if num.isdigit():
-        target_num = int(num)
-        best_match = None
-        best_distance = float('inf')
-        for _, count, pub_code in tied:
-            max_issue = _get_max_numeric_issue(pub_code)
-            if max_issue > 0:
-                distance = abs(target_num - max_issue)
-                # Pick the series whose last published number is closest to target_num
-                if distance < best_distance:
-                    best_distance = distance
-                    best_match = pub_code
-        if best_match:
-            return best_match
+    def key(p):
+        st = stats[p]
+        running = bool(newest) and st["last_year"] >= newest - _RUNNING_YEARS
+        distance = abs(int(num) - st["max_num"]) if num and num.isdigit() and st["max_num"] else float("inf")
+        return (not running, distance, -st["count"])
 
-    return None
+    return min(pub_codes, key=key)
 
 
-_MAX_ISSUE_CACHE: dict[str, int] = {}
+# A series whose last issue is this many years older than its newest homonym's
+# has stopped: it is the previous period of the same magazine.
+_RUNNING_YEARS = 2
 
-def _get_max_numeric_issue(pub_code: str) -> int:
-    if pub_code in _MAX_ISSUE_CACHE:
-        return _MAX_ISSUE_CACHE[pub_code]
+_STATS_CACHE: dict[str, dict] = {}
+
+def _pub_stats(pub_code: str) -> dict:
+    """Highest numeric issue, year of the last dated issue, issue count, and
+    whether the series is numbered YYYY-MM."""
+    if pub_code in _STATS_CACHE:
+        return _STATS_CACHE[pub_code]
+    st = {"max_num": 0, "last_year": 0, "count": 0, "year_month": False}
     rows = query_db(
-        "SELECT MAX(CAST(issuenumber AS INTEGER)) FROM inducks_issue "
-        "WHERE publicationcode = ? AND issuenumber GLOB '[0-9]*'",
+        "SELECT MAX(CASE WHEN issuenumber GLOB '[0-9]*' THEN CAST(issuenumber AS INTEGER) END), "
+        "COUNT(*), MAX(CASE WHEN issuenumber GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]' THEN 1 ELSE 0 END) "
+        "FROM inducks_issue WHERE publicationcode = ?",
         (pub_code,)
     )
-    val = int(rows[0][0]) if rows and rows[0][0] is not None else 0
-    _MAX_ISSUE_CACHE[pub_code] = val
-    return val
+    if rows:
+        st["max_num"] = int(rows[0][0] or 0)
+        st["count"] = int(rows[0][1] or 0)
+        st["year_month"] = bool(rows[0][2])
+    try:
+        # '9999-12-31' stands for an unknown date in Inducks.
+        rows = query_db(
+            "SELECT MAX(filledoldestdate) FROM inducks_issue "
+            "WHERE publicationcode = ? AND filledoldestdate < '9999'",
+            (pub_code,)
+        )
+        if rows and rows[0][0]:
+            st["last_year"] = int(str(rows[0][0])[:4])
+    except Exception:
+        pass
+    _STATS_CACHE[pub_code] = st
+    return st
+
+
+def _same_title_family(pub_code: str, country: str) -> list[str]:
+    """The publication plus every other one of the country sharing its base title."""
+    _load_country_pubs(country)
+    pubs = _PUB_CACHE.get(country, [])
+    bases = {clean for code, _, clean, _ in pubs if code == pub_code and clean}
+    return [pub_code] + [code for code, _, clean, _ in pubs if clean in bases and code != pub_code]
+
+
+def _resolve_canonical(pub_code: str, country: str, num: str) -> str:
+    """A curated publication code, unless it has stopped while a homonym runs on.
+
+    The curated table is trusted while its series is alive: a title like
+    "topolino" also names a dozen reprint series that must not compete. Once
+    the series is dead (gr/MM ended in 2013), the magazine lives on under
+    another period code (gr/MMB), chosen among the homonyms by number.
+    """
+    family = _same_title_family(pub_code, country)
+    if len(family) == 1:
+        return pub_code
+    stats = _pub_stats(pub_code)
+    years = [_pub_stats(p)["last_year"] for p in family]
+    if stats["last_year"] >= max(years) - _RUNNING_YEARS:
+        return pub_code
+    # Dead in the dump, but the number follows its last one: the dump is
+    # simply behind on this series.
+    if num.isdigit() and stats["max_num"] < int(num) <= stats["max_num"] + _CONTINUATION_GAP:
+        return pub_code
+    return _pick_publication(family, num)
+
+
+# How far past a series' last known number an issue still continues it.
+_CONTINUATION_GAP = 5
+
+
+def _contains_words(haystack: str, needle: str) -> bool:
+    """True when needle appears in haystack as whole words ("io" is not in "topolino")."""
+    return bool(needle) and f" {needle} " in f" {haystack} "
 
 
 def search_publication_code(
@@ -354,76 +413,82 @@ def search_publication_code(
                 # Next try to find issue number from title
                 m_num = re.search(r"\b(\d{1,4})\b", raw_title)
                 num = m_num.group(1) if m_num else (m_sku.group(1) if m_sku else None)
-                if num:
-                    return f"{pub_code} {int(num)}"
-                return pub_code
+                # A publication code without an issue number is not an issue:
+                # better an unknown than a DBI entry for "TL".
+                return f"{pub_code} {int(num)}" if num else None
 
     base, num = _extract_base_and_number(raw_title)
-    if not base:
-        base = raw_title
-    norm_base = _normalize(base)
+    if not num:
+        # Same reason: a title without a number cannot name an issue, and a
+        # loose match on it only finds noise ("io" -> it/BIG).
+        return None
+    norm_base = _normalize(base or "")
 
     # Normalize dates e.g. 05/2026 -> 2026-05, or 10/26 -> 2026-10
-    if num:
-        m_date = re.match(r"^(\d{1,2})/(\d{4})$", num)
-        if m_date:
-            mm, yyyy = m_date.groups()
-            num = f"{yyyy}-{mm.zfill(2)}"
-        else:
-            m_date2 = re.match(r"^(\d{1,2})/(\d{2})$", num)
-            if m_date2:
-                issue_part, yy = m_date2.groups()
-                num = f"20{yy}-{issue_part.zfill(2)}"
+    m_date = re.match(r"^(\d{1,2})/(\d{4})$", num)
+    if m_date:
+        mm, yyyy = m_date.groups()
+        num = f"{yyyy}-{mm.zfill(2)}"
+    else:
+        m_date2 = re.match(r"^(\d{1,2})/(\d{2})$", num)
+        if m_date2:
+            issue_part, yy = m_date2.groups()
+            num = f"20{yy}-{issue_part.zfill(2)}"
 
-    # 2. Canonical mapping lookup: EXACT match first (e.g. "topolino" -> it/TL, "ltb" -> de/LTB)
+    # 2. Canonical mapping, exact match first (e.g. "topolino" -> it/TL). It
+    # names a magazine, not one period of it: the period is chosen by number.
     for norm_key, pub_code in _SORTED_CANONICAL.get(country, []):
         if norm_base == norm_key:
-            if num:
-                return f"{pub_code} {num}"
-            return pub_code
+            return f"{_resolve_canonical(pub_code, country, num)} {num}"
 
-    # 3. Database search with ranking by relevance and historical issue count
+    # 3. Database search, matching whole words only, ranked by relevance.
     _load_country_pubs(country)
     pubs = _PUB_CACHE.get(country, [])
     if pubs:
+        # Book titles stack series and subtitle ("Donald Duck: Duck Avenger
+        # Strikes Again: Disney Masters Vol. 8"): the segment right before the
+        # number names the series, so it is tried before the whole title.
+        segments = [s for s in re.split(r"\s*(?::|\s-\s)\s*", base or "") if s.strip()]
+        segment_term = _strip_article(_normalize(segments[-1])) if len(segments) > 1 else ""
+        search_terms = [segment_term, _strip_article(norm_base)]
         # Also try expanding German abbreviations e.g. "ltb ..." -> "lustiges taschenbuch ..."
-        search_terms = [norm_base]
         if country == "de" and (norm_base.startswith("ltb ") or norm_base.startswith("ltb-")):
             search_terms.append(re.sub(r"^ltb[\s\-]+", "lustiges taschenbuch ", norm_base))
 
-        candidates = []
-        for term in search_terms:
+        best_score, best_tied = 0, []
+        for term in dict.fromkeys(t for t in search_terms if t):
+            scores: dict[str, int] = {}
             for pub_code, norm_title, clean_title, count in pubs:
+                if not clean_title:
+                    continue
                 if term == clean_title or term == norm_title:
-                    candidates.append((100, count, pub_code))
-                elif term.startswith(clean_title) or clean_title.startswith(term):
-                    candidates.append((70, count, pub_code))
-                elif clean_title in term or term in clean_title:
-                    candidates.append((40, count, pub_code))
+                    score = 100
+                elif term.startswith(clean_title + " ") or clean_title.startswith(term + " "):
+                    score = 70
+                elif _contains_words(term, clean_title) or _contains_words(clean_title, term):
+                    score = 40
+                else:
+                    continue
+                scores[pub_code] = max(score, scores.get(pub_code, 0))
+            if term == segment_term and 100 not in scores.values():
+                # A lone segment is only trusted as an exact series name: a
+                # loose hit on "Das Magazin" means nothing.
+                continue
+            if scores and max(scores.values()) > best_score:
+                best_score = max(scores.values())
+                # Homonyms (periods of one magazine) tie: the number decides.
+                best_tied = [p for p, sc in scores.items() if sc == best_score]
+            if best_score == 100:
+                break
 
-        if candidates:
-            # When multiple publications share the same title (homonyms),
-            # disambiguate using the issue number format and recency.
-            if num and len(candidates) > 1:
-                best = _disambiguate_homonyms(candidates, num, country)
-                if best:
-                    return f"{best} {num}"
+        if best_tied:
+            return f"{_pick_publication(best_tied, num)} {num}"
 
-            # Default: sort by score descending, then by issue count descending
-            candidates.sort(reverse=True)
-            best_pub = candidates[0][2]
-            if num:
-                return f"{best_pub} {num}"
-            return best_pub
-
-    # 4. Fallback canonical prefix/word match (for subtitles: e.g. "Topolino - La grande sfida")
+    # 4. Fallback canonical word match (for subtitles: e.g. "Topolino - La grande sfida")
     for norm_key, pub_code in _SORTED_CANONICAL.get(country, []):
-        if norm_base.startswith(norm_key + " ") or norm_base.startswith(norm_key) or norm_key in norm_base:
-            if num:
-                return f"{pub_code} {num}"
-            return pub_code
+        if _contains_words(norm_base, norm_key):
+            return f"{_resolve_canonical(pub_code, country, num)} {num}"
 
-    # 4. Fallback: if issue number exists and title contains known single-word hints
     return None
 
 

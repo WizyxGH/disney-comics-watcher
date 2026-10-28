@@ -1,4 +1,5 @@
 import os
+import re
 from src.config import SUPPORTED_COUNTRIES
 from src.dbi.utils import _format_date_for_dbi, _format_price_for_dbi, sort_dbi_file
 from src.dbi.mappers import (
@@ -89,6 +90,12 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
             if dbi_issue_code.startswith(prefix):
                 dbi_issue_code = dbi_issue_code[3:]
                 break
+
+        # An issue code needs a number: "BIG" or "fr/UNK" alone would be an
+        # entry for a whole publication, which no reviewer can place.
+        if not re.search(r"\d", dbi_issue_code):
+            print(f"  [DBI] Skipped: no issue number in '{issue_path}' for {info.get('title')!r}")
+            return None
 
         isslet_val = None
         if dbi_issue_code.startswith("JM "):

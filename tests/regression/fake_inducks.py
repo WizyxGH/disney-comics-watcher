@@ -25,6 +25,11 @@ PUBLICATIONS = [
     ("it/BIG",  "Cartonatoni Disney",        [("1", "1990-01-01")], ["Io"]),
     ("it/ZP",   "Zio Paperone",              [("216", "2016-12-01")], []),
     ("it/ZPP",  "Zio Paperone (Panini)",     [("40", "2026-09-01")], []),
+    # Panini's "spev" product code is Disney Special Events, variants lettered.
+    ("it/DSE",  "Disney Special Events",     [("58", "2026-03-12"), ("58B", "2026-03-31"), ("58C", "2026-03-31"),
+                                              ("58D", "2026-12-31"), ("59", "2026-05-31")], []),
+    ("it/DMIX", "Disney Mix",                [("39", "2026-06-11"), ("39SP3", "2026-06-30")], []),
+    ("it/DKT",  "DuckTales",                 [("1", "1993-05-31"), ("2", "1994-01-31")], []),
     # USA: book titles stack series and subtitles.
     ("us/DMF",  "Disney Masters",            [("7", "2026-01-01")], []),
     ("us/DDKK", "Walt Disney's Donald Duck", [("3", "2015-01-01")], []),
@@ -73,7 +78,7 @@ class FakeInducks:
         for p in self.patches:
             p.start()
         # The search module caches per country and per publication.
-        for name in ("_PUB_CACHE", "_CACHE_LOADED", "_STATS_CACHE", "_MAX_ISSUE_CACHE"):
+        for name in ("_PUB_CACHE", "_CACHE_LOADED", "_STATS_CACHE", "_MAX_ISSUE_CACHE", "_NEWEST_CACHE"):
             if hasattr(isv_search, name):
                 getattr(isv_search, name).clear()
         isv_search._DB_HAS_ISSUESCOUNT = None

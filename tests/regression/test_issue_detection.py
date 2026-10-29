@@ -61,6 +61,42 @@ class IssueCodeDetection(unittest.TestCase):
     def test_year_month_numbering(self):
         self.assertEqual(self.resolve("Макрокомикс 10/2026", "bg"), "bg/MAC 2026-10")
 
+    # Panini product codes: "1wspev" once led to the non-existent it/SPEV.
+    PANINI = "https://www.panini.it/shp_ita_it/{}-it08.html"
+
+    def test_panini_product_code(self):
+        self.assertEqual(self.resolve("PK: Meno Tre all'Alba", "it",
+                                      page_url=self.PANINI.format("pk-meno-tre-all-alba-1wspev062sp")),
+                         "it/DSE 62")
+        self.assertEqual(self.resolve("Zio Paperone 41", "it",
+                                      page_url=self.PANINI.format("zio-paperone-41-1wzipa041")),
+                         "it/ZPP 41")
+
+    def test_panini_extra_issue_follows_the_product_code(self):
+        # The shop titles it "Disney Mix Speciale 43"; Inducks numbers it 41SP3.
+        self.assertEqual(self.resolve("Disney Mix Speciale 43", "it",
+                                      page_url=self.PANINI.format("disney-mix-speciale-43-1wdmix041sp3")),
+                         "it/DMIX 41SP3")
+
+    def test_loose_match_never_lands_on_a_dead_series(self):
+        # Was "DKT 3": the DuckTales of 1993-94, two issues.
+        self.assertIsNone(self.resolve("Ducktales – Nuova Serie 3", "it"))
+
+    def test_loose_match_never_lands_on_an_old_number(self):
+        # Uncle Scrooge is running, but its #3 is from the 1950s.
+        self.assertIsNone(self.resolve("Uncle Scrooge Gift Box Set 3", "us"))
+        self.assertEqual(self.resolve("Uncle Scrooge Legacy #464", "us"), "us/US 464")
+
+    def test_variant_gets_the_next_free_letter(self):
+        # Was "SPEV 62" twice: the variant must not reuse the regular code.
+        self.assertEqual(self.resolve("PK: Meno Tre all'Alba – Variant Simone Di Meo", "it",
+                                      page_url=self.PANINI.format("pk-meno-tre-all-alba-variant-1wspev062spv")),
+                         "it/DSE 62B")
+        # 58B to 58D are already taken on Inducks.
+        self.assertEqual(self.resolve("PK Early Days 58", "it",
+                                      page_url=self.PANINI.format("pk-early-days-1wspev058spv")),
+                         "it/DSE 58E")
+
     def test_band_inside_a_word_is_not_a_volume(self):
         self.assertEqual(isv_search._extract_base_and_number("Lustiges Taschenbuch Sonderband 134"),
                          ("Lustiges Taschenbuch Sonderband", "134"))

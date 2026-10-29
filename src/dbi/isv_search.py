@@ -162,16 +162,18 @@ _SORTED_CANONICAL: dict[str, list[tuple[str, str]]] = {
     for c, mapping in CANONICAL_SERIES.items()
 }
 
-# Panini Italy URL SKU prefixes -> Inducks publication codes
+# Panini Italy URL SKU prefixes -> Inducks publication codes (checked against
+# Inducks: "spev" is Disney Special Events, Zio Paperone / Grandi Classici /
+# Paperinik are the Panini periods of those titles).
 PANINI_SKU_MAP = {
     "1wtopo": "it/TL",
     "1wdbig": "it/DBIG",
-    "1wzipa": "it/ZP",
+    "1wzipa": "it/ZPP",
     "1wdmix": "it/DMIX",
     "1wspec": "it/SPD",
-    "1wspev": "it/SPEV",
-    "1wgcd": "it/GCD",
-    "1wpk": "it/PK",
+    "1wspev": "it/DSE",
+    "1wgcd": "it/GCDN",
+    "1wpk": "it/PPK",
     "1wpap": "it/PM",
 }
 
@@ -382,11 +384,40 @@ def _resolve_canonical(pub_code: str, country: str, num: str) -> str:
 
 # How far past a series' last known number an issue still continues it.
 _CONTINUATION_GAP = 5
+# How far below a series' last number a loosely matched title may still sit
+# (a dump ahead of the shop, a late reprint): further back, it is another book.
+_LOOSE_MATCH_BACKLOG = 20
+
+
+def _not_an_old_number(pub_code: str, num: str) -> bool:
+    """False when a loosely matched title would land on an issue the series
+    printed long ago: a new release is near the series' last number."""
+    return not num.isdigit() or int(num) >= _pub_stats(pub_code)["max_num"] - _LOOSE_MATCH_BACKLOG
 
 
 def _contains_words(haystack: str, needle: str) -> bool:
     """True when needle appears in haystack as whole words ("io" is not in "topolino")."""
     return bool(needle) and f" {needle} " in f" {haystack} "
+
+
+_NEWEST_CACHE: dict[str, int] = {}
+
+def _country_newest_year(country: str) -> int:
+    """Year of the newest dated issue of a country: "now" as far as the dump knows."""
+    if country not in _NEWEST_CACHE:
+        year = 0
+        try:
+            rows = query_db(
+                "SELECT MAX(filledoldestdate) FROM inducks_issue "
+                "WHERE issuecode LIKE ? AND filledoldestdate < '9999'",
+                (f"{country}/%",)
+            )
+            if rows and rows[0][0]:
+                year = int(str(rows[0][0])[:4])
+        except Exception:
+            pass
+        _NEWEST_CACHE[country] = year
+    return _NEWEST_CACHE[country]
 
 
 def search_publication_code(
@@ -399,10 +430,45 @@ def search_publication_code(
     """
     Main entry point: given a raw title and country code, returns the full
     Inducks issue path (e.g. 'it/TL 3700', 'de/MMC 106', 'gr/SMB 134').
+    A variant cover gets its own issue code, as on Inducks ('it/DSE 58B').
     """
     if not raw_title:
         return None
+    path = _search_issue_path(raw_title, country, page_url)
+    if path and _is_variant(raw_title, page_url):
+        path = _variant_path(path)
+    return path
 
+
+# Panini product codes end with the issue number, then a format tag; a
+# variant repeats the tag with a trailing "v" (1wspev062sp / 1wspev062spv,
+# 1wtopo3702 / 1wtopo3702v).
+_PANINI_VARIANT_SKU = re.compile(r"-1w[a-z]+\d+[a-z]*v-[a-z]{2}\d+\.html")
+
+def _is_variant(raw_title: str, page_url: str | None) -> bool:
+    return bool(re.search(r"\bvariant\b", raw_title, re.IGNORECASE)
+                or (page_url and _PANINI_VARIANT_SKU.search(page_url.lower())))
+
+
+def _variant_path(path: str) -> str:
+    """'it/DSE 62' -> 'it/DSE 62B': the first letter after those Inducks
+    already gives that number's variants (58B, 58C, 58D -> 58E)."""
+    pub_code, _, num = path.rpartition(" ")
+    if not num.isdigit():
+        return path
+    taken = {
+        str(r[0]) for r in (query_db(
+            "SELECT issuenumber FROM inducks_issue WHERE publicationcode = ? AND issuenumber GLOB ?",
+            (pub_code, f"{num}[A-Z]"),
+        ) or [])
+    }
+    for letter in "BCDEFGHIJKLMNOPQRSTUVWXYZ":
+        if f"{num}{letter}" not in taken:
+            return f"{pub_code} {num}{letter}"
+    return path
+
+
+def _search_issue_path(raw_title: str, country: str, page_url: str | None) -> str | None:
     # 1. Italian Panini URL SKU identification
     if page_url and country == "it":
         url_lower = page_url.lower()
@@ -415,7 +481,16 @@ def search_publication_code(
                 num = m_num.group(1) if m_num else (m_sku.group(1) if m_sku else None)
                 # A publication code without an issue number is not an issue:
                 # better an unknown than a DBI entry for "TL".
-                return f"{pub_code} {int(num)}" if num else None
+                if not num:
+                    return None
+                num = str(int(num))
+                # Inducks numbers Panini's extra issues after the regular one
+                # they follow, as the product code does: 1wdmix041sp3 is
+                # Disney Mix 41SP3, whatever number the shop title shows.
+                m_extra = re.search(re.escape(sku_prefix) + r"(\d+)sp(\d+)", url_lower)
+                if m_extra:
+                    num = f"{int(m_extra.group(1))}SP{m_extra.group(2)}"
+                return f"{_resolve_canonical(pub_code, country, num)} {num}"
 
     base, num = _extract_base_and_number(raw_title)
     if not num:
@@ -481,13 +556,26 @@ def search_publication_code(
             if best_score == 100:
                 break
 
+        if best_tied and best_score < 100:
+            # A loose match to a series that stopped years ago is a different
+            # magazine sharing a word ("DuckTales - Nuova Serie" is not the
+            # DuckTales of 1994): a new release belongs to a running series.
+            newest = _country_newest_year(country)
+            best_tied = [p for p in best_tied
+                         if not newest or _pub_stats(p)["last_year"] >= newest - _RUNNING_YEARS]
+            # Nor does a new release reuse a number the series printed long
+            # ago: "Donald Duck Gift Box Set 3" is not Donald Duck #3 (1940s).
+            best_tied = [p for p in best_tied if _not_an_old_number(p, num)]
+
         if best_tied:
             return f"{_pick_publication(best_tied, num)} {num}"
 
-    # 4. Fallback canonical word match (for subtitles: e.g. "Topolino - La grande sfida")
+    # 4. Fallback canonical word match (for subtitles: e.g. "Topolino - La grande sfida"),
+    # as loose as the matches above, so held to the same number check.
     for norm_key, pub_code in _SORTED_CANONICAL.get(country, []):
         if _contains_words(norm_base, norm_key):
-            return f"{_resolve_canonical(pub_code, country, num)} {num}"
+            pub = _resolve_canonical(pub_code, country, num)
+            return f"{pub} {num}" if _not_an_old_number(pub, num) else None
 
     return None
 

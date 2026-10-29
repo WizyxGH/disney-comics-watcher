@@ -30,6 +30,11 @@ class DbiSkeleton(unittest.TestCase):
         self.assertIsNone(generate_dbi_skeleton(info, "it"))
         self.assertFalse(os.path.exists(os.path.join("issues", "it.dbi")))
 
+    def test_no_entry_for_an_unknown_issue(self):
+        # Was "UNK_340418   h3 Terravento": a shop product id, not an issue.
+        info = {"title": "Terravento", "issue_path": "it/UNK_340418"}
+        self.assertIsNone(generate_dbi_skeleton(info, "it"))
+
     def test_story_entries_by_page(self):
         info = {"title": "Topolino 3701", "issue_path": "it/TL 3701", "pages": 164,
                 "stories": [{"title": "Uno", "story_code": "I TL 3701-1", "pages": 30, "start_page": 5},

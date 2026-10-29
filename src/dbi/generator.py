@@ -92,9 +92,10 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
                 break
 
         # An issue code needs a number: "BIG" or "fr/UNK" alone would be an
-        # entry for a whole publication, which no reviewer can place.
-        if not re.search(r"\d", dbi_issue_code):
-            print(f"  [DBI] Skipped: no issue number in '{issue_path}' for {info.get('title')!r}")
+        # entry for a whole publication, which no reviewer can place. "UNK_<id>"
+        # carries the shop's product id, not an issue number: same thing.
+        if not re.search(r"\d", dbi_issue_code) or dbi_issue_code.startswith("UNK"):
+            print(f"  [DBI] Skipped: no Inducks issue found for {info.get('title')!r} ({issue_path})")
             return None
 
         isslet_val = None

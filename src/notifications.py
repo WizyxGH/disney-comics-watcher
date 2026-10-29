@@ -106,6 +106,12 @@ def send_telegram(photo_url: str | None, caption: str, buttons: list | None = No
                 delay = max(delay * 2, retry_after + 1)
                 continue
 
+            if 400 <= resp.status_code < 500:
+                # The request itself is wrong (bad chat, bad HTML…): sending it
+                # again five times only delays the run and the next messages.
+                print(f"  [error] Telegram {resp.status_code}, not retried: {resp.text[:300]}")
+                return None
+
             resp.raise_for_status()
             return resp.json().get("result", {}).get("message_id")
 
@@ -348,7 +354,6 @@ def _dispatch_notification(
         dbi_content = generate_dbi_skeleton(info, publication_type=publication_type, overrides=OVERRIDES)
 
         # 7. Send DBI to the admin channel / DM
-        admin_id = os.environ.get("TELEGRAM_ADMIN_ID")
         if dbi_content:
             # Remove ^^ Source: line for the message
             dbi_lines = [line for line in dbi_content.strip().split("\n") if not line.startswith("^^ Source")]
@@ -370,23 +375,27 @@ def _dispatch_notification(
                 
                 dm_buttons = [[{"text": "Upload Scan", "url": upload_url}]]
 
-            if "telegram" in NOTIFY_BACKENDS and admin_id:
-                # Send DBI skeleton as formatted pre text to avoid caption length limit
-                send_telegram(photo_url=cover_url if len(dm_text) <= 1024 else None, caption=dm_text, chat_id=admin_id, buttons=dm_buttons)
-
-            if "discord" in NOTIFY_BACKENDS and DISCORD_ADMIN_WEBHOOK_URL:
-                dm_description = html_to_markdown(dm_text)
-                dm_links = build_link_line(dm_buttons)
-                if dm_links:
-                    dm_description += f"\n\n{dm_links}"
-                send_discord(
-                    text=dm_description,
-                    image_url=cover_url,
-                    webhook_url=DISCORD_ADMIN_WEBHOOK_URL,
-                )
+            send_admin(dm_text, photo_url=cover_url, buttons=dm_buttons)
 
 
 # ── PUBLIC NOTIFICATION FUNCTIONS ───────────────────────────────────────────────
+
+def send_admin(text_html: str, photo_url: str | None = None, buttons: list | None = None):
+    """Sends a message to the admin DM (Telegram) and admin channel (Discord):
+    DBI skeletons, and the watcher's own alerts about sources gone silent."""
+    admin_id = os.environ.get("TELEGRAM_ADMIN_ID")
+    if "telegram" in NOTIFY_BACKENDS and admin_id:
+        # Sent as text past the caption limit (a DBI in <pre> is long).
+        send_telegram(photo_url=photo_url if len(text_html) <= 1024 else None,
+                      caption=text_html, chat_id=admin_id, buttons=buttons)
+
+    if "discord" in NOTIFY_BACKENDS and DISCORD_ADMIN_WEBHOOK_URL:
+        description = html_to_markdown(text_html)
+        links = build_link_line(buttons)
+        if links:
+            description += f"\n\n{links}"
+        send_discord(text=description, image_url=photo_url, webhook_url=DISCORD_ADMIN_WEBHOOK_URL)
+
 
 def notify_magazine(info: dict, releve_date: str | None = None):
     """Sends the Telegram notification for a new magazine issue."""

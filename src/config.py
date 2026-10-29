@@ -139,6 +139,12 @@ SE_KEY_PREFIX = "se:"
 
 STATE_FILE    = "state.json"
 
+# Source health: a provider that has delivered before and comes back empty is
+# retried once after this delay, and reported to the admins once it has been
+# empty this many runs in a row (the watcher runs hourly).
+EMPTY_RETRY_DELAY_S = int(os.environ.get("EMPTY_RETRY_DELAY_S", "10"))
+HEALTH_ALERT_RUNS   = int(os.environ.get("HEALTH_ALERT_RUNS", "6"))
+
 if os.path.exists(".env"):
     with open(".env", "r", encoding="utf-8") as f:
         for line in f:

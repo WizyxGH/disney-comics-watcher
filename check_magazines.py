@@ -1,5 +1,7 @@
 import sys
 sys.stdout.reconfigure(encoding='utf-8')
+import html as html_lib
+import time
 from datetime import datetime
 from src.config import (
     PARIS_TZ, SKIP_CODIFS, OVERRIDES, GLENAT_KEY_PREFIX, FANTAGRAPHICS_KEY_PREFIX, MARVEL_KEY_PREFIX,
@@ -9,9 +11,11 @@ from src.config import (
     DK_KEY_PREFIX, ES_KEY_PREFIX, FI_KEY_PREFIX, IS_KEY_PREFIX, NO_KEY_PREFIX, NL_KEY_PREFIX,
     UK_KEY_PREFIX, SE_KEY_PREFIX, LTB_DE_KEY_PREFIX,
     NOTIFY_BACKENDS, DISCORD_WEBHOOK_URL, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID,
+    HEALTH_ALERT_RUNS, EMPTY_RETRY_DELAY_S,
 )
+from src.health import has_history, update_provider_health
 from src.utils import load_state, save_state, parse_date_fr, is_fully_indexed_in_inducks
-from src.notifications import notify_magazine, notify_glenat_announce, notify_glenat_release, notify_international_comic, get_issue_path_from_info
+from src.notifications import notify_magazine, notify_glenat_announce, notify_glenat_release, notify_international_comic, get_issue_path_from_info, send_admin
 
 from src.scrapers.fr import discover_fr_kiosk, fetch_fr_kiosk_details, discover_glenat, fetch_glenat_details
 from src.scrapers.us import discover_fantagraphics, discover_marvel, discover_dynamite, fetch_dynamite_details
@@ -228,6 +232,26 @@ def main():
             except Exception as e:
                 print(f"  [error] discover_{name.lower()}: {e}")
                 discovered_books[name] = []
+
+    # A source that has delivered before and comes back empty gets a second
+    # chance: Panini IT and ES return an empty list about one run in three,
+    # which otherwise delays their news by an hour.
+    for name, prefix, func, *_ in PROVIDERS:
+        if not discovered_books.get(name) and has_history(state, prefix):
+            time.sleep(EMPTY_RETRY_DELAY_S)
+            try:
+                discovered_books[name] = func()
+                print(f"  [{name}] Empty discovery retried: {len(discovered_books[name])} item(s).")
+            except Exception as e:
+                print(f"  [error] discover_{name.lower()} (retry): {e}")
+
+    for name, prefix, *_ in PROVIDERS:
+        alert = update_provider_health(state, name, prefix, len(discovered_books.get(name, [])),
+                                       alert_after=HEALTH_ALERT_RUNS)
+        if alert:
+            print(f"  [health] {alert}")
+            if not first_run:
+                send_admin(html_lib.escape(alert, quote=False))
 
     for name, prefix, func, country, default_status, fetch_details, is_glenat in PROVIDERS:
         books = discovered_books.get(name, [])

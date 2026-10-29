@@ -12,7 +12,6 @@ def discover_nahdet_misr_eg():
     urls = [
         "https://nahdetmisrbookstore.com/en/products?search=mickey",
         "https://nahdetmisrbookstore.com/en/products?search=miki",
-        "https://nahdetmisrbookstore.com/en/categories/mickey-and-disney-characters"
     ]
     
     seen_ids = set()

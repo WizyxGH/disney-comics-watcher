@@ -134,7 +134,9 @@ def inducks_button(issue_path: str | None, raw_title: str, country: str, info: d
     issue, otherwise Inducks' advanced search (comp.php?mode=2) filled with
     what is known, as precise as it gets: country, publication (or title),
     number, year. A not-yet-indexed issue has no page: issue.php would only
-    say "not found", while the search finds it as soon as Inducks adds it."""
+    say "not found", while the search finds it as soon as Inducks adds it.
+    The publisher keeps out homonyms of other houses (it/PK 119 is Disney
+    Italia's, Panini's Paperinik 119 is it/PPK)."""
     info = info or {}
     known = bool(issue_path) and "UNK" not in issue_path and "/" in issue_path
     if known and not re.search(r"\d", issue_path):
@@ -159,6 +161,7 @@ def inducks_button(issue_path: str | None, raw_title: str, country: str, info: d
     if year:
         # "equal to or after": a new release keeps old homonyms out.
         params["date2"] = year.group(0)
+    params["publisher"] = info.get("publisher") or info.get("editeur") or info.get("editor")
     return {"text": "Search on Inducks", "url": "https://inducks.org/compmag.php?" + urlencode({k: v for k, v in params.items() if v})}
 
 

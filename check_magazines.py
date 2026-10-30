@@ -9,7 +9,7 @@ from src.config import (
     NAHDET_MISR_EG_KEY_PREFIX, BG_KEY_PREFIX, HR_KEY_PREFIX, EE_KEY_PREFIX, LV_KEY_PREFIX,
     LT_KEY_PREFIX, PL_KEY_PREFIX, CZ_KEY_PREFIX, RS_KEY_PREFIX, SI_KEY_PREFIX, CN_KEY_PREFIX,
     DK_KEY_PREFIX, ES_KEY_PREFIX, FI_KEY_PREFIX, IS_KEY_PREFIX, NO_KEY_PREFIX, NL_KEY_PREFIX,
-    UK_KEY_PREFIX, SE_KEY_PREFIX, LTB_DE_KEY_PREFIX,
+    UK_KEY_PREFIX, SE_KEY_PREFIX, LTB_DE_KEY_PREFIX, PROVIDER_PUBLISHERS,
     NOTIFY_BACKENDS, DISCORD_WEBHOOK_URL, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID,
     HEALTH_ALERT_RUNS, EMPTY_RETRY_DELAY_S,
 )
@@ -86,6 +86,8 @@ def _process_provider_books(
             if not book_id: continue
 
             key = f"{key_prefix}{book_id}"
+            if PROVIDER_PUBLISHERS.get(key_prefix):
+                book.setdefault("publisher", PROVIDER_PUBLISHERS[key_prefix])
             current = state.get(key)
 
             pub_date = _release_date(book)
@@ -207,7 +209,7 @@ def main():
         ("DK", DK_KEY_PREFIX, discover_dk, "dk", "announced", fetch_dk_details, False),
         ("ES", ES_KEY_PREFIX, discover_es, "es", "announced", fetch_es_details, False),
         ("FI", FI_KEY_PREFIX, discover_fi, "fi", "released", fetch_fi_details, False),
-        ("IS", IS_KEY_PREFIX, discover_is, "is", "announced", fetch_is_details, False),
+        ("Edda IS", IS_KEY_PREFIX, discover_is, "is", "released", fetch_is_details, False),
         ("NO", NO_KEY_PREFIX, discover_no, "no", "announced", fetch_no_details, False),
         ("NL", NL_KEY_PREFIX, discover_nl, "nl", "announced", fetch_nl_details, False),
         ("UK", UK_KEY_PREFIX, discover_uk, "uk", "announced", fetch_uk_details, False),

@@ -33,6 +33,12 @@ class InducksButton(unittest.TestCase):
         self.assertTrue(button["url"].startswith("https://inducks.org/compmag.php?"))
         self.assertEqual(self.query(button), {"country": "it", "title1": "PM", "entrycodeh3": "557", "date2": "2026"})
 
+    # Inducks matches part of the name: "Panini" finds "Disney Italia, Panini Comics".
+    def test_publisher_narrows_the_search(self):
+        button = inducks_button(None, "Paperinik 119", "it", {"publisher": "Panini"})
+        self.assertEqual(self.query(button), {"country": "it", "title1": "Paperinik", "entrycodeh3": "119",
+                                              "publisher": "Panini"})
+
     def test_unknown_publication_is_searched_by_title(self):
         button = inducks_button("it/UNK_314885", "PK Omnibus 7", "it")
         self.assertEqual(self.query(button), {"country": "it", "title1": "PK Omnibus", "entrycodeh3": "7"})

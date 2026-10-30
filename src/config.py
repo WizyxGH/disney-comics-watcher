@@ -132,10 +132,33 @@ AKUANKKA_SITE_BASE = os.environ.get("AKUANKKA_SITE_BASE", "https://www.akuankka.
 # aatk (pocket books) also exists, but reaches the site months after release.
 AKUANKKA_PUBLICATIONS = ["aa"]
 IS_KEY_PREFIX = "is:"
+# Edda (Iceland) sells each new Syrpa pocket book in its web shop, newest
+# first. Andrés Önd itself is subscription-only and listed nowhere.
+EDDA_SYRPUR_URL = os.environ.get(
+    "EDDA_SYRPUR_URL",
+    "https://www.edda.is/voruflokkur/?categoryid=a60ec41d-3589-42bc-9430-9c6406e2a789",
+)
 NO_KEY_PREFIX = "no:"
 NL_KEY_PREFIX = "nl:"
 UK_KEY_PREFIX = "uk:"
 SE_KEY_PREFIX = "se:"
+
+# Publisher of each source's releases, as Inducks names it (or part of the
+# name: its advanced search matches "Panini" in "Disney Italia, Panini Comics").
+# Narrows "Search on Inducks" to the right homonym; a scraper that reads the
+# publisher of an item ("publisher" field) takes precedence.
+PROVIDER_PUBLISHERS = {
+    GLENAT_KEY_PREFIX:         "Glénat",
+    FANTAGRAPHICS_KEY_PREFIX:  "Fantagraphics",
+    MARVEL_KEY_PREFIX:         "Marvel",
+    DYNAMITE_KEY_PREFIX:       "Dynamite",
+    EGMONT_DE_KEY_PREFIX:      "Egmont",
+    LTB_DE_KEY_PREFIX:         "Egmont",
+    KATHIMERINI_KEY_PREFIX:    "Kathimerini",
+    PANINI_IT_KEY_PREFIX:      "Panini",
+    PANINI_BR_KEY_PREFIX:      "Panini",
+    NAHDET_MISR_EG_KEY_PREFIX: "Nahdet Misr",
+}
 
 STATE_FILE    = "state.json"
 

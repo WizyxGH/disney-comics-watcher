@@ -1056,6 +1056,10 @@
   "panini-it:340073": "announced",
   "_health": {
     "ES": {
+      "empty_runs": 2,
+      "alerted": false
+    },
+    "Panini IT": {
       "empty_runs": 1,
       "alerted": false
     }
@@ -1065,5 +1069,17 @@
   "es:341714": "announced",
   "es:341699": "announced",
   "panini-it:340613": "announced",
-  "panini-it:340631": "announced"
+  "panini-it:340631": "announced",
+  "is:d1f7893f-fc43-4aa6-bf03-888543b0e19d": "released",
+  "is:2cd11449-0a87-408f-867b-df8a825278bd": "released",
+  "is:ea55b58e-3e3b-4af6-acdc-dcc8b4f2a0b6": "released",
+  "is:42653448-47a7-4ca2-8dd7-848106ad3e57": "released",
+  "is:8421e28c-78b3-4524-ad0d-2b5e797df870": "released",
+  "is:0daf7fcd-ee12-4f4f-9fa1-10b7115dc49b": "released",
+  "is:c5d09038-d32d-4802-bb53-8971c4ef887a": "released",
+  "is:e228ac8f-2459-422f-9928-0deea1b758fa": "released",
+  "is:23c09f4a-1fcb-4ed4-b6ca-c577c9cf54c6": "released",
+  "is:6ed2aea5-4096-4a26-af5c-3b8124e4616e": "released",
+  "is:4a762c1f-a868-49ec-bb2c-5ad905b09e96": "released",
+  "is:84b1252d-d124-4df6-a7d3-6f836582e2c4": "released"
 }

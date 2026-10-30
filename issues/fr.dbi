@@ -1,30 +1,18 @@
-AOD   3      h3 Les Âges d'or de Picsou - Tome 03 [issdate:2026-10-14] [price:19.00 EUR] [pages:208] [size:202 x 276 mm] [EAN 9782344075210] [inx:-]
-AOD   3a    ?                 1 c
-
-AOD   4      h3 Les Âges d'or de Picsou - Tome 04 [issdate:2027-01-20] [price:19.00 EUR] [pages:208] [size:200 x 273 mm] [EAN 9782344079751] [inx:-]
-AOD   4a    ?                 1 c
-
-GHP   4      h3 La Grande Histoire de Picsou - Tome 04 [issdate:2026-11-18] [price:19.00 EUR] [pages:184] [size:200 x 273 mm] [EAN 9782344075135] [inx:-]
-GHP   4a    ?                 1 c
-
-JMHSC 2      h3 Le Journal de Mickey HS BD Collector [issdate:2026-10-07] [price:6.95 EUR] [inx:-]
-JMHSC 2a    ?                 1 c
-
-JMHSN 13     h3 Journal de Mickey HS [issdate:2026-10-15] [price:6.99 EUR] [inx:-]
-JMHSN 13a   ?                 1 c
-
-MJU           h3 MICKEY JUNIOR HS JEUX [issdate:2026-10-23] [price:6.95 EUR] [inx:-]
-MJUa        ?                 1 c
-
-TODO_12011 1 h3 LE JOURNAL DE MICKEY HS BD COLLECTOR [issdate:2026-07-08] [price:6.95 EUR] [inx:-]
-->          ?              1  c                     [entrycode:TODO_12011 1a]
-
-UNK          h3 LE JOURNAL DE MICKEY HS 100 % BD [issdate:2026-10-22] [price:5.50 EUR] [inx:-]
-UNKa        ?                 1 c
-
 AOD   3      h3 Les Âges d'or de Donald - Tome 03 [issdate:2026-10-28] [price:19.00 EUR] [pages:192] [size:203 x 275 mm] [EAN 9782344075197] [inx:-]
 AOD   3a    ?              1 c
 
+AOD   4      h3 Les Âges d'or de Picsou - Tome 04 [issdate:2027-01-20] [price:19.00 EUR] [pages:208] [size:200 x 273 mm] [EAN 9782344079751] [inx:-]
+AOD   4a    ?              1 c
+
+GHP   4      h3 La Grande Histoire de Picsou - Tome 04 [issdate:2026-11-18] [price:19.00 EUR] [pages:184] [size:200 x 273 mm] [EAN 9782344075135] [inx:-]
+GHP   4a    ?              1 c
+
 JM 3880-81   h3 Journal de Mickey [issdate:2026-10-28] [price:5.90 EUR] [pages:116] [inx:-]
 JM 3880-81a ?              1 c      FPt FPt         [isslet:B.L.A.C.K Studio]
+
+JMHSC  2     h3 Le Journal de Mickey HS BD Collector [issdate:2026-10-07] [price:6.95 EUR] [inx:-]
+JMHSC  2a   ?              1 c
+
+JMHSN 13     h3 Journal de Mickey HS [issdate:2026-10-15] [price:6.99 EUR] [inx:-]
+JMHSN 13a   ?              1 c
 

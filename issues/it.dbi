@@ -1,129 +1,48 @@
-BIG          h3 Topolino Sosia di Re Sorcio [issdate:2026-11-03] [price:5.50 EUR] [inx:-]
-BIGa        ?              1 c
-
-CWD 129      h3 I Grandi Classici Disney 129 [issdate:2026-09-15] [price:5.50 EUR] [inx:-]
-CWD 129a    ?                 1 c
-
-DBIG 223     h3 Disney Big 223 [issdate:2026-10-20] [price:6.90 EUR] [inx:-]
-DBIG 223a ?                 1 c
-
-DKT 3         h3 Ducktales - Nuova Serie 3 [issdate:2026-10-29] [price:12.00 EUR] [inx:-]
-DKT 3a      ?                 1 c
+DBIG223      h3 Disney Big 223 [issdate:2026-10-20] [price:6.90 EUR] [inx:-]
+DBIG223a    ?              1 c
 
 DMIX 42      h3 Disney Mix Speciale 42 [issdate:2026-10-19] [price:7.50 EUR] [inx:-]
-DMIX 42a ?                 1 c
+DMIX 42a    ?              1 c
 
-PA 553       h3 Paperino 553 [price:3.90 EUR] [inx:-]
-PA 553a ?              1  c
+DSE  61B     h3 PK: Meno Due all'Alba - Variant Fabio Celoni [issdate:2026-09-10] [price:8.90 EUR] [inx:-]
+DSE  61Ba   ?              1 c
 
-PA 554       h3 Paperino 554 [price:3.90 EUR] [inx:-]
-PA 554a ?                 1 c
+DSE  62      h3 PK: Meno Tre all'Alba [issdate:2026-10-29] [price:5.90 EUR] [inx:-]
+DSE  62a    ?              1 c
 
-PA 555       h3 Paperino 555 [issdate:2026-08-28] [price:3.90 EUR] [inx:-]
-PA 555a ?                 1 c
+DSE  62B     h3 PK: Meno Tre all'Alba - Variant Simone Di Meo [issdate:2026-10-29] [price:8.90 EUR] [inx:-]
+DSE  62Ba   ?              1 c
 
-PA 556       h3 Paperino 556 [issdate:2026-09-30] [price:3.90 EUR] [inx:-]
-PA 556a ?                 1 c
+GCDN129      h3 I Grandi Classici Disney 129 [issdate:2026-09-15] [price:5.50 EUR] [inx:-]
+GCDN129a    ?              1 c
 
-PA 557        h3 Paperino 557 [issdate:2026-10-30] [price:3.90 EUR] [inx:-]
-PA 557a     ?                 1 c
+PM  553      h3 Paperino 553 [price:3.90 EUR] [inx:-]
+PM  553a    ?              1 c
 
-SPEV 7       h3 I Mercoledì di Pippo 7 [issdate:2026-10-12] [price:15.00 EUR] [inx:-]
-SPEV 7a ?                 1 c
+PM  554      h3 Paperino 554 [price:3.90 EUR] [inx:-]
+PM  554a    ?              1 c
 
-SPEV 11      h3 Definitive Collection Fantomius 11 [price:10.00 EUR] [inx:-]
-SPEV 11a ?                 1 c
+PM  555      h3 Paperino 555 [issdate:2026-08-28] [price:3.90 EUR] [inx:-]
+PM  555a    ?              1 c
 
-SPEV 61      h3 PK: Meno Due all'Alba - Variant Fabio Celoni [issdate:2026-09-10] [price:8.90 EUR] [inx:-]
-SPEV 61a ?                 1 c
+PM  556      h3 Paperino 556 [issdate:2026-09-30] [price:3.90 EUR] [inx:-]
+PM  556a    ?              1 c
 
-SPEV 62       h3 PK: Meno Tre all'Alba - Variant Simone Di Meo [issdate:2026-10-29] [price:8.90 EUR] [inx:-]
-SPEV 62a    ?                 1 c
-
-TL 3700      h3 Topolino 3700 con i Dadi da Gioco di Wizards of Mickey [issdate:2026-10-21] [price:14.90 EUR] [inx:-]
-TL 3700a ?                 1 c
-
-TL 3701      h3 Topolino 3701 Variant Lucca Comics 3701 [issdate:2026-10-28] [price:9.00 EUR] [inx:-]
-TL 3701a ?                 1 c
-
-TL 3702      h3 Topolino 3702 con Pencil Tin Calciatori 2026-2027 [issdate:2026-11-04] [price:16.90 EUR] [inx:-]
-TL 3702a    ?                 1 c
-
-TL 3703      h3 Topolino: Holiday Celebration 3703 [issdate:2026-11-11] [price:5.90 EUR] [inx:-]
-TL 3703a ?                 1 c
-
-UNK_314885   h3 PK Omnibus 7 [issdate:2026-10-29] [price:79.00 EUR] [inx:-]
-UNK_314885a ?              1 c
-
-UNK_314888    h3 Wizards of Mickey Omnibus 3 [issdate:2026-10-29] [price:79.00 EUR] [inx:-]
-UNK_314888a ?                 1 c
-
-UNK_340268   h3 Twisted Tale: Unbirthday 1 [issdate:2026-10-29] [price:7.90 EUR] [inx:-]
-UNK_340268a ?              1 c
-
-UNK_340271   h3 Twisted-Wonderland il Manga: Book of Scarabia 1 [issdate:2026-10-29] [price:7.90 EUR] [inx:-]
-UNK_340271a ?              1 c
-
-UNK_340274   h3 Twisted-Wonderland il Manga: Book of Scarabia 1 [issdate:2026-10-29] [price:9.00 EUR] [inx:-]
-UNK_340274a ?              1 c
-
-UNK_340277   h3 Twisted Tale: Unbirthday 1 [issdate:2026-10-29] [price:9.00 EUR] [inx:-]
-UNK_340277a ?              1 c
-
-UNK_340286    h3 Wings of Starlight- Il Manga [issdate:2026-10-29] [price:20.00 EUR] [inx:-]
-UNK_340286a ?                 1 c
-
-UNK_340313   h3 PK: Box 30° Anniversario [issdate:2026-10-29] [price:50.00 EUR] [inx:-]
-UNK_340313a ?              1 c
-
-UNK_340316   h3 W.I.T.C.H. - Il Manga Complete Edition [issdate:2026-10-29] [price:20.00 EUR] [inx:-]
-UNK_340316a ?              1 c
-
-UNK_340343   h3 Il Taccuino di Silvia Ziche [issdate:2026-10-29] [price:29.90 EUR] [inx:-]
-UNK_340343a ?              1 c
-
-UNK_340412   h3 Papereneide [issdate:2026-10-29] [price:22.00 EUR] [inx:-]
-UNK_340412a ?              1 c
-
-UNK_340415   h3 Gli Allegri Mestieri di Paperino [issdate:2026-10-29] [price:17.00 EUR] [inx:-]
-UNK_340415a ?              1 c
-
-UNK_340418   h3 Terravento [issdate:2026-10-29] [price:23.00 EUR] [inx:-]
-UNK_340418a ?              1 c
-
-UNK_340421   h3 Il Fiorentino nelle Storie di Topolino [issdate:2026-10-29] [price:18.00 EUR] [inx:-]
-UNK_340421a ?              1 c
-
-UNK_340424   h3 Paperino e la Blusa Stregata [issdate:2026-10-29] [price:22.00 EUR] [inx:-]
-UNK_340424a ?              1 c
-
-UNK_340430   h3 Topolino e l'Isola delle Folgori [issdate:2026-10-29] [price:22.00 EUR] [inx:-]
-UNK_340430a ?              1 c
-
-UNK_340436   h3 PK: Galaxy Gate 2 [issdate:2026-10-22] [price:18.90 EUR] [inx:-]
-UNK_340436a ?                 1 c
-
-UNK_340439   h3 Tim Burton's the Nightmare Before Christmas: Lunga Vita alla Regina delle Zucche [issdate:2026-10-22] [price:15.00 EUR] [inx:-]
-UNK_340439a ?                 1 c
-
-UNK_340451   h3 Circus 5 [issdate:2026-10-22] [price:13.00 EUR] [inx:-]
-UNK_340451a ?                 1 c
+PM  557      h3 Paperino 557 [issdate:2026-10-30] [price:3.90 EUR] [inx:-]
+PM  557a    ?              1 c
 
 SUD 123      h3 Disney Team 123 [issdate:2026-11-03] [price:6.50 EUR] [inx:-]
 SUD 123a    ?              1 c
 
+TL 3700      h3 Topolino 3700 con i Dadi da Gioco di Wizards of Mickey [issdate:2026-10-21] [price:14.90 EUR] [inx:-]
+TL 3700a    ?              1 c
+
+TL 3701B     h3 Topolino 3701 Variant Lucca Comics 3701 [issdate:2026-10-28] [price:9.00 EUR] [inx:-]
+TL 3701Ba   ?              1 c
+
 TL 3702      h3 Topolino 3702 [issdate:2026-11-04] [price:3.50 EUR] [inx:-]
 TL 3702a    ?              1 c
 
-DKT 3        h3 Ducktales - Nuova Serie 3 [issdate:2026-10-29] [price:12.00 EUR] [inx:-]
-DKT 3a      ?              1 c
-
-SPEV 62      h3 PK: Meno Tre all'Alba [issdate:2026-10-29] [price:5.90 EUR] [inx:-]
-SPEV 62a    ?              1 c
-
-SPEV 62      h3 PK: Meno Tre all'Alba - Variant Simone Di Meo [issdate:2026-10-29] [price:8.90 EUR] [inx:-]
-SPEV 62a    ?              1 c
-
-PM 557       h3 Paperino 557 [issdate:2026-10-30] [price:3.90 EUR] [inx:-]
-PM 557a     ?              1 c
+TL 3703      h3 Topolino: Holiday Celebration 3703 [issdate:2026-11-11] [price:5.90 EUR] [inx:-]
+TL 3703a    ?              1 c
 

@@ -1007,7 +1007,7 @@
   "panini-it:340277": "released",
   "panini-it:340286": "announced",
   "panini-it:340316": "released",
-  "panini-it:340625": "announced",
+  "panini-it:340625": "released",
   "ltb-de:LTB_Europareise_Band_7": "released",
   "ltb-de:LTB_Phantomias_Collection_Band_6": "released",
   "fi:fi-aa2026-44": "released",
@@ -1055,7 +1055,7 @@
   "kathi-gr:564490864": "released",
   "panini-it:340073": "announced",
   "_health": {
-    "Panini IT": {
+    "ES": {
       "empty_runs": 1,
       "alerted": false
     }
@@ -1063,5 +1063,7 @@
   "es:341708": "announced",
   "es:341705": "announced",
   "es:341714": "announced",
-  "es:341699": "announced"
+  "es:341699": "announced",
+  "panini-it:340613": "announced",
+  "panini-it:340631": "announced"
 }

@@ -16,27 +16,17 @@ def _parse_date_fr(s: str | None):
         return None
 
 
-# Symbols that are not the dollar; checked before "$" because "R$" contains it.
-_CURRENCY_SYMBOLS = (("R$", "BRL"), ("zł", "PLN"), ("Kč", "CZK"), ("лв", "BGN"), ("£", "GBP"), ("€", "EUR"), ("$", "USD"))
-
-
 def _format_price_for_dbi(prix_str: str | None) -> str | None:
-    """Converts a price to the DBI format 'X.XX CUR' ('1850 ISK' for whole units).
-
-    The currency comes from an ISO code in the string ("1850 ISK", given by
-    scrapers that know it), else from its symbol, else EUR.
-    """
+    """Converts a price to the DBI format 'X.XX CUR'."""
     if not prix_str:
         return None
-    iso = re.search(r'([A-Z]{3})', prix_str)
-    currency = iso.group(1) if iso else next(
-        (c for sym, c in _CURRENCY_SYMBOLS if sym in prix_str), "EUR")
-    m = re.search(r'([0-9]+)[,\.]([0-9]{1,2})', prix_str)
+    m = re.search(r'([0-9]+)[,\.]([0-9]{1,2})', prix_str)
     if m:
-        return f"{m.group(1)}.{m.group(2).ljust(2, '0')} {currency}"
-    # Whole-unit prices are only trusted when the scraper named the currency.
-    m = re.search(r'([0-9]+)', prix_str) if iso else None
-    return f"{m.group(1)} {currency}" if m else None
+        major = m.group(1)
+        minor = m.group(2).ljust(2, '0')
+        currency = "USD" if "$" in prix_str else "EUR"
+        return f"{major}.{minor} {currency}"
+    return None
 
 
 def _format_date_for_dbi(date_str: str | None) -> str | None:

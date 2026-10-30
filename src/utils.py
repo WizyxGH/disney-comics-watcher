@@ -124,6 +124,20 @@ def is_fully_indexed_in_inducks(issue_code: str) -> bool:
         
     return False
 
+def cover_filename(issue_code: str, country: str) -> str:
+    """Name of an issue's cover in covers/, without extension: 'it_pm_0557a_001'.
+    Spacing does not matter ('PM 557', 'PM  557' and 'DBIG223' / 'DBIG 223'
+    name the same file), so a code respaced as Inducks spaces it keeps its cover."""
+    m = re.match(r'^([a-zA-Z]+)(?:[\s_]+(.*)|(\d+[A-Za-z]?))$', issue_code)
+    if m:
+        pub_code = m.group(1).lower()
+        number = re.sub(r'[^a-zA-Z0-9]', '_', m.group(2) if m.group(2) is not None else m.group(3)).lower()
+        safe_code = number.zfill(4) if pub_code == country else f"{pub_code}_{number.zfill(4)}"
+    else:
+        safe_code = re.sub(r'[^a-zA-Z0-9]', '_', issue_code).lower()
+    return f"{country}_{safe_code}a_001"
+
+
 @lru_cache(maxsize=2048)
 def does_issue_exist_in_inducks(issue_code: str) -> bool:
     """Check if an issue exists in Inducks."""

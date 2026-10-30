@@ -3,16 +3,17 @@ import re
 import html as html_lib
 import time
 import requests
-from urllib.parse import quote, quote_plus
+from urllib.parse import quote_plus, urlencode
 from src.config import (
     TELEGRAM_API, TELEGRAM_CHAT_ID, TELEGRAM_THREADS,
     DISCORD_ADMIN_WEBHOOK_URL, NOTIFY_BACKENDS,
     OVERRIDES, SITE_BASE, SUPPORTED_COUNTRIES,
 )
 from src.discord import send_discord, role_mention, build_link_line, html_to_markdown
-from src.utils import format_price_fr, get_session, truncate_summary, is_fully_indexed_in_inducks
+from src.utils import format_price_fr, get_session, truncate_summary, is_fully_indexed_in_inducks, does_issue_exist_in_inducks, cover_filename
 from src.dbi.generator import generate_dbi_skeleton
-from src.dbi.mappers import build_inducks_path, resolve_magazine_metadata, resolve_glenat_metadata, resolve_comic_metadata
+from src.dbi.mappers import resolve_magazine_metadata, resolve_glenat_metadata, resolve_comic_metadata
+from src.dbi.isv_search import _extract_base_and_number
 from src.gemini_analyzer import analyze_cover_with_gemini
 
 # One pooled connection to api.telegram.org, mirroring the one in src/discord.py.
@@ -125,12 +126,41 @@ def send_telegram(photo_url: str | None, caption: str, buttons: list | None = No
     return None
 
 
-def build_inducks_url(inducks, numero: str) -> str | None:
-    """Builds the Inducks URL for a given issue number."""
-    path = build_inducks_path(inducks, numero)
-    if not path:
-        return None
-    return f"https://inducks.org/issue.php?c={quote_plus(path)}"
+INDUCKS_BUTTONS = ("Search on Inducks", "Search Inducks", "View on Inducks", "View Publication", "View issues")
+
+
+def inducks_button(issue_path: str | None, raw_title: str, country: str, info: dict | None = None) -> dict:
+    """The Inducks button of a release: the issue page when Inducks lists the
+    issue, otherwise Inducks' advanced search (comp.php?mode=2) filled with
+    what is known, as precise as it gets: country, publication (or title),
+    number, year. A not-yet-indexed issue has no page: issue.php would only
+    say "not found", while the search finds it as soon as Inducks adds it."""
+    info = info or {}
+    known = bool(issue_path) and "UNK" not in issue_path and "/" in issue_path
+    if known and not re.search(r"\d", issue_path):
+        # Only the publication is known.
+        return {"text": "View issues", "url": f"https://inducks.org/publication.php?c={quote_plus(issue_path)}"}
+    if known and does_issue_exist_in_inducks(issue_path):
+        return {"text": "View on Inducks", "url": f"https://inducks.org/issue.php?c={quote_plus(issue_path)}"}
+
+    params = {"country": country}
+    if known:
+        # 'it/PM  557' -> publication 'PM' (the search reads entry codes), number '557'.
+        pub, _, number = issue_path.split("/", 1)[1].rpartition(" ")
+        if not pub:
+            pub, number = re.match(r"^([A-Za-z]+)(.*)$", issue_path.split("/", 1)[1]).groups()
+        params["title1"], params["entrycodeh3"] = pub.strip(), number.strip()
+    else:
+        base, number = _extract_base_and_number(raw_title or "")
+        params["title1"] = base or raw_title or ""
+        if number:
+            params["entrycodeh3"] = number
+    year = re.search(r"\b(19|20)\d{2}\b", str(info.get("date") or info.get("date_mise_en_vente") or ""))
+    if year:
+        # "equal to or after": a new release keeps old homonyms out.
+        params["date2"] = year.group(0)
+    return {"text": "Search on Inducks", "url": "https://inducks.org/compmag.php?" + urlencode({k: v for k, v in params.items() if v})}
+
 
 
 
@@ -159,47 +189,6 @@ def fetch_disneymagazines_cover(slug: str) -> str | None:
     except Exception as e:
         print(f"  [warn] Unable to retrieve cover from DisneyMagazines for {slug}: {e}")
     return None
-
-def build_glenat_inducks_url(album: dict) -> str:
-    """Builds the Inducks URL for a Glénat album (direct page if possible, otherwise search)."""
-    title = album.get("title", "")
-    title_lower = title.lower()
-    tome_num = album.get("numero_de_tome")
-
-    if tome_num is None:
-        tome_match = re.search(r'(?:tome|t\.)\s*(\d+)', title_lower)
-        if tome_match:
-            tome_num = int(tome_match.group(1))
-
-    collection_label = (album.get("collection_label") or "").lower()
-    serie_label = (album.get("serie_label") or "").lower()
-
-    import unicodedata
-    def clean_str(s):
-        if not s: return ""
-        s = unicodedata.normalize('NFKD', s)
-        return "".join(c for c in s if not unicodedata.combining(c))
-
-    coll_clean = clean_str(collection_label)
-    serie_clean = clean_str(serie_label)
-    title_clean = clean_str(title_lower)
-
-    if "grande histoire de picsou" in title_clean or "grande epopee de picsou" in title_clean or "grande histoire de picsou" in serie_clean:
-        if tome_num is not None:
-            return f"https://inducks.org/issue.php?c={quote_plus(f'fr/GHP{str(tome_num).rjust(4)}')}"
-        return "https://inducks.org/publication.php?c=fr/GHP"
-
-    if "ages d'or" in title_clean or "age d'or" in title_clean or "ages d'or" in coll_clean or "ages d'or" in serie_clean:
-        if tome_num is not None:
-            return f"https://inducks.org/issue.php?c={quote_plus(f'fr/AOD{str(tome_num).rjust(4)}')}"
-        return "https://inducks.org/publication.php?c=fr/AOD"
-
-    if "les grands heros" in coll_clean or "les grands heros" in serie_clean or "les grands heros" in title_clean:
-        if tome_num is not None:
-            return f"https://inducks.org/issue.php?c={quote_plus(f'fr/GHD{str(tome_num).rjust(4)}')}"
-        return "https://inducks.org/publication.php?c=fr/GHD"
-
-    return f"https://inducks.org/search.php?search={quote(title)}"
 
 # ── COMMON DISPATCH HELPER ──────────────────────────────────────────────────────
 
@@ -252,20 +241,7 @@ def _dispatch_notification(
 
     # 'magazine' and 'glenat' are French publication types; the others are country codes.
     country = publication_type if publication_type in SUPPORTED_COUNTRIES else "fr"
-    country_prefix = country
-
-    m = re.match(r'^([a-zA-Z]+)([\s_]+)(.*)$', issue_code)
-    if m:
-        pub_code = m.group(1).lower()
-        number = re.sub(r'[^a-zA-Z0-9]', '_', m.group(3)).lower()
-        if pub_code == country_prefix:
-            safe_code = number.zfill(4)
-        else:
-            safe_code = f"{pub_code}_{number.zfill(4)}"
-    else:
-        safe_code = re.sub(r'[^a-zA-Z0-9]', '_', issue_code).lower()
-    
-    cover_filename = f"{country_prefix}_{safe_code}a_001"
+    cover_name = cover_filename(issue_code, country)
 
     # 1. Truncate summary if necessary
     if summary:
@@ -286,7 +262,7 @@ def _dispatch_notification(
 
     # 3. Download cover (only if not fully indexed)
     if cover_url and not is_fully_indexed:
-        download_cover(cover_url, cover_filename)
+        download_cover(cover_url, cover_name)
 
     # 4. Process buttons dynamically based on Inducks
     final_buttons = []
@@ -294,18 +270,8 @@ def _dispatch_notification(
         for row in buttons:
             new_row = []
             for btn in row:
-                text = btn.get("text")
-                if text in ("Search on Inducks", "Search Inducks", "View on Inducks", "View Publication", "View issues"):
-                    if issue_path and "UNK" not in issue_path:
-                        # Si le numéro précis est reconnu (ex: "it/TL 3700", "fi/AA2026-44", "nl/DD1985-01"), lien direct vers le numéro
-                        if re.search(r"\d", issue_path):
-                            new_row.append({"text": "View on Inducks", "url": f"https://inducks.org/issue.php?c={quote_plus(issue_path)}"})
-                        else:
-                            # Seule la publication/série est connue sans numéro précis
-                            new_row.append({"text": "View issues", "url": f"https://inducks.org/publication.php?c={quote_plus(issue_path)}"})
-                    else:
-                        search_url = f"https://inducks.org/search.php?search={quote_plus(raw_title)}" if raw_title else btn.get("url")
-                        new_row.append({"text": "Search Inducks", "url": search_url})
+                if btn.get("text") in INDUCKS_BUTTONS:
+                    new_row.append(inducks_button(issue_path, raw_title, country, info))
                 else:
                     new_row.append(btn)
             final_buttons.append(new_row)
@@ -413,8 +379,8 @@ def notify_magazine(info: dict, releve_date: str | None = None):
     if date: lines.append(f"📅 Published: {date}")
     if releve_date: lines.append(f"📅 On newsstands until: {releve_date}")
     
-    inducks_url = build_inducks_url(ov.get("inducks"), num) or f"https://inducks.org/search.php?search={quote(f'{name} {num}')}"
-    buttons = [[{"text": "View Source", "url": url}], [{"text": "Search Inducks", "url": inducks_url}]]
+    # The Inducks button is filled in by _dispatch_notification.
+    buttons = [[{"text": "View Source", "url": url}], [{"text": "Search on Inducks", "url": ""}]]
 
     cover_url = None
     if info.get("slug"):
@@ -447,7 +413,8 @@ def notify_magazine(info: dict, releve_date: str | None = None):
 
 def _build_glenat_buttons(album: dict, raw_title: str) -> list:
     row1 = [{"text": "View Source", "url": album["url"]}]
-    return [row1,[{"text": "Search Inducks", "url": build_glenat_inducks_url(album)}]]
+    # The Inducks button is filled in by _dispatch_notification.
+    return [row1, [{"text": "Search on Inducks", "url": ""}]]
 
 def notify_glenat_announce(album: dict, state: dict | None = None):
     """Glénat announcement notification (upcoming album)."""
@@ -508,21 +475,8 @@ def notify_international_comic(album: dict, state: dict | None = None, country: 
     if album.get("date"): lines.append(f"{date_prefix} {album['date']}")
     if album.get("price"): lines.append(f"{price_prefix} {html_lib.escape(album['price'])}")
 
-    row1 = []
-    inducks_url = f"https://inducks.org/search.php?search={quote(raw_title)}"
-    inducks_btn_text = "Search Inducks"
-    issue_path = album.get("issue_path")
-    if issue_path and "UNK" not in issue_path:
-        if re.search(r"\d", issue_path):
-            inducks_url = f"https://inducks.org/issue.php?c={quote_plus(issue_path)}"
-            inducks_btn_text = "View on Inducks"
-        else:
-            inducks_url = f"https://inducks.org/publication.php?c={quote_plus(issue_path)}"
-            inducks_btn_text = "View issues"
-
-    row1.append({"text": "View Source", "url": album.get("url", "")})
-
-    buttons = [row1, [{"text": inducks_btn_text, "url": inducks_url}]] if row1 else [[{"text": inducks_btn_text, "url": inducks_url}]]
+    # The Inducks button is filled in by _dispatch_notification.
+    buttons = [[{"text": "View Source", "url": album.get("url", "")}], [{"text": "Search on Inducks", "url": ""}]]
 
     _dispatch_notification(
         info=album,

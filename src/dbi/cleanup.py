@@ -1,37 +1,12 @@
-import re
 import os
-import requests
+from src.dbi.utils import split_dbi_blocks, parse_issue_code_from_block
+from src.utils import cover_filename
 
 def cleanup_indexed_issues(dbi_paths: list[str]):
     """Removes blocks from the given DBI files that correspond to issues already indexed in Inducks."""
     
     issue_codes_to_check = set()
     file_blocks = {}
-    
-    def parse_issue_code_from_block(block: str) -> str:
-        for line in block.split('\n'):
-            line = line.strip()
-            if not line or line.startswith('^^'):
-                continue
-            if ' h3 ' in line:
-                code_part = line.split(' h3 ')[0].strip()
-                if code_part and code_part != '->':
-                    return code_part
-                m = re.search(r'\[entrycode:([^\s\]]+)\]', line)
-                if m:
-                    return m.group(1).strip()
-
-        m = re.search(r'\[entrycode:([^\s\]]+)a\]', block)
-        if m:
-            return m.group(1).strip()
-
-        m = re.search(r'\[entrycode:([^\s\]]+)\]', block)
-        if m:
-            ec = m.group(1).strip()
-            if ec.endswith('a'):
-                return ec[:-1].strip()
-            return ec
-        return ""
 
     for path in dbi_paths:
         if not os.path.exists(path):
@@ -39,25 +14,18 @@ def cleanup_indexed_issues(dbi_paths: list[str]):
         try:
             with open(path, "r", encoding="utf-8") as f:
                 content = f.read()
-            content = re.sub(r'^\^\^\s*Pre-index.*?\n', '', content, flags=re.MULTILINE)
-            blocks = re.split(r'(?=\n?(?:^[A-Za-z0-9\-_/]+\s+h3\s|^->\s+h3\s|^\^\^ Source:))', content, flags=re.MULTILINE)
-            
             country_prefix = os.path.basename(path).replace(".dbi", "").lower()
             parsed_blocks = []
-            for b in blocks:
-                b_str = b.strip()
-                lines = [line.rstrip() for line in b_str.split('\n') if not line.startswith('^^ Source:')]
-                cleaned_block = '\n'.join(lines).strip()
-                if cleaned_block and (' h3 ' in cleaned_block):
-                    code = parse_issue_code_from_block(cleaned_block)
-                    if code:
-                        clean_code = code.replace(" ", "").replace("_", "").lower()
-                        if "/" not in clean_code:
-                            clean_code = f"{country_prefix}/{clean_code}"
-                        parsed_blocks.append((code, clean_code, cleaned_block))
-                        issue_codes_to_check.add(clean_code)
-                    else:
-                        parsed_blocks.append((code, None, cleaned_block))
+            for cleaned_block in split_dbi_blocks(content):
+                code = parse_issue_code_from_block(cleaned_block)
+                if code:
+                    clean_code = code.replace(" ", "").replace("_", "").lower()
+                    if "/" not in clean_code:
+                        clean_code = f"{country_prefix}/{clean_code}"
+                    parsed_blocks.append((code, clean_code, cleaned_block))
+                    issue_codes_to_check.add(clean_code)
+                else:
+                    parsed_blocks.append((code, None, cleaned_block))
             file_blocks[path] = parsed_blocks
         except Exception as e:
             print(f"  [warn] Failed to read {path} for cleanup: {e}")
@@ -98,16 +66,8 @@ def cleanup_indexed_issues(dbi_paths: list[str]):
         return
 
     def delete_cover_for_issue(issue_code: str, country_prefix: str):
-        m = re.match(r'^([a-zA-Z]+)([\s_]+)(.*)$', issue_code)
-        if m:
-            pub_code = m.group(1).lower()
-            number = re.sub(r'[^a-zA-Z0-9]', '_', m.group(3)).lower()
-            safe_code = f"{pub_code}_{number.zfill(4)}"
-        else:
-            safe_code = re.sub(r'[^a-zA-Z0-9]', '_', issue_code).lower()
-            
         # Check standard .jpg extension
-        cover_path = os.path.join("covers", f"{country_prefix}_{safe_code}a_001.jpg")
+        cover_path = os.path.join("covers", f"{cover_filename(issue_code, country_prefix)}.jpg")
         if os.path.exists(cover_path):
             try:
                 os.remove(cover_path)

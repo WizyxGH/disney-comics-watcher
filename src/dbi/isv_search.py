@@ -7,6 +7,7 @@ Provides canonical series mappings and smart fuzzy lookup for new comic releases
 
 import os
 import re
+from collections import Counter
 import unicodedata
 from src.db import query_db
 
@@ -42,7 +43,7 @@ CANONICAL_SERIES: dict[str, dict[str, str]] = {
         "grandi classici": "it/GCD",
         "disney mix speciale": "it/DMIX",
         "disney mix": "it/DMIX",
-        "paperinik": "it/PK",
+        "paperinik": "it/PPK",
         "paperino mese": "it/PM",
         "paperino": "it/PM",
     },
@@ -435,9 +436,71 @@ def search_publication_code(
     if not raw_title:
         return None
     path = _search_issue_path(raw_title, country, page_url)
+    if path and _is_old_issue(path, country):
+        # Another magazine already holds this code: Inducks lists the issue
+        # years back ("Paperinik 119" is not it/PK 119 of 2003). Two magazines
+        # never share a code, so an unknown beats a wrong one.
+        return None
     if path and _is_variant(raw_title, page_url):
         path = _variant_path(path)
     return path
+
+
+def _is_old_issue(path: str, country: str) -> bool:
+    """True when Inducks lists this issue, dated years before the newest one
+    of the country: a new release cannot be it."""
+    rows = query_db(
+        "SELECT MAX(filledoldestdate) FROM inducks_issue "
+        "WHERE REPLACE(issuecode, ' ', '') = ? AND filledoldestdate < '9999'",
+        (path.replace(" ", ""),)
+    )
+    date = rows[0][0] if rows else None
+    newest = _country_newest_year(country)
+    return bool(date and newest) and int(str(date)[:4]) < newest - _RUNNING_YEARS
+
+
+_CODES_CACHE: dict[str, list[tuple[str, str]]] = {}
+
+def issue_code(pub_code: str, num: str) -> str:
+    """The Inducks code of an issue, spaced as Inducks spaces it ('it/PM  557',
+    'it/TL 3700', 'uk/MF1993-32'): the dump's own code when it lists the
+    issue, otherwise the spacing the publication uses for numbers that long.
+    A single space is wrong for most series, and issue.php finds nothing."""
+    pub_code = pub_code.rstrip()
+    if pub_code not in _CODES_CACHE:
+        _CODES_CACHE[pub_code] = [
+            (str(c), str(n)) for c, n in (query_db(
+                "SELECT issuecode, issuenumber FROM inducks_issue WHERE publicationcode = ?",
+                (pub_code,)) or [])
+        ]
+    codes = _CODES_CACHE[pub_code]
+    if num.isdigit() and not any(len(n) > 1 and n.startswith("0") for _, n in codes):
+        # A shop's "Tome 04" is issue 4 where Inducks numbers without zeros.
+        num = str(int(num))
+    for code, number in codes:
+        if number.upper() == num.upper():
+            return code
+    # Separator Inducks puts before a number of each length (the usual one:
+    # a few issues of a series are spaced otherwise).
+    counts: dict[int, Counter] = {}
+    for code, number in codes:
+        sep = code[len(pub_code):len(code) - len(number)]
+        if code.startswith(pub_code) and code.endswith(number) and not sep.strip():
+            counts.setdefault(len(number), Counter())[sep] += 1
+    seps = {length: c.most_common(1)[0][0] for length, c in counts.items()}
+    if len(num) in seps:
+        return f"{pub_code}{seps[len(num)]}{num}"
+    if seps:
+        # Numbers are right-aligned on a fixed width: a longer one eats the spaces.
+        length, sep = max(seps.items(), key=lambda kv: kv[0])
+        width = len(pub_code) + len(sep) + length
+        pad = max(width - len(pub_code) - len(num), 0)
+        return f"{pub_code}{' ' * pad}{num}"
+    # No other issue to copy: Inducks' usual width, ten characters.
+    return f"{pub_code}{' ' * max(_CODE_WIDTH - len(pub_code) - len(num), 1)}{num}"
+
+
+_CODE_WIDTH = 10
 
 
 # Panini product codes end with the issue number, then a format tag; a
@@ -454,6 +517,7 @@ def _variant_path(path: str) -> str:
     """'it/DSE 62' -> 'it/DSE 62B': the first letter after those Inducks
     already gives that number's variants (58B, 58C, 58D -> 58E)."""
     pub_code, _, num = path.rpartition(" ")
+    pub_code = pub_code.rstrip()
     if not num.isdigit():
         return path
     taken = {
@@ -464,7 +528,7 @@ def _variant_path(path: str) -> str:
     }
     for letter in "BCDEFGHIJKLMNOPQRSTUVWXYZ":
         if f"{num}{letter}" not in taken:
-            return f"{pub_code} {num}{letter}"
+            return issue_code(pub_code, f"{num}{letter}")
     return path
 
 
@@ -490,7 +554,7 @@ def _search_issue_path(raw_title: str, country: str, page_url: str | None) -> st
                 m_extra = re.search(re.escape(sku_prefix) + r"(\d+)sp(\d+)", url_lower)
                 if m_extra:
                     num = f"{int(m_extra.group(1))}SP{m_extra.group(2)}"
-                return f"{_resolve_canonical(pub_code, country, num)} {num}"
+                return issue_code(_resolve_canonical(pub_code, country, num), num)
 
     base, num = _extract_base_and_number(raw_title)
     if not num:
@@ -514,7 +578,7 @@ def _search_issue_path(raw_title: str, country: str, page_url: str | None) -> st
     # names a magazine, not one period of it: the period is chosen by number.
     for norm_key, pub_code in _SORTED_CANONICAL.get(country, []):
         if norm_base == norm_key:
-            return f"{_resolve_canonical(pub_code, country, num)} {num}"
+            return issue_code(_resolve_canonical(pub_code, country, num), num)
 
     # 3. Database search, matching whole words only, ranked by relevance.
     _load_country_pubs(country)
@@ -568,14 +632,14 @@ def _search_issue_path(raw_title: str, country: str, page_url: str | None) -> st
             best_tied = [p for p in best_tied if _not_an_old_number(p, num)]
 
         if best_tied:
-            return f"{_pick_publication(best_tied, num)} {num}"
+            return issue_code(_pick_publication(best_tied, num), num)
 
     # 4. Fallback canonical word match (for subtitles: e.g. "Topolino - La grande sfida"),
     # as loose as the matches above, so held to the same number check.
     for norm_key, pub_code in _SORTED_CANONICAL.get(country, []):
         if _contains_words(norm_base, norm_key):
             pub = _resolve_canonical(pub_code, country, num)
-            return f"{pub} {num}" if _not_an_old_number(pub, num) else None
+            return issue_code(pub, num) if _not_an_old_number(pub, num) else None
 
     return None
 

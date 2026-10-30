@@ -44,6 +44,51 @@ def _format_date_for_dbi(date_str: str | None) -> str | None:
 
 # ─────────────────────────────────────────────────────────────────────────────
 
+# An issue block starts on its h3 line. Inducks codes hold spaces ("PM  557",
+# "TL 3700"): the code is any run of words before " h3 ", not a single word,
+# or the whole file is read as one block and duplicates are never merged.
+_BLOCK_START = re.compile(r'(?=\n?(?:^(?:->|[A-Za-z0-9\-_/]+(?: +[A-Za-z0-9\-_/]+)*)\s+h3\s|^\^\^ Source:))', re.MULTILINE)
+
+
+def split_dbi_blocks(content: str) -> list[str]:
+    """The issue blocks of a DBI file, without header comments nor legacy '^^ Source:' lines."""
+    content = re.sub(r'^\^\^\s*Pre-index.*?\n', '', content, flags=re.MULTILINE)
+    blocks = []
+    for b in _BLOCK_START.split(content):
+        lines = [line.rstrip() for line in b.strip().split('\n') if not line.startswith('^^ Source:')]
+        block = '\n'.join(lines).strip()
+        if block and ' h3 ' in block:
+            blocks.append(block)
+    return blocks
+
+
+def parse_issue_code_from_block(block: str) -> str:
+    """Issue code of a DBI block ('PM  557'), from its h3 line or its [entrycode:]."""
+    for line in block.split('\n'):
+        line = line.strip()
+        if not line or line.startswith('^^'):
+            continue
+        if ' h3 ' in line:
+            code_part = line.split(' h3 ')[0].strip()
+            if code_part and code_part != '->':
+                return code_part
+            m = re.search(r'\[entrycode:([^\s\]]+)\]', line)
+            if m:
+                return m.group(1).strip()
+
+    m = re.search(r'\[entrycode:([^\s\]]+)a\]', block)
+    if m:
+        return m.group(1).strip()
+
+    m = re.search(r'\[entrycode:([^\s\]]+)\]', block)
+    if m:
+        ec = m.group(1).strip()
+        if ec.endswith('a'):
+            return ec[:-1].strip()
+        return ec
+    return ""
+
+
 def sort_dbi_file(dbi_path: str):
     """Sorts the pre-index blocks in the DBI file alphabetically and naturally by issue code, putting a single header at the top."""
     if not os.path.exists(dbi_path):
@@ -52,43 +97,7 @@ def sort_dbi_file(dbi_path: str):
         with open(dbi_path, "r", encoding="utf-8") as f:
             content = f.read()
 
-        # Remove any occurrence of "^^ Pre-index..." comment lines from the content
-        content = re.sub(r'^\^\^\s*Pre-index.*?\n', '', content, flags=re.MULTILINE)
-
-        # Split blocks by h3 header or legacy "^^ Source:"
-        blocks = re.split(r'(?=\n?(?:^[A-Za-z0-9\-_/]+\s+h3\s|^->\s+h3\s|^\^\^ Source:))', content, flags=re.MULTILINE)
-        cleaned_blocks = []
-        for b in blocks:
-            b_str = b.strip()
-            lines = [line.rstrip() for line in b_str.split('\n') if not line.startswith('^^ Source:')]
-            cleaned_b = '\n'.join(lines).strip()
-            if cleaned_b and (' h3 ' in cleaned_b):
-                cleaned_blocks.append(cleaned_b)
-
-        def parse_issue_code_from_block(block: str) -> str:
-            for line in block.split('\n'):
-                line = line.strip()
-                if not line or line.startswith('^^'):
-                    continue
-                if ' h3 ' in line:
-                    code_part = line.split(' h3 ')[0].strip()
-                    if code_part and code_part != '->':
-                        return code_part
-                    m = re.search(r'\[entrycode:([^\s\]]+)\]', line)
-                    if m:
-                        return m.group(1).strip()
-
-            m = re.search(r'\[entrycode:([^\s\]]+)a\]', block)
-            if m:
-                return m.group(1).strip()
-
-            m = re.search(r'\[entrycode:([^\s\]]+)\]', block)
-            if m:
-                ec = m.group(1).strip()
-                if ec.endswith('a'):
-                    return ec[:-1].strip()
-                return ec
-            return ""
+        cleaned_blocks = split_dbi_blocks(content)
 
         def natural_sort_key(s: str):
             s_clean = re.sub(r'\s+', ' ', s).strip()
@@ -107,7 +116,9 @@ def sort_dbi_file(dbi_path: str):
                 if is_fully_indexed_in_inducks(full_code):
                     print(f"  [DBI] Automatically removed: {full_code} is already completely indexed.")
                     continue
-                unique_blocks[code] = b
+                # One code, one entry: a later detection of the same issue
+                # replaces the earlier one (spacing aside: "PM 557" = "PM  557").
+                unique_blocks[re.sub(r"\s+", "", code)] = b
             else:
                 unique_blocks[f"unknown_{len(unique_blocks)}"] = b
 

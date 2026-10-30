@@ -11,7 +11,8 @@ from unittest import mock
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
-# (publicationcode, title, [(issuenumber, filledoldestdate), ...], [alternative names])
+# (publicationcode, title, [(issuenumber, filledoldestdate[, issuecode]), ...], [alternative names])
+# The issue code defaults to "<publication> <number>"; Inducks often pads more.
 PUBLICATIONS = [
     # Greece: the Kathimerini magazines are the second period of old titles.
     ("gr/MM",  "Μίκυ Μάους",                [("1", "1966-01-01"), ("646", "1979-03-01"), ("2460", "2013-09-06")], []),
@@ -30,6 +31,12 @@ PUBLICATIONS = [
                                               ("58D", "2026-12-31"), ("59", "2026-05-31")], []),
     ("it/DMIX", "Disney Mix",                [("39", "2026-06-11"), ("39SP3", "2026-06-30")], []),
     ("it/DKT",  "DuckTales",                 [("1", "1993-05-31"), ("2", "1994-01-31")], []),
+    # Paperino Mese is padded to ten characters; "Paperinik" is Panini's
+    # it/PPK, while it/PK is a magazine of the 2000s with the same numbers.
+    ("it/PM",   "Paperino Mese",             [("99", "1988-09-01", "it/PM   99"), ("551", "2026-04-30", "it/PM  551"),
+                                              ("552", "2026-05-29", "it/PM  552")], []),
+    ("it/PK",   "Paperinik e altri supereroi", [("119", "2003-08-31", "it/PK  119"), ("139", "2005-04-31", "it/PK  139")], []),
+    ("it/PPK",  "Paperinik",                 [("114", "2026-06-05")], []),
     # USA: book titles stack series and subtitles.
     ("us/DMF",  "Disney Masters",            [("7", "2026-01-01")], []),
     ("us/DDKK", "Walt Disney's Donald Duck", [("3", "2015-01-01")], []),
@@ -59,9 +66,9 @@ def _build() -> sqlite3.Connection:
         conn.execute("INSERT INTO inducks_publication VALUES (?,?,?)", (code, code.split("/")[0], title))
         for alt in alts:
             conn.execute("INSERT INTO inducks_publicationname VALUES (?,?)", (code, alt))
-        for number, date in issues:
+        for number, date, *issuecode in issues:
             conn.execute("INSERT INTO inducks_issue VALUES (?,?,?,?,?)",
-                         (f"{code} {number}", code, number, date, "N"))
+                         (issuecode[0] if issuecode else f"{code} {number}", code, number, date, "N"))
     conn.executemany("INSERT INTO inducks_story VALUES (?)", [(s,) for s in STORIES])
     return conn
 
@@ -78,7 +85,7 @@ class FakeInducks:
         for p in self.patches:
             p.start()
         # The search module caches per country and per publication.
-        for name in ("_PUB_CACHE", "_CACHE_LOADED", "_STATS_CACHE", "_MAX_ISSUE_CACHE", "_NEWEST_CACHE"):
+        for name in ("_PUB_CACHE", "_CACHE_LOADED", "_STATS_CACHE", "_MAX_ISSUE_CACHE", "_NEWEST_CACHE", "_CODES_CACHE"):
             if hasattr(isv_search, name):
                 getattr(isv_search, name).clear()
         isv_search._DB_HAS_ISSUESCOUNT = None

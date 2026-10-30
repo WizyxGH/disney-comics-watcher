@@ -97,6 +97,20 @@ class IssueCodeDetection(unittest.TestCase):
                                       page_url=self.PANINI.format("pk-early-days-1wspev058spv")),
                          "it/DSE 58E")
 
+    # Inducks pads codes: "it/PM 557" (one space) is not found on issue.php.
+    def test_issue_code_spaced_as_inducks(self):
+        self.assertEqual(self.resolve("Paperino 552", "it"), "it/PM  552")
+        self.assertEqual(self.resolve("Paperino 557", "it"), "it/PM  557")
+        self.assertEqual(isv_search.issue_code("it/PM", "98"), "it/PM   98")
+        self.assertEqual(isv_search.issue_code("it/PM", "1000"), "it/PM 1000")
+        # "Tome 04": Inducks numbers it 4.
+        self.assertEqual(isv_search.issue_code("it/PM", "0552"), "it/PM  552")
+
+    # Two magazines never share a code: "Paperinik 119" was it/PK 119 (2003).
+    def test_new_release_never_takes_an_old_issue_code(self):
+        self.assertEqual(self.resolve("Paperinik 119", "it"), "it/PPK 119")
+        self.assertIsNone(self.resolve("Paperinik e altri supereroi 119", "it"))
+
     def test_band_inside_a_word_is_not_a_volume(self):
         self.assertEqual(isv_search._extract_base_and_number("Lustiges Taschenbuch Sonderband 134"),
                          ("Lustiges Taschenbuch Sonderband", "134"))

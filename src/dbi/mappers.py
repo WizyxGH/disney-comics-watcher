@@ -1,6 +1,6 @@
 import re
 import unicodedata
-from src.dbi.isv_search import search_publication_code, _find_issue_by_title
+from src.dbi.isv_search import search_publication_code, _find_issue_by_title, issue_code
 
 def _build_metadata(issue_path: str | None, name: str, info: dict, ean: str | None = None) -> dict:
     return {
@@ -96,7 +96,7 @@ def build_inducks_path(inducks, numero: str) -> str | None:
         n = int(digits)
 
         if isinstance(inducks, str):
-            return f"fr/{inducks} {num_str}"
+            return issue_code(f"fr/{inducks}", num_str)
         elif len(inducks) == 2:
             code, width = inducks
             return f"fr/{code}{str(n).rjust(width)}"

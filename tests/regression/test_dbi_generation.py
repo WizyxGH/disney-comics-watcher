@@ -9,6 +9,7 @@ import unittest
 
 from fake_inducks import FakeInducks
 from src.dbi.generator import generate_dbi_skeleton
+from src.dbi.utils import parse_issue_code_from_block, split_dbi_blocks
 from src.scrapers import fi
 
 
@@ -52,6 +53,19 @@ class DbiSkeleton(unittest.TestCase):
         self.assertTrue(lines[1].startswith("AA2026-42a  HC DD2025-38"))
         self.assertTrue(lines[2].startswith("AA2026-42b  H 2013-227"))
         self.assertTrue(lines[3].startswith("AA2026-42c "))
+
+    # Codes hold spaces ("PM  557"): the file used to be read as one block,
+    # so a re-detected issue was appended again instead of replacing itself.
+    def test_one_code_one_entry(self):
+        for title in ("Topolino 3700 con i Dadi da Gioco", "Topolino 3700"):
+            generate_dbi_skeleton({"title": title, "issue_path": "it/TL 3700"}, "it")
+        generate_dbi_skeleton({"title": "Paperino 557", "issue_path": "it/PM  557"}, "it")
+        with open(os.path.join("issues", "it.dbi"), encoding="utf-8") as f:
+            blocks = split_dbi_blocks(f.read())
+        self.assertEqual([parse_issue_code_from_block(b) for b in blocks], ["PM  557", "TL 3700"])
+        self.assertIn("h3 Topolino 3700 [inx:-]", blocks[1])
+        # Columns stay aligned whatever the spacing: "h" at position 14.
+        self.assertEqual(blocks[0].split("\n")[0].index("h3"), 13)
 
 
 class AkuankkaStoryCodes(unittest.TestCase):

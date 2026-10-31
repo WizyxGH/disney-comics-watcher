@@ -75,6 +75,9 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
                     # only from the Inducks data (src/dbi/story_rules.py).
                     from src.dbi.story_rules import apply_story_rules
                     info["stories"] = apply_story_rules(info["stories"])
+                    # Stories still without a code: from the image of their first page.
+                    from src.dbi.story_rules import find_story_codes
+                    find_story_codes(info["stories"], issue_path)
             except Exception as e:
                 print(f"  [warn] Failed to enrich LTB: {e}")
 

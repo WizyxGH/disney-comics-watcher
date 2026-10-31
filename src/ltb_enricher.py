@@ -99,6 +99,8 @@ def _parse_stories(html: str) -> tuple[str | None, str | None, list[dict]]:
             m = re.search(r'_0*(\d+)\.jpg', img_link['href'])
             if m:
                 story['start_page'] = int(m.group(1))
+                # The story's first page: finds its code among Inducks scans when the site has none.
+                story['preview_url'] = requests.compat.urljoin(LTB_BASE + '/', img_link['href'])
 
         stories.append(story)
 

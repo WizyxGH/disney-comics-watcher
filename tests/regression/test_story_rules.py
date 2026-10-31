@@ -80,5 +80,32 @@ class LtbSkeleton(unittest.TestCase):
         self.assertIn("[pages:104]", lines[5])
 
 
+class StoryFromItsFirstPage(unittest.TestCase):
+    """find_story_codes: only empty codes, only with the preview of the story's own first page."""
+    def run_with(self, stories):
+        from unittest import mock
+        from src.dbi import story_rules
+        fetched, asked = [], []
+        def find(query, page, known, fetch, own_issue="", log=print):
+            asked.append((page, tuple(known), own_issue))
+            return "I TL 3681-1P"
+        with mock.patch.object(story_rules, "_query", lambda sql, params=(): [(1,)]),                 mock.patch.object(story_rules, "_fetch", lambda url: fetched.append(url) or b"img"),                 mock.patch.object(story_rules, "_find_story_code", find):
+            story_rules.find_story_codes(stories, "de/LTB 611", log=lambda *_: None)
+        return fetched, asked
+
+    def test_empty_code_filled_from_the_preview(self):
+        stories = [dict(story("", 5, 20), preview_url="https://x/LTB-611_005.jpg"),
+                   dict(story("I PKA  42-1", 25, 20), preview_url="https://x/LTB-611_025.jpg")]
+        fetched, asked = self.run_with(stories)
+        self.assertEqual(fetched, ["https://x/LTB-611_005.jpg"])
+        self.assertEqual(asked, [(b"img", ("I PKA  42-1",), "de/LTB 611")])
+        self.assertEqual(stories[0]["story_code"], "I TL 3681-1P")
+
+    def test_later_part_does_not_use_the_first_part_preview(self):
+        stories = [dict(story("", 45, 20, ), preview_url="https://x/LTB-611_005.jpg")]
+        self.assertEqual(self.run_with(stories), ([], []))
+        self.assertEqual(stories[0]["story_code"], "")
+
+
 if __name__ == "__main__":
     unittest.main()

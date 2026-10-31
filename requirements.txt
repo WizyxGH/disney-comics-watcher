@@ -2,4 +2,4 @@ requests
 beautifulsoup4
 libsql-client
 # Inducks .dbi lines and story rules shared with Archiving-Helper
-inducks-dbi[covers] @ git+https://github.com/WizyxGH/inducks-dbi@v0.1.0
+inducks-dbi[covers] @ git+https://github.com/WizyxGH/inducks-dbi@v0.2.0

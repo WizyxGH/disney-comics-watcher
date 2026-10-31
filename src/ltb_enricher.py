@@ -143,6 +143,7 @@ def enrich_ltb_metadata(info: dict) -> dict:
             last_story = stories[-1]
             if 'start_page' in last_story and 'pages' in last_story:
                 info['pages'] = last_story['start_page'] + last_story['pages'] - 1
+                info['pages_estimated'] = True
             if cover_title:
                 info['name'] = cover_title
             if issue_date:

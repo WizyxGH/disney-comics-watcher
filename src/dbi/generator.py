@@ -1,5 +1,7 @@
 import os
 import re
+from inducks_dbi.lines import code_and_pages as _code_and_pages
+
 from src.config import SUPPORTED_COUNTRIES
 from src.dbi.utils import _format_date_for_dbi, _format_price_for_dbi, sort_dbi_file
 from src.dbi.mappers import (
@@ -45,6 +47,7 @@ def _sanitize_bolderbast(text: str) -> str:
     text = text.replace("…", "...")
     return text
 
+
 def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | None = None) -> str | None:
     overrides = overrides or {}
     try:
@@ -67,8 +70,19 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
                     data["date"] = info["date"]
                 if info.get("pages"):
                     data["pages"] = info["pages"]
+                if info.get("stories"):
+                    # Serials split into their parts, strips per page, invented codes:
+                    # only from the Inducks data (src/dbi/story_rules.py).
+                    from src.dbi.story_rules import apply_story_rules
+                    info["stories"] = apply_story_rules(info["stories"])
             except Exception as e:
                 print(f"  [warn] Failed to enrich LTB: {e}")
+
+        if not info.get("cover_code") and info.get("cover_url") and info.get("stories"):
+            # A reprinted cover (LTB 610a = D 28817, the Nordic pocket books' cover): found from
+            # the image among the covers of the issues printing the same stories.
+            from src.dbi.story_rules import find_cover_code
+            info["cover_code"] = find_cover_code(info["cover_url"], info["stories"], issue_path)
                 
         name = _sanitize_bolderbast(data["name"])
         prix_raw = data["price"]
@@ -106,7 +120,8 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         fields = []
         if issdate: fields.append(f"[issdate:{issdate}]")
         if price: fields.append(f"[price:{price}]")
-        if pages_val: fields.append(f"[pages:{pages_val}]")
+        # A page count worked out from the last story is a lower bound, not the issue's count.
+        if pages_val and not info.get("pages_estimated"): fields.append(f"[pages:{pages_val}]")
         if size_val: fields.append(f"[size:{size_val}]")
         if ean_val: fields.append(f"[EAN {ean_val}]")
         if isstrans: fields.append(f"[isstrans:{isstrans}]")
@@ -132,8 +147,7 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         cover_ec = dbi_issue_code + "a"
         storycode = info.get("cover_code") or "?"
         
-        storycode_field = storycode[:12].ljust(12)
-        pages_field     = "1".rjust(4)
+        storycode_field, pages_field, cover_overflow = _code_and_pages(storycode, "1")
         brokpg          = " "
         pagel           = "c"
         
@@ -162,6 +176,7 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         cover_title = info.get("cover_title") or ""
         suffixes = []
         if cover_title: suffixes.append(cover_title)
+        suffixes += cover_overflow
         if len(cover_ec) > 12: suffixes.append(f"[entrycode:{cover_ec}]")
         
         characters = info.get("characters", [])
@@ -209,10 +224,11 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
                 else:
                     story_ec = f"{dbi_issue_code}{chr(97 + i)}"
                 
-                story_code = (story.get("story_code", "") or story.get("code", ""))[:12].ljust(12)
-                pages_str = str(story.get("pages", "")).strip()[:4].rjust(4)
+                story_code = (story.get("story_code", "") or story.get("code", "")).strip()
+                pages_str = str(story.get("pages", "")).strip()
+                code_field, pages_field, overflow = _code_and_pages(story_code, pages_str)
                 brokpg = " "
-                pagel = " "
+                pagel = str(story.get("pagel") or " ")[:1]
                 
                 c_hero = ""
                 if story.get("characters"):
@@ -228,14 +244,14 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
                 st_credits = f"  {c_plot}{c_writ}{c_art}{c_ink}{c_hero}  "
                 
                 if len(story_ec) <= 12:
-                    st_prefix = f"{story_ec.ljust(12)}{story_code}{pages_str}{brokpg}{pagel}{st_credits}"
+                    st_prefix = f"{story_ec.ljust(12)}{code_field}{pages_field}{brokpg}{pagel}{st_credits}"
                 else:
-                    st_prefix = f"->          {story_code}{pages_str}{brokpg}{pagel}{st_credits}"
+                    st_prefix = f"->          {code_field}{pages_field}{brokpg}{pagel}{st_credits}"
 
                 st_title = _sanitize_bolderbast(story.get("title", "").strip())
-                st_suffixes = []
-                if "LTB " in dbi_issue_code:
-                    st_suffixes.append("[part:]")
+                st_suffixes = list(overflow)
+                if story.get("part"):
+                    st_suffixes.append(f"[part:{story['part']}]")
                 if len(story_ec) > 12: st_suffixes.append(f"[entrycode:{story_ec}]")
                 if story.get("characters"):
                     c_codes = [c["code"] for c in story["characters"] if c.get("code")]

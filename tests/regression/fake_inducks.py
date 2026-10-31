@@ -52,6 +52,32 @@ PUBLICATIONS = [
 
 STORIES = ["H 2013-227", "I PKA  42-1", "HC DD2025-38"]
 
+# Story versions (storyversioncode, storycode, entirepages, rowsperpage) and their
+# printings (entrycode, issuecode, storyversioncode, position, part): a serial in two
+# parts (I TL 3583-1P), one in five parts printed between other stories in an issue laid
+# out like the German LTB (pl/GP 269, I TL 3681-1P), and single stories.
+STORY_VERSIONS = [
+    ("I TL 3583-1P", "I TL 3583-1P", 52, 3), ("it/TL 3583p009", "I TL 3583-1P", 26, 3),
+    ("it/TL 3583p037", "I TL 3583-1P", 26, 3),
+    ("I TL 3681-1P", "I TL 3681-1P", 40, 3), ("pl/GP 269p005", "I TL 3681-1P", 20, 3),
+    ("pl/GP 269p045", "I TL 3681-1P", 20, 3), ("pl/GP 269p089", "I TL 3681-1P", 20, 3),
+    ("pl/GP 269p179", "I TL 3681-1P", 20, 3), ("pl/GP 269p231", "I TL 3681-1P", 24, 3),
+    ("I PKA  42-1", "I PKA  42-1", 20, 3), ("I TL 3017-3", "I TL 3017-3", 24, 3),
+    ("I TL 3622-1", "I TL 3622-1", 30, 3),
+]
+ENTRIES = [
+    ("it/TL 3583p009", "it/TL 3583", "it/TL 3583p009", "p009", "1"),
+    ("it/TL 3583p037", "it/TL 3583", "it/TL 3583p037", "p037", "2"),
+    ("pl/GP 269p005", "pl/GP 269", "pl/GP 269p005", "p005", "1"),
+    ("pl/GP 269p025", "pl/GP 269", "I PKA  42-1", "p025", ""),
+    ("pl/GP 269p045", "pl/GP 269", "pl/GP 269p045", "p045", "2"),
+    ("pl/GP 269p065", "pl/GP 269", "I TL 3017-3", "p065", ""),
+    ("pl/GP 269p089", "pl/GP 269", "pl/GP 269p089", "p089", "3"),
+    ("pl/GP 269p179", "pl/GP 269", "pl/GP 269p179", "p179", "4"),
+    ("pl/GP 269p231", "pl/GP 269", "pl/GP 269p231", "p231", "5"),
+    ("de/LTB 610p095", "de/LTB 610", "I TL 3622-1", "p095", ""),
+]
+
 
 def _build() -> sqlite3.Connection:
     conn = sqlite3.connect(":memory:")
@@ -61,6 +87,10 @@ def _build() -> sqlite3.Connection:
         CREATE TABLE inducks_issue (issuecode TEXT, publicationcode TEXT, issuenumber TEXT,
                                     filledoldestdate TEXT, fullyindexed TEXT);
         CREATE TABLE inducks_story (storycode TEXT);
+        CREATE TABLE inducks_storyversion (storyversioncode TEXT, storycode TEXT, entirepages TEXT,
+                                           rowsperpage TEXT);
+        CREATE TABLE inducks_entry (entrycode TEXT, issuecode TEXT, storyversioncode TEXT,
+                                    position TEXT, part TEXT);
     """)
     for code, title, issues, alts in PUBLICATIONS:
         conn.execute("INSERT INTO inducks_publication VALUES (?,?,?)", (code, code.split("/")[0], title))
@@ -70,6 +100,8 @@ def _build() -> sqlite3.Connection:
             conn.execute("INSERT INTO inducks_issue VALUES (?,?,?,?,?)",
                          (issuecode[0] if issuecode else f"{code} {number}", code, number, date, "N"))
     conn.executemany("INSERT INTO inducks_story VALUES (?)", [(s,) for s in STORIES])
+    conn.executemany("INSERT INTO inducks_storyversion VALUES (?,?,?,?)", STORY_VERSIONS)
+    conn.executemany("INSERT INTO inducks_entry VALUES (?,?,?,?,?)", ENTRIES)
     return conn
 
 
@@ -77,11 +109,12 @@ class FakeInducks:
     """Context manager routing every query_db call to the in-memory database."""
 
     def __enter__(self):
-        from src.dbi import isv_search
+        from src.dbi import isv_search, story_rules
         self.conn = _build()
         query = lambda sql, params=(): self.conn.execute(sql, params).fetchall()
         self.patches = [mock.patch("src.db.query_db", query),
-                        mock.patch.object(isv_search, "query_db", query)]
+                        mock.patch.object(isv_search, "query_db", query),
+                        mock.patch.object(story_rules, "query_db", query)]
         for p in self.patches:
             p.start()
         # The search module caches per country and per publication.

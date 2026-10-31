@@ -38,10 +38,23 @@ jobs:
 
       # 4. Dependencies
       - name: Install dependencies
-        run: pip install requests beautifulsoup4 libsql-client
+        run: pip install -r requirements.txt
 
       # 4b. Build local Inducks DB (saves 100% Turso quota and eliminates rate limits)
+      # The Inducks tables used by the DBI story rules and the cover lookup (~490 MB) are downloaded once a week.
+      - name: Week number
+        id: week
+        run: echo "week=$(date -u +%G-%V)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Inducks story tables
+        uses: actions/cache@v4
+        with:
+          path: .inducks-story-tables
+          key: inducks-story-tables-v2-${{ steps.week.outputs.week }}
+
       - name: Build local Inducks DB
+        env:
+          INDUCKS_STORY_TABLES_DIR: .inducks-story-tables
         run: python build_sqlite.py
 
       # 5. Run the watcher

@@ -5,6 +5,55 @@ import time
 import requests
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "inducks.db")
+ISV_BASE = "https://inducks.org/inducks/isv"
+
+# Tables read by the DBI story rules and the cover lookup (package inducks-dbi): only the
+# columns used. ~490 MB to download, so they are loaded only when INDUCKS_STORY_TABLES_DIR names
+# a folder where the files are kept (the watcher workflow caches it for a week).
+STORY_TABLES = {
+    "inducks_storyversion": ("storyversioncode", "storycode", "entirepages", "rowsperpage"),
+    "inducks_entry": ("entrycode", "issuecode", "storyversioncode", "position", "part"),
+    "inducks_entryurl": ("entrycode", "sitecode", "pagenumber", "url", "storycode"),
+}
+# Rows kept: the scans Inducks serves (site "webusers") of a known story, for the cover lookup.
+STORY_TABLE_ROWS = {"inducks_entryurl": lambda row: row[1] == "webusers" and row[4] != ""}
+STORY_TABLE_MAX_AGE_DAYS = 7
+
+
+def _story_table_file(table: str, cache_dir: str) -> str:
+    path = os.path.join(cache_dir, f"{table}.isv")
+    fresh = os.path.exists(path) and time.time() - os.path.getmtime(path) < STORY_TABLE_MAX_AGE_DAYS * 86400
+    if not fresh:
+        print(f"Downloading {table}.isv ...")
+        os.makedirs(cache_dir, exist_ok=True)
+        with requests.get(f"{ISV_BASE}/{table}.isv", stream=True, timeout=300) as r:
+            r.raise_for_status()
+            with open(path + ".part", "wb") as f:
+                for chunk in r.iter_content(1 << 20):
+                    f.write(chunk)
+        os.replace(path + ".part", path)
+    return path
+
+
+def _load_story_tables(cur, cache_dir: str) -> None:
+    for table, columns in STORY_TABLES.items():
+        path = _story_table_file(table, cache_dir)
+        cur.execute(f"CREATE TABLE {table} ({', '.join(c + ' TEXT' for c in columns)})")
+        with open(path, encoding="utf-8", errors="replace") as f:
+            header = f.readline().rstrip("\r\n").split("^")
+            index = [header.index(c) for c in columns]
+            rows = (tuple(cells[i] if i < len(cells) else "" for i in index)
+                    for cells in (line.rstrip("\r\n").split("^") for line in f) if len(cells) > 1)
+            keep = STORY_TABLE_ROWS.get(table)
+            if keep:
+                rows = (row for row in rows if keep(row))
+            cur.executemany(f"INSERT INTO {table} VALUES ({', '.join('?' * len(columns))})", rows)
+        print(f"  -> {table} imported.")
+    cur.execute("CREATE INDEX idx_sv_storycode ON inducks_storyversion(storycode)")
+    cur.execute("CREATE INDEX idx_sv_code ON inducks_storyversion(storyversioncode)")
+    cur.execute("CREATE INDEX idx_entry_sv ON inducks_entry(storyversioncode)")
+    cur.execute("CREATE INDEX idx_entry_issue ON inducks_entry(issuecode)")
+    cur.execute("CREATE INDEX idx_entryurl_story ON inducks_entryurl(storycode)")
 
 def build():
     t_start = time.time()
@@ -69,6 +118,14 @@ def build():
     cur.executemany("INSERT OR REPLACE INTO inducks_issue VALUES (?, ?, ?, ?, ?)", issues)
     con.commit()
     print(f"  -> {len(issues)} issues imported.")
+
+    story_dir = os.environ.get("INDUCKS_STORY_TABLES_DIR")
+    if story_dir:
+        try:
+            _load_story_tables(cur, story_dir)
+            con.commit()
+        except Exception as e:  # the watcher still works without them, only the story rules are off
+            print(f"  [warn] Story tables not loaded: {e}")
 
     print("Computing publication issue counts ...")
     cur.execute("""

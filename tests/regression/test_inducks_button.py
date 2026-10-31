@@ -26,12 +26,19 @@ class InducksButton(unittest.TestCase):
         self.assertEqual(inducks_button("it/TL 3700", "Topolino 3700", "it"),
                          {"text": "View on Inducks", "url": "https://inducks.org/issue.php?c=it%2FTL+3700"})
 
-    # Was issue.php?c=it/PM+557: "The issue code 'it/PM 557' was not found".
-    def test_issue_not_yet_listed_is_searched_with_what_is_known(self):
+    # Was issue.php?c=it/PM+557: "The issue code 'it/PM 557' was not found"; then a search,
+    # while the publication was known (I Viaggi di Topolino 3): its page lists the issues.
+    def test_issue_not_yet_listed_links_to_its_publication(self):
         button = inducks_button("it/PM  557", "Paperino 557", "it", {"date": "30/10/2026"})
+        self.assertEqual(button, {"text": "View Publication", "url": "https://inducks.org/publication.php?c=it%2FPM"})
+        self.assertEqual(inducks_button("de/LTB 999", "Lustiges Taschenbuch 999", "de")["url"],
+                         "https://inducks.org/publication.php?c=de%2FLTB")
+
+    def test_unknown_publication_is_searched_with_what_is_known(self):
+        button = inducks_button("it/ZZZ 3", "Zzz 3", "it", {"date": "30/10/2026"})
         self.assertEqual(button["text"], "Search on Inducks")
         self.assertTrue(button["url"].startswith("https://inducks.org/compmag.php?"))
-        self.assertEqual(self.query(button), {"country": "it", "title1": "PM", "entrycodeh3": "557", "date2": "2026"})
+        self.assertEqual(self.query(button), {"country": "it", "title1": "ZZZ", "entrycodeh3": "3", "date2": "2026"})
 
     # Inducks matches part of the name: "Panini" finds "Disney Italia, Panini Comics".
     def test_publisher_narrows_the_search(self):

@@ -9,6 +9,7 @@ from src.config import (
     DISCORD_ADMIN_WEBHOOK_URL, NOTIFY_BACKENDS,
     OVERRIDES, SITE_BASE, SUPPORTED_COUNTRIES,
 )
+from src import db as _db
 from src.discord import send_discord, role_mention, build_link_line, html_to_markdown
 from src.utils import format_price_fr, get_session, truncate_summary, is_fully_indexed_in_inducks, does_issue_exist_in_inducks, cover_filename
 from src.dbi.generator import generate_dbi_skeleton
@@ -144,6 +145,14 @@ def inducks_button(issue_path: str | None, raw_title: str, country: str, info: d
         return {"text": "View issues", "url": f"https://inducks.org/publication.php?c={quote_plus(issue_path)}"}
     if known and does_issue_exist_in_inducks(issue_path):
         return {"text": "View on Inducks", "url": f"https://inducks.org/issue.php?c={quote_plus(issue_path)}"}
+    if known:
+        # The publication is right but Inducks does not list this number yet: its page
+        # lists the issues, and shows this one as soon as Inducks adds it.
+        publication = re.sub(r"\s+\S+$", "", issue_path.strip())
+        if " " not in issue_path.strip():  # 'fi/AA2026-42': no space before the number
+            publication = re.match(r"^[a-z]+/[A-Za-z]+", issue_path).group(0)
+        if _db.query_db("SELECT 1 FROM inducks_publication WHERE publicationcode = ?", (publication,)):
+            return {"text": "View Publication", "url": f"https://inducks.org/publication.php?c={quote_plus(publication)}"}
 
     params = {"country": country}
     if known:

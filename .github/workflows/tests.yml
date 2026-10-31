@@ -18,7 +18,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install requests beautifulsoup4
+        run: pip install -r requirements.txt
 
       # Offline: the tests run against an in-memory Inducks slice, never Turso.
       - name: Run regression tests

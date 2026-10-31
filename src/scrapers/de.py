@@ -254,6 +254,7 @@ def fetch_lustiges_taschenbuch_de_details(url: str) -> dict:
                 last_story = stories[-1]
                 if "start_page" in last_story and "pages" in last_story:
                     details["pages"] = last_story["start_page"] + last_story["pages"] - 1
+                    details["pages_estimated"] = True
     except Exception as e:
         print(f"  [warn] fetch_lustiges_taschenbuch_de_details failed for {url}: {e}")
     return details

@@ -1054,7 +1054,12 @@
   "kathi-gr:564490936": "released",
   "kathi-gr:564490864": "released",
   "panini-it:340073": "announced",
-  "_health": {},
+  "_health": {
+    "ES": {
+      "empty_runs": 1,
+      "alerted": false
+    }
+  },
   "es:341708": "announced",
   "es:341705": "announced",
   "es:341714": "announced",
@@ -1072,5 +1077,6 @@
   "is:23c09f4a-1fcb-4ed4-b6ca-c577c9cf54c6": "released",
   "is:6ed2aea5-4096-4a26-af5c-3b8124e4616e": "released",
   "is:4a762c1f-a868-49ec-bb2c-5ad905b09e96": "released",
-  "is:84b1252d-d124-4df6-a7d3-6f836582e2c4": "released"
+  "is:84b1252d-d124-4df6-a7d3-6f836582e2c4": "released",
+  "panini-it:340463": "announced"
 }

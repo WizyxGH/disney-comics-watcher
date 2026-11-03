@@ -135,6 +135,73 @@ def discover_marvel():
             
     return result
 
+
+def fetch_marvel_details(url: str) -> dict:
+    """Fetches price, publication date, synopsis, cover and UPC from a Marvel.com issue page."""
+    from bs4 import BeautifulSoup
+    s = get_session()
+    s.headers.update({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
+    try:
+        r = s.get(url, timeout=15)
+        r.raise_for_status()
+    except Exception as e:
+        print(f"  [warn] Failed to fetch Marvel details from {url}: {e}")
+        return {}
+
+    soup = BeautifulSoup(r.text, "html.parser")
+    details = {"publisher": "Marvel"}
+
+    # Cover image
+    og = soup.select_one('meta[property="og:image"]')
+    if og and og.get("content"):
+        details["cover_url"] = og["content"].split("?")[0]
+    else:
+        img = soup.select_one(".ComicMasthead img, .featured-item-cover img")
+        if img and img.get("src"):
+            details["cover_url"] = img["src"].split("?")[0]
+
+    text = soup.get_text(" ", strip=True)
+
+    # Summary
+    desc = soup.select_one(".ComicMasthead__Description, .featured-item-desc, .description")
+    if desc:
+        details["summary"] = desc.get_text(strip=True)
+
+    # Price (strictly formatted as $X.XX)
+    m_price = re.search(r'Price\s*:\s*\$([0-9.]+)', text)
+    if not m_price:
+        m_price = re.search(r'\$([0-9]+\.[0-9]{2})', text)
+    if m_price:
+        details["price"] = f"${m_price.group(1)}"
+
+    # Date
+    m_date = re.search(r'Published\s+([A-Za-z]+ \d{1,2}, \d{4})', text)
+    if not m_date:
+        m_date = re.search(r'FOC Date\s*:\s*([A-Za-z]+ \d{1,2}, \d{4})', text)
+    if m_date:
+        try:
+            dt = datetime.strptime(m_date.group(1), "%B %d, %Y")
+            details["pub_date"] = dt.date()
+            details["date"] = dt.strftime("%d/%m/%Y")
+        except Exception:
+            details["date"] = m_date.group(1)
+
+    # UPC / SKU
+    m_upc = re.search(r'UPC\s*:\s*(\d+)', text)
+    if m_upc:
+        details["sku"] = m_upc.group(1)
+
+    # Page count
+    m_pages = re.search(r'Page Count\s*:\s*(\d+)', text)
+    if m_pages:
+        try:
+            details["pages"] = int(m_pages.group(1))
+        except Exception:
+            pass
+
+    return details
+
+
 DYNAMITE_DISNEY = "https://disney.dynamite.com"
 _RE_DYNAMITE_ON_SALE = re.compile(r"On Sale Date:\s*(\d{1,2})/(\d{1,2})/(\d{2,4})")
 

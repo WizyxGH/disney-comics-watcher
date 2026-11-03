@@ -13,20 +13,35 @@ if os.path.exists(".env"):
                 key, val = line.split("=", 1)
                 os.environ[key.strip()] = val.strip().strip('"').strip("'")
 
+SEND = "--send" in sys.argv
+FORCE_PUBLIC = "--force-public" in sys.argv
+
+if not FORCE_PUBLIC:
+    # NEVER allow test runs to spam public Discord channel (#new-releases)
+    os.environ["DISCORD_WEBHOOK_URL"] = ""
+
+if not SEND:
+    print("Dry-run mode by default: no real notifications will be sent.")
+    print("Run with --send to post notifications (public Discord is blocked unless --force-public is given).")
+    os.environ["TELEGRAM_BOT_TOKEN"] = ""
+    os.environ["NOTIFY_BACKENDS"] = ""
+
 telegram_token = os.environ.get("TELEGRAM_BOT_TOKEN")
 telegram_chat = os.environ.get("TELEGRAM_CHAT_ID_FR") or os.environ.get("TELEGRAM_CHAT_ID")
-
-if not telegram_token or not telegram_chat:
-    print("Error: TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID must be set in your environment.")
-    print("You can run it like this in PowerShell:")
-    print('  $env:TELEGRAM_BOT_TOKEN="your_token"; $env:TELEGRAM_CHAT_ID="your_chat_id"; python test_telegram_notif.py')
-    # sys.exit(1)
 
 from src.notifications import notify_international_comic, notify_magazine, notify_glenat_release
 from src.scrapers.fr import fetch_glenat_details
 
 print('\nSending test notification for US Comic...')
-us_comic = {'id': '123456', 'title': 'Uncle Scrooge #1', 'date': '15/07/2026', 'price': '.99', 'url': 'https://marvel.com', 'cover_url': 'https://i.annihil.us/u/prod/marvel/i/mg/3/40/4bc63b9278bd1/detail.jpg'}
+us_comic = {
+    'id': '123732',
+    'title': "Uncle Scrooge: Earth's Mightiest Duck (2025) #1",
+    'date': '13/08/2025',
+    'price': '$4.99',
+    'url': 'https://www.marvel.com/comics/issue/123732/uncle_scrooge_earths_mightiest_duck_2025_1',
+    'cover_url': 'https://cdn.marvel.com/u/prod/marvel/i/mg/7/00/688a67b3f2e72/portrait_uncanny.webp',
+    'publisher': 'Marvel'
+}
 notify_international_comic(us_comic, country="us", event_type="release")
 
 print('\nSending test notification for DE Comic...')

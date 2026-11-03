@@ -94,6 +94,7 @@ LTB_URL_PATTERNS: dict[str, str] = {
     "de/LTBGA":  "nebenreihen/galaxy/band-{num}",
     "de/LTBHI":  "nebenreihen/history/band-{num}",
     "de/LTBM":   "nebenreihen/maus-edition/band-{num}",
+    "de/LTBNL":  "nebenreihen/ltb-nikolaus/band-{num}",
     "de/LTBPC":  "nebenreihen/LTB-Phantomias-Collection/band-{num}",
     "de/LTBPR":  "nebenreihen/premium/band-{num}",
     "de/LTBPRP": "nebenreihen/ltb-premium-plus/band-{num}",

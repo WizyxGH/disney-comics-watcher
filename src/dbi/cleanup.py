@@ -114,7 +114,7 @@ def cleanup_indexed_issues(dbi_paths: list[str]):
 
 def cleanup_existing_covers(covers_dir: str = "covers"):
     """Scans all images in covers/ and deletes any that:
-    1. Already have a cover scan uploaded on Inducks (inducks_entryurl has a matching entry/filename), OR
+    1. Already have a cover scan uploaded on Inducks (inducks_entryurl has a matching entry), OR
     2. Belong to an issue that is already fully indexed in Inducks (fullyindexed == 'Y')."""
     if not os.path.isdir(covers_dir):
         return
@@ -140,50 +140,39 @@ def cleanup_existing_covers(covers_dir: str = "covers"):
         base, _ = os.path.splitext(fname)
 
         already_present = False
-        # 1. Direct scan check by filename in URL
-        if has_entryurl:
-            rows = query_db("SELECT 1 FROM inducks_entryurl WHERE url LIKE ? LIMIT 1", (f"%{fname}",))
-            if rows:
-                already_present = True
+        m = re.match(r'^([a-z]+)_(.+?)(?:a)?_\d+$', base, re.IGNORECASE)
+        if m:
+            country = m.group(1).lower()
+            inner = m.group(2).lower()
+            inner_norm = re.sub(r'_0+(\d+)', r'\1', inner)
 
-        # 2. Extract potential entry code from filename format {country}_{code}a_{page}
-        if not already_present:
-            m = re.match(r'^([a-z]+)_(.+?)(?:a)?_\d+$', base, re.IGNORECASE)
-            if m:
-                country = m.group(1).lower()
-                inner = m.group(2).lower()
-                inner_norm = re.sub(r'_0+(\d+)', r'_\1', inner)
+            candidates_issue = [
+                f"{country}/{inner.replace('_', '')}",
+                f"{country}/{inner_norm.replace('_', '')}",
+            ]
+            if country == "fr":
+                for prefix in ("mp", "jm", "jmg", "dp", "pm", "spg", "tp"):
+                    candidates_issue.append(f"fr/{prefix}{inner.replace('_', '')}")
+                    candidates_issue.append(f"fr/{prefix}{inner_norm.replace('_', '')}")
 
-                candidates_entry = [
-                    f"{country}/{inner}a".replace("_", ""),
-                    f"{country}/{inner_norm}a".replace("_", ""),
-                    f"{country}/{inner}".replace("_", "") + "a",
-                ]
-                candidates_issue = [
-                    f"{country}/{inner}".replace("_", ""),
-                    f"{country}/{inner_norm}".replace("_", ""),
-                ]
-                if country == "fr":
-                    for prefix in ("mp", "jm", "jmg", "dp"):
-                        candidates_entry.append(f"fr/{prefix}{inner}a".replace("_", ""))
-                        candidates_issue.append(f"fr/{prefix}{inner}".replace("_", ""))
+            placeholders = ",".join(["?"] * len(candidates_issue))
+            # Fast query using idx_issue_clean
+            iss_rows = query_db(
+                f"SELECT issuecode, fullyindexed FROM inducks_issue WHERE LOWER(REPLACE(issuecode, ' ', '')) IN ({placeholders})",
+                tuple(candidates_issue)
+            ) if has_issue else []
 
-                if has_entryurl:
-                    placeholders = ",".join(["?"] * len(candidates_entry))
-                    check_scan = query_db(
-                        f"SELECT 1 FROM inducks_entryurl WHERE LOWER(REPLACE(entrycode, ' ', '')) IN ({placeholders}) LIMIT 1",
-                        tuple(candidates_entry)
+            if iss_rows:
+                issuecode, fullyindexed = iss_rows[0]
+                if fullyindexed and fullyindexed.strip().upper() == 'Y':
+                    already_present = True
+                elif has_entryurl:
+                    # Fast query using idx_inducks_entryurl_entrycode
+                    scan = query_db(
+                        "SELECT 1 FROM inducks_entryurl WHERE entrycode = ? OR entrycode = ? LIMIT 1",
+                        (f"{issuecode}a", f"{issuecode} a")
                     )
-                    if check_scan:
-                        already_present = True
-
-                if not already_present and has_issue:
-                    placeholders_iss = ",".join(["?"] * len(candidates_issue))
-                    check_fi = query_db(
-                        f"SELECT 1 FROM inducks_issue WHERE LOWER(REPLACE(issuecode, ' ', '')) IN ({placeholders_iss}) AND fullyindexed = 'Y' LIMIT 1",
-                        tuple(candidates_issue)
-                    )
-                    if check_fi:
+                    if scan:
                         already_present = True
 
         if already_present:

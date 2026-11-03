@@ -1012,9 +1012,9 @@
   "ltb-de:LTB_Phantomias_Collection_Band_6": "released",
   "fi:fi-aa2026-44": "released",
   "kathi-gr:564490858": "released",
-  "panini-it:341363": "announced",
-  "panini-it:340469": "announced",
-  "panini-it:340442": "announced",
+  "panini-it:341363": "released",
+  "panini-it:340469": "released",
+  "panini-it:340442": "released",
   "cz:egmont_105211079": "announced",
   "cz:egmont_103766951": "announced",
   "cz:egmont_79290933": "announced",
@@ -1054,7 +1054,12 @@
   "kathi-gr:564490936": "released",
   "kathi-gr:564490864": "released",
   "panini-it:340073": "announced",
-  "_health": {},
+  "_health": {
+    "ES": {
+      "empty_runs": 1,
+      "alerted": false
+    }
+  },
   "es:341708": "announced",
   "es:341705": "announced",
   "es:341714": "announced",
@@ -1077,5 +1082,8 @@
   "glenat:9782344079768": "announced",
   "panini-it:340337": "announced",
   "egmont-de:200/03410": "released",
-  "egmont-de:200/03387": "released"
+  "egmont-de:200/03387": "released",
+  "ltb-de:weihnachten_band_32": "released",
+  "ltb-de:spezial_band_133": "released",
+  "fi:fi-aa2026-45": "released"
 }

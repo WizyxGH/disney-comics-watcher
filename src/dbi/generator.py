@@ -358,7 +358,7 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
                 else:
                     story_ec = f"{dbi_issue_code}{chr(97 + i)}"
                 
-                story_code = (story.get("story_code", "") or story.get("code", "")).strip()
+                story_code = (story.get("story_code", "") or story.get("code", "")).strip() or "?"
                 pages_str = str(story.get("pages", "")).strip()
                 code_field, pages_field, overflow = _code_and_pages(story_code, pages_str)
                 brokpg = " "

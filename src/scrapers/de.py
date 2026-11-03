@@ -197,7 +197,7 @@ def discover_lustiges_taschenbuch_de():
                         "url": full_url,
                         "cover_url": cover_url,
                         "numero": num,
-                        "price": "8,99 €"
+                        "price": None
                     })
     except Exception as e:
         print(f"  [warn] discover_lustiges_taschenbuch_de alle-ausgaben: {e}")

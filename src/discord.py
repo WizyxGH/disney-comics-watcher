@@ -165,6 +165,13 @@ def send_discord(
         print("  [warn] No Discord webhook configured.")
         return False
 
+    # Ironclad safety guard: never post to the public announcement webhook during tests
+    if not webhook_url or hook == DISCORD_WEBHOOK_URL:
+        if os.environ.get("DISCORD_BLOCK_PUBLIC") or "unittest" in sys.modules or "pytest" in sys.modules:
+            if not os.environ.get("FORCE_PUBLIC_DISCORD"):
+                print("  [SAFETY] Public Discord notification blocked during test execution.")
+                return False
+
     body = f"{mention}\n{text}" if mention else text
     parts = split_message(body.strip())
     image = _fetch_image(image_url) if image_url else None

@@ -232,22 +232,90 @@ def _is_placeholder_cover(url: str | None) -> bool:
         'coverabbildung-nicht-verfugbar',
     ))
 
-def _get_inputfilename_for_issue(country_part: str, pub_part: str) -> str:
+def _get_inputfilename_for_issue(issue_path: str) -> str:
     from src.db import query_db
+    import re
     try:
-        full_pub = f"{country_part}/{pub_part}"
-        rows = query_db(
-            "SELECT inf.path, inf.filename FROM inducks_inputfile inf "
-            "JOIN inducks_issue iss ON iss.inputfilecode = inf.inputfilecode "
-            "WHERE iss.publicationcode = ? OR iss.issuerangecode = ? LIMIT 1",
-            (full_pub, full_pub)
-        )
+        parts = issue_path.strip().split("/", 1)
+        country = parts[0] if len(parts) == 2 else ""
+        rest = parts[1] if len(parts) == 2 else parts[0]
+
+        pub = rest.split()[0] if rest else ""
+        num = rest.split(None, 1)[1] if len(rest.split()) > 1 else ""
+        full_pub = f"{country}/{pub}" if country else pub
+
+        # 1. Exact issue match in inducks_issue
+        rows = query_db("""
+            SELECT inf.path, inf.filename
+            FROM inducks_issue iss
+            JOIN inducks_inputfile inf ON iss.inputfilecode = inf.inputfilecode
+            WHERE iss.issuecode = ? OR iss.issuecode = ? OR (iss.publicationcode = ? AND iss.issuenumber = ?)
+        """, (issue_path, issue_path.replace(" ", ""), full_pub, num))
         if rows and rows[0][0] and rows[0][1]:
-            path, filename = rows[0][0], rows[0][1]
-            return f"{path.strip('/')}/{filename}"
-    except Exception:
-        pass
-    return f"issues/{country_part}/{pub_part.lower()}.dbi"
+            p, fn = rows[0][0].strip("/"), rows[0][1]
+            return f"{p}/{fn}"
+
+        # 2. Candidate input files for this publication
+        files = query_db("""
+            SELECT DISTINCT inf.path, inf.filename
+            FROM inducks_inputfile inf
+            JOIN inducks_issue iss ON iss.inputfilecode = inf.inputfilecode
+            WHERE iss.publicationcode = ?
+        """, (full_pub,))
+
+        if not files:
+            return f"issues/{country}/{pub.lower()}.dbi"
+        if len(files) == 1:
+            p, fn = files[0][0].strip("/"), files[0][1]
+            return f"{p}/{fn}"
+
+        # 3. Multiple files: parse numeric issue number and match ranges (e.g. ltb601-700.dbi)
+        num_clean = re.sub(r"[^0-9]", "", num)
+        if num_clean:
+            val = int(num_clean)
+            range_candidates = []
+            for p, fn in files:
+                m = re.search(r"(\d+)-(\d+)", fn)
+                if m:
+                    range_candidates.append((int(m.group(1)), int(m.group(2)), p, fn))
+            if range_candidates:
+                for start, end, p, fn in range_candidates:
+                    if start <= val <= end:
+                        return f"{p.strip('/')}/{fn}"
+                range_candidates.sort(key=lambda x: x[1])
+                return f"{range_candidates[-1][2].strip('/')}/{range_candidates[-1][3]}"
+
+            thresh_candidates = []
+            for p, fn in files:
+                m = re.search(r"(\d+)", fn)
+                if m:
+                    thresh_candidates.append((int(m.group(1)), p, fn))
+            if thresh_candidates:
+                thresh_candidates.sort(key=lambda x: x[0])
+                chosen = thresh_candidates[0]
+                for t_val, p, fn in thresh_candidates:
+                    if val >= t_val:
+                        chosen = (t_val, p, fn)
+                return f"{chosen[1].strip('/')}/{chosen[2]}"
+
+        # 4. Fallback: file of most recent issue in publication
+        recent = query_db("""
+            SELECT inf.path, inf.filename
+            FROM inducks_issue iss
+            JOIN inducks_inputfile inf ON iss.inputfilecode = inf.inputfilecode
+            WHERE iss.publicationcode = ?
+            ORDER BY iss.issuecode DESC LIMIT 1
+        """, (full_pub,))
+        if recent and recent[0][0] and recent[0][1]:
+            return f"{recent[0][0].strip('/')}/{recent[0][1]}"
+
+        return f"{files[0][0].strip('/')}/{files[0][1]}"
+    except Exception as e:
+        print(f"  [warn] _get_inputfilename_for_issue: {e}")
+
+    country_fallback = issue_path.split("/", 1)[0] if "/" in issue_path else "misc"
+    pub_fallback = (issue_path.split("/", 1)[1] if "/" in issue_path else issue_path).split()[0].lower()
+    return f"issues/{country_fallback}/{pub_fallback}.dbi"
 
 
 def _dispatch_notification(
@@ -369,7 +437,7 @@ def _dispatch_notification(
                 u_part = f"{i_part}a"
                 upload_url = f"https://inducks.org/sendscan.php?c={quote_plus(country_part)}&s={s_part}&i={i_part}&u={u_part}"
                 
-                input_file = _get_inputfilename_for_issue(country_part, s_part)
+                input_file = _get_inputfilename_for_issue(issue_path)
                 edit_url = f"https://inducks.org/cvsedit.php?inputfilename={quote_plus(input_file)}&induckscode={i_part}"
                 
                 dm_buttons = [

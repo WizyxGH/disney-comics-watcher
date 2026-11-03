@@ -82,9 +82,16 @@ def _storycode_candidates(slug: str) -> list[str]:
     return [prefix + " " * n + number for n in (1, 2, 3, 4)]
 
 
-def _resolve_storycodes(entries: list[dict]) -> dict[str, str]:
+def _resolve_storycodes(entries: list[dict | str]) -> dict[str, str]:
     """Maps each story entry's slug to its confirmed Inducks code, or "".
     Uses slug candidates, Finnish reprint title matching, and original title lookup."""
+    norm_entries: list[dict] = []
+    for e in entries:
+        if isinstance(e, str):
+            norm_entries.append({"slug_story": e})
+        elif isinstance(e, dict):
+            norm_entries.append(e)
+    entries = norm_entries
     slugs = [e.get("slug_story", "") for e in entries]
     candidates = {s: _storycode_candidates(s) for s in slugs if s}
     known = set()

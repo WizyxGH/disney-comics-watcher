@@ -112,7 +112,7 @@ def _build_glenat_inducks_path(title: str, ean: str | None = None, collection_la
     title_lower = title.lower() if title else ""
     def clean_str(s):
         if not s: return ""
-        s = s.lower()
+        s = s.replace("’", "'").replace("‘", "'").lower()
         s = unicodedata.normalize('NFKD', s)
         return "".join(c for c in s if not unicodedata.combining(c))
 
@@ -136,7 +136,14 @@ def _build_glenat_inducks_path(title: str, ean: str | None = None, collection_la
     elif any(k in title_clean for k in ("grande histoire de picsou", "grande epopee de picsou")) or "grande histoire de picsou" in serie_clean:
         path = f"fr/GHP{str(tome_num).rjust(4)}" if tome_num is not None else "fr/GHP"
     elif any(k in title_clean for k in ("ages d'or", "age d'or")) or "ages d'or" in coll_clean or "ages d'or" in serie_clean:
-        path = f"fr/AOD{str(tome_num).rjust(4)}" if tome_num is not None else "fr/AOD"
+        if "donald" in title_clean or "donald" in serie_clean:
+            path = f"fr/AODD{str(tome_num).rjust(3)}" if tome_num is not None else "fr/AODD"
+        elif "mickey" in title_clean or "mickey" in serie_clean:
+            path = f"fr/AODM{str(tome_num).rjust(3)}" if tome_num is not None else "fr/AODM"
+        elif "picsou" in title_clean or "picsou" in serie_clean:
+            path = f"fr/AODP{str(tome_num).rjust(3)}" if tome_num is not None else "fr/AODP"
+        else:
+            path = f"fr/AOD{str(tome_num).rjust(4)}" if tome_num is not None else "fr/AOD"
     elif "les grands heros" in coll_clean or "les grands heros" in serie_clean or "les grands heros" in title_clean:
         path = f"fr/GHD{str(tome_num).rjust(4)}" if tome_num is not None else "fr/GHD"
 

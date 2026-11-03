@@ -39,6 +39,86 @@ _RESOLVERS = {
     # magazine needs overrides -> handled separately
 }
 
+def _get_preindexed_metadata(issue_path: str) -> dict | None:
+    from src.db import query_db
+    try:
+        cols = {c[1] for c in (query_db("PRAGMA table_info(inducks_issue)") or [])}
+        if "title" not in cols:
+            return None
+    except Exception:
+        return None
+    clean_path = issue_path.strip()
+    pub_code = clean_path.split(" ")[0] if " " in clean_path else clean_path
+    num_part = clean_path.split(" ", 1)[1].strip() if " " in clean_path else ""
+    no_space = clean_path.replace(" ", "")
+
+    rows = query_db(
+        "SELECT issuecode, title, size, pages, price, oldestdate, filledoldestdate, maintenanceteamcode "
+        "FROM inducks_issue "
+        "WHERE issuecode = ? OR issuecode = ? OR (publicationcode = ? AND issuenumber = ?)",
+        (clean_path, no_space, pub_code, num_part)
+    )
+    if not rows:
+        return None
+
+    r = rows[0]
+    matched_issuecode = r[0]
+    existing = {
+        "issuecode": matched_issuecode,
+        "title": r[1] or "",
+        "size": r[2] or "",
+        "pages": r[3] or "",
+        "price": r[4] or "",
+        "oldestdate": r[5] or r[6] or "",
+        "inx": r[7] or "",
+        "isstrans": None,
+        "cover_code": None,
+        "cover_hero": None,
+        "cover_title": None,
+    }
+
+    try:
+        job_rows = query_db(
+            "SELECT personcode, inxtransletcol FROM inducks_issuejob WHERE issuecode = ?",
+            (matched_issuecode,)
+        )
+        for j_person, j_col in (job_rows or []):
+            if j_col == 't' and j_person:
+                existing["isstrans"] = j_person
+            elif j_col == 'x' and j_person and not existing["inx"]:
+                existing["inx"] = j_person
+    except Exception:
+        pass
+
+    try:
+        entry_rows = query_db(
+            "SELECT entrycode, storyversioncode, position, title, reallytitle, printedhero "
+            "FROM inducks_entry "
+            "WHERE issuecode = ? AND (position = 'a' OR position = '' OR entrycode LIKE ?)",
+            (matched_issuecode, f"{matched_issuecode}a")
+        )
+        if entry_rows:
+            for er in entry_rows:
+                pos = er[2]
+                ecode = er[0]
+                if pos == 'a' or ecode.endswith('a'):
+                    existing["cover_code"] = er[1] or ""
+                    existing["cover_title"] = er[3] or ""
+                    existing["cover_hero"] = er[5] or ""
+                    if existing["cover_code"] and not existing["cover_hero"]:
+                        app_rows = query_db(
+                            "SELECT charactercode FROM inducks_appearance WHERE storyversioncode = ? AND charactercode != '' LIMIT 1",
+                            (existing["cover_code"],)
+                        )
+                        if app_rows:
+                            existing["cover_hero"] = app_rows[0][0]
+                    break
+    except Exception:
+        pass
+
+    return existing
+
+
 def _sanitize_bolderbast(text: str) -> str:
     if not text: return ""
     text = text.replace("–", "-").replace("—", "-")
@@ -58,6 +138,29 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
             data = resolver(info)
 
         issue_path = data["issue_path"]
+
+        preindexed = _get_preindexed_metadata(issue_path)
+        if preindexed:
+            if preindexed.get("title"):
+                if not data.get("name") or data["name"].rstrip("!") == preindexed["title"].rstrip("!"):
+                    data["name"] = preindexed["title"]
+            if preindexed.get("price"):
+                data["price"] = preindexed["price"]
+            if preindexed.get("pages") and preindexed["pages"] not in ("", "0"):
+                data["pages"] = preindexed["pages"]
+                info["pages_estimated"] = False
+            if preindexed.get("size") and not data.get("size"):
+                data["size"] = preindexed["size"]
+            if preindexed.get("isstrans"):
+                data["isstrans"] = preindexed["isstrans"]
+            if preindexed.get("oldestdate") and not data.get("date"):
+                data["date"] = preindexed["oldestdate"]
+            if preindexed.get("cover_code") and (not info.get("cover_code") or info.get("cover_code") == "?"):
+                info["cover_code"] = preindexed["cover_code"]
+            if preindexed.get("cover_hero") and not info.get("cover_hero"):
+                info["cover_hero"] = preindexed["cover_hero"]
+            if preindexed.get("cover_title") and not info.get("cover_title"):
+                info["cover_title"] = preindexed["cover_title"]
         
         if publication_type == "de":
             try:
@@ -87,6 +190,27 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
             from src.dbi.story_rules import find_cover_code
             info["cover_code"] = find_cover_code(info["cover_url"], info["stories"], issue_path)
                 
+        if preindexed:
+            if preindexed.get("title"):
+                data["name"] = preindexed["title"]
+            if preindexed.get("price"):
+                data["price"] = preindexed["price"]
+            if preindexed.get("pages") and preindexed["pages"] not in ("", "0"):
+                data["pages"] = preindexed["pages"]
+                info["pages_estimated"] = False
+            if preindexed.get("size") and not data.get("size"):
+                data["size"] = preindexed["size"]
+            if preindexed.get("isstrans"):
+                data["isstrans"] = preindexed["isstrans"]
+            if preindexed.get("oldestdate") and not data.get("date"):
+                data["date"] = preindexed["oldestdate"]
+            if preindexed.get("cover_code") and (not info.get("cover_code") or info.get("cover_code") == "?"):
+                info["cover_code"] = preindexed["cover_code"]
+            if preindexed.get("cover_hero") and not info.get("cover_hero"):
+                info["cover_hero"] = preindexed["cover_hero"]
+            if preindexed.get("cover_title") and not info.get("cover_title"):
+                info["cover_title"] = preindexed["cover_title"]
+
         name = _sanitize_bolderbast(data["name"])
         prix_raw = data["price"]
         date_raw = data["date"]
@@ -96,7 +220,10 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         ean_val = data["ean"]
 
         issdate = _format_date_for_dbi(date_raw)
-        price   = _format_price_for_dbi(prix_raw)
+        if preindexed and preindexed.get("price"):
+            price = preindexed["price"]
+        else:
+            price = _format_price_for_dbi(prix_raw)
 
         os.makedirs("issues", exist_ok=True)
         dbi_path = os.path.join("issues", f"{publication_type}.dbi" if publication_type in SUPPORTED_COUNTRIES and publication_type != "fr" else "fr.dbi")
@@ -127,12 +254,13 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         if pages_val and not info.get("pages_estimated"): fields.append(f"[pages:{pages_val}]")
         if size_val: fields.append(f"[size:{size_val}]")
         if ean_val: fields.append(f"[EAN {ean_val}]")
-        if isstrans: fields.append(f"[isstrans:{isstrans}]")
+
         
         if info.get("stories"):
             fields.append("[inx:FGK,-]")
         else:
             fields.append("[inx:-]")
+        if isstrans: fields.append(f"[isstrans:{isstrans}]")
 
         # Bolderbast DBI spec: position 1..12 is issue code or '->          ' with [entrycode:xx]
         if len(dbi_issue_code) <= 12:
@@ -156,10 +284,13 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         
         plot_val, writ_val, art_val, ink_val, hero_val = "", "", "", "", ""
 
-        for c in info.get("characters", []):
-            if c.get("code"):
-                hero_val = c["code"]
-                break
+        if info.get("cover_hero"):
+            hero_val = info["cover_hero"]
+        else:
+            for c in info.get("characters", []):
+                if c.get("code"):
+                    hero_val = c["code"]
+                    break
 
         if dbi_issue_code.startswith("JM "):
             writ_val, art_val = "FPt", "FPt"
@@ -176,7 +307,7 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         else:
             prefix = f"->          {storycode_field}{pages_field}{brokpg}{pagel}{credits_field}"
 
-        cover_title = info.get("cover_title") or ""
+        cover_title = info.get("cover_title") or ("CV" if cover_ec.endswith("a") else "")
         suffixes = []
         if cover_title: suffixes.append(cover_title)
         suffixes += cover_overflow

@@ -89,6 +89,15 @@ CANONICAL_SERIES: dict[str, dict[str, str]] = {
         "lustiges taschenbuch young comics": "de/LTBYC",
         "ltb young comics": "de/LTBYC",
         "lustiges taschenbuch sonderband": "de/LTBSP",
+        "ltb sonderband": "de/LTBSP",
+        "lustiges taschenbuch sonderband weihnachten": "de/LTBSB",
+        "lustiges taschenbuch weihnachtsgeschichten": "de/LTBSB",
+        "lustiges taschenbuch weihnachten": "de/LTBSB",
+        "ltb sonderband weihnachten": "de/LTBSB",
+        "ltb weihnachten": "de/LTBSB",
+        "weihnachten": "de/LTBSB",
+        "frohes fest in entenhausen": "de/LTBSB",
+        "weihnachten frohes fest in entenhausen": "de/LTBSB",
         "lustiges taschenbuch spezial": "de/LTBSP",
         "ltb spezial": "de/LTBSP",
         "lustiges taschenbuch sonderband freizeit": "de/LTBBA",
@@ -154,6 +163,20 @@ CANONICAL_SERIES: dict[str, dict[str, str]] = {
         "макрокомикс": "bg/MAC",
         "мики маус": "bg/MM",
         "доналд дак": "bg/DD",
+    },
+    "fr": {
+        "les ages d'or de donald": "fr/AODD",
+        "ages d'or de donald": "fr/AODD",
+        "les ages d'or de mickey": "fr/AODM",
+        "ages d'or de mickey": "fr/AODM",
+        "les ages d'or de picsou": "fr/AODP",
+        "ages d'or de picsou": "fr/AODP",
+        "les ages d'or": "fr/AOD",
+        "ages d'or": "fr/AOD",
+        "la grande histoire de picsou": "fr/GHP",
+        "la grande epopee de picsou": "fr/GHP",
+        "les grands heros disney": "fr/GHD",
+        "creations originales": "fr/DBG",
     }
 }
 
@@ -555,6 +578,16 @@ def _search_issue_path(raw_title: str, country: str, page_url: str | None) -> st
                 if m_extra:
                     num = f"{int(m_extra.group(1))}SP{m_extra.group(2)}"
                 return issue_code(_resolve_canonical(pub_code, country, num), num)
+
+    # 1b. German LTB URL identification
+    if page_url and country == "de" and "lustiges-taschenbuch.de" in page_url:
+        from src.config import LTB_URL_PATTERNS
+        for pub_code, pattern in LTB_URL_PATTERNS.items():
+            pattern_regex = re.escape(pattern).replace(r"\{num\}", r"(\d+)")
+            m_ltb = re.search(pattern_regex, page_url, re.IGNORECASE)
+            if m_ltb:
+                num = str(int(m_ltb.group(1)))
+                return issue_code(pub_code, num)
 
     base, num = _extract_base_and_number(raw_title)
     if not num:

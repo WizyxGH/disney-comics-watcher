@@ -232,6 +232,24 @@ def _is_placeholder_cover(url: str | None) -> bool:
         'coverabbildung-nicht-verfugbar',
     ))
 
+def _get_inputfilename_for_issue(country_part: str, pub_part: str) -> str:
+    from src.db import query_db
+    try:
+        full_pub = f"{country_part}/{pub_part}"
+        rows = query_db(
+            "SELECT inf.path, inf.filename FROM inducks_inputfile inf "
+            "JOIN inducks_issue iss ON iss.inputfilecode = inf.inputfilecode "
+            "WHERE iss.publicationcode = ? OR iss.issuerangecode = ? LIMIT 1",
+            (full_pub, full_pub)
+        )
+        if rows and rows[0][0] and rows[0][1]:
+            path, filename = rows[0][0], rows[0][1]
+            return f"{path.strip('/')}/{filename}"
+    except Exception:
+        pass
+    return f"issues/{country_part}/{pub_part.lower()}.dbi"
+
+
 def _dispatch_notification(
     info: dict,
     base_caption: str,
@@ -351,7 +369,15 @@ def _dispatch_notification(
                 u_part = f"{i_part}a"
                 upload_url = f"https://inducks.org/sendscan.php?c={quote_plus(country_part)}&s={s_part}&i={i_part}&u={u_part}"
                 
-                dm_buttons = [[{"text": "Upload Scan", "url": upload_url}]]
+                input_file = _get_inputfilename_for_issue(country_part, s_part)
+                edit_url = f"https://inducks.org/cvsedit.php?inputfilename={quote_plus(input_file)}&induckscode={i_part}"
+                
+                dm_buttons = [
+                    [
+                        {"text": "Upload Scan", "url": upload_url},
+                        {"text": "Edit using SVN", "url": edit_url}
+                    ]
+                ]
 
             send_admin(dm_text, photo_url=cover_url, buttons=dm_buttons)
 

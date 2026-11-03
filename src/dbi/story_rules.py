@@ -1,10 +1,49 @@
 """Rules of the shared inducks-dbi package on the watcher's Inducks database (src.db): story
 rules (serial parts, strips per page, codes an equivalent issue prints) and the image lookups
 (reprinted cover, story from its first page)."""
+from collections import Counter
 from inducks_dbi.covers import find_cover_code as _find_cover_code, find_story_code as _find_story_code
+import inducks_dbi.story_rules as _idbi_story_rules
 from inducks_dbi.story_rules import apply_story_rules as _apply_story_rules
 
 from src.db import query_db
+
+_orig_part_lengths = _idbi_story_rules.part_lengths
+
+def _enhanced_part_lengths(query, code: str, total: int) -> list[int] | None:
+    lengths = _orig_part_lengths(query, code, total)
+    if lengths:
+        return lengths
+    # Cross-issue fallback: When a story originally ran across multiple weekly issues
+    # (e.g. Topolino 3086, 3087, 3088, 3089), each issue only contains one part.
+    # We aggregate the agreed page counts per part number across all issues.
+    try:
+        rows = query(
+            "SELECT e.part, sv.entirepages FROM inducks_entry e "
+            "JOIN inducks_storyversion sv ON sv.storyversioncode = e.storyversioncode "
+            "WHERE sv.storycode = ? AND e.part != ''", (code,)
+        )
+        by_part: dict[int, Counter] = {}
+        for part, pages in rows or []:
+            try:
+                p_num = int(str(part).strip())
+                p_pages = int(str(pages).strip())
+                if p_num > 0 and p_pages > 0:
+                    by_part.setdefault(p_num, Counter())[p_pages] += 1
+            except (ValueError, TypeError):
+                continue
+
+        if by_part:
+            max_p = max(by_part.keys())
+            if sorted(by_part.keys()) == list(range(1, max_p + 1)) and max_p > 1:
+                candidate = [by_part[p].most_common(1)[0][0] for p in range(1, max_p + 1)]
+                if sum(candidate) == total and all(candidate):
+                    return candidate
+    except Exception:
+        pass
+    return None
+
+_idbi_story_rules.part_lengths = _enhanced_part_lengths
 
 
 def _query(sql, params=()):

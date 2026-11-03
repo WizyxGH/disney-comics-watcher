@@ -277,8 +277,9 @@ def main():
         print(f"[done] {notif_count} notification(s) sent via {', '.join(sorted(NOTIFY_BACKENDS))}.")
 
     import glob
-    from src.dbi.cleanup import cleanup_indexed_issues
+    from src.dbi.cleanup import cleanup_indexed_issues, cleanup_existing_covers
     cleanup_indexed_issues(glob.glob("issues/*.dbi"))
+    cleanup_existing_covers("covers")
 
 if __name__ == "__main__":
     main()

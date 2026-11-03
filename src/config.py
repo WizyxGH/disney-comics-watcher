@@ -97,6 +97,7 @@ LTB_URL_PATTERNS: dict[str, str] = {
     "de/LTBPC":  "nebenreihen/LTB-Phantomias-Collection/band-{num}",
     "de/LTBPR":  "nebenreihen/premium/band-{num}",
     "de/LTBPRP": "nebenreihen/ltb-premium-plus/band-{num}",
+    "de/LTBSB":  "nebenreihen/weihnachten/band-{num}",
     "de/LTBSP":  "nebenreihen/spezial/band-{num}",
     "de/LTBUP":  "nebenreihen/ultimate-phantomias/band-{num}",
     "de/LTBWE":  "nebenreihen/weihnachtsgeschichten/band-{num}",

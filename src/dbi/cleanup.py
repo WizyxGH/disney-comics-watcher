@@ -134,48 +134,91 @@ def cleanup_existing_covers(covers_dir: str = "covers"):
     if not has_entryurl and not has_issue:
         return
 
-    deleted_count = 0
+    # 1. Parse all covers into issue candidate mappings
+    file_candidates: dict[str, list[str]] = {}
+    all_issue_candidates: set[str] = set()
+
     for fpath in cover_files:
         fname = os.path.basename(fpath)
         base, _ = os.path.splitext(fname)
-
-        already_present = False
         m = re.match(r'^([a-z]+)_(.+?)(?:a)?_\d+$', base, re.IGNORECASE)
-        if m:
-            country = m.group(1).lower()
-            inner = m.group(2).lower()
-            inner_norm = re.sub(r'_0+(\d+)', r'\1', inner)
+        if not m:
+            continue
+        country = m.group(1).lower()
+        inner = m.group(2).lower()
+        inner_norm = re.sub(r'_0+(\d+)', r'\1', inner)
 
-            candidates_issue = [
-                f"{country}/{inner.replace('_', '')}",
-                f"{country}/{inner_norm.replace('_', '')}",
-            ]
-            if country == "fr":
-                for prefix in ("mp", "jm", "jmg", "dp", "pm", "spg", "tp"):
-                    candidates_issue.append(f"fr/{prefix}{inner.replace('_', '')}")
-                    candidates_issue.append(f"fr/{prefix}{inner_norm.replace('_', '')}")
+        cands = [
+            f"{country}/{inner.replace('_', '')}",
+            f"{country}/{inner_norm.replace('_', '')}",
+        ]
+        if country == "fr":
+            for prefix in ("mp", "jm", "jmg", "dp", "pm", "spg", "tp"):
+                cands.append(f"fr/{prefix}{inner.replace('_', '')}")
+                cands.append(f"fr/{prefix}{inner_norm.replace('_', '')}")
 
-            placeholders = ",".join(["?"] * len(candidates_issue))
-            # Fast query using idx_issue_clean
-            iss_rows = query_db(
-                f"SELECT issuecode, fullyindexed FROM inducks_issue WHERE LOWER(REPLACE(issuecode, ' ', '')) IN ({placeholders})",
-                tuple(candidates_issue)
-            ) if has_issue else []
+        file_candidates[fpath] = cands
+        all_issue_candidates.update(cands)
 
-            if iss_rows:
-                issuecode, fullyindexed = iss_rows[0]
-                if fullyindexed and fullyindexed.strip().upper() == 'Y':
-                    already_present = True
-                elif has_entryurl:
-                    # Fast query using idx_inducks_entryurl_entrycode
-                    scan = query_db(
-                        "SELECT 1 FROM inducks_entryurl WHERE entrycode = ? OR entrycode = ? LIMIT 1",
-                        (f"{issuecode}a", f"{issuecode} a")
-                    )
-                    if scan:
-                        already_present = True
+    if not all_issue_candidates:
+        return
 
-        if already_present:
+    # 2. Batch query inducks_issue for fully indexed status & matched issuecodes
+    matched_issues: dict[str, tuple[str, bool]] = {}  # clean_code -> (issuecode, is_fully_indexed)
+    cand_list = list(all_issue_candidates)
+    batch_size = 200
+
+    if has_issue:
+        for i in range(0, len(cand_list), batch_size):
+            batch = cand_list[i:i + batch_size]
+            placeholders = ",".join(["?"] * len(batch))
+            rows = query_db(
+                f"SELECT issuecode, LOWER(REPLACE(issuecode, ' ', '')), fullyindexed FROM inducks_issue WHERE LOWER(REPLACE(issuecode, ' ', '')) IN ({placeholders})",
+                tuple(batch)
+            ) or []
+            for issuecode, clean_code, fully_indexed in rows:
+                is_full = bool(fully_indexed and fully_indexed.strip().upper() == 'Y')
+                matched_issues[clean_code] = (issuecode, is_full)
+
+    # 3. For issues that are NOT fully indexed, check if entryurl has the cover scan
+    entrycodes_to_check: set[str] = set()
+    issuecode_to_entrycodes: dict[str, list[str]] = {}
+
+    for clean_code, (issuecode, is_full) in matched_issues.items():
+        if not is_full and has_entryurl:
+            ecs = [f"{issuecode}a", f"{issuecode} a"]
+            issuecode_to_entrycodes[issuecode] = ecs
+            entrycodes_to_check.update(ecs)
+
+    scanned_entrycodes: set[str] = set()
+    if entrycodes_to_check:
+        ec_list = list(entrycodes_to_check)
+        for i in range(0, len(ec_list), batch_size):
+            batch = ec_list[i:i + batch_size]
+            placeholders = ",".join(["?"] * len(batch))
+            rows = query_db(
+                f"SELECT DISTINCT entrycode FROM inducks_entryurl WHERE entrycode IN ({placeholders})",
+                tuple(batch)
+            ) or []
+            for (ec,) in rows:
+                scanned_entrycodes.add(ec)
+
+    # 4. Determine obsolete files and delete
+    deleted_count = 0
+    for fpath, cands in file_candidates.items():
+        fname = os.path.basename(fpath)
+        is_obsolete = False
+        for c in cands:
+            if c in matched_issues:
+                issuecode, is_full = matched_issues[c]
+                if is_full:
+                    is_obsolete = True
+                    break
+                if any(ec in scanned_entrycodes for ec in issuecode_to_entrycodes.get(issuecode, [])):
+                    is_obsolete = True
+                    break
+
+        if is_obsolete:
             try:
                 os.remove(fpath)
                 deleted_count += 1

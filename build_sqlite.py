@@ -54,6 +54,7 @@ def _load_story_tables(cur, cache_dir: str) -> None:
     cur.execute("CREATE INDEX idx_entry_sv ON inducks_entry(storyversioncode)")
     cur.execute("CREATE INDEX idx_entry_issue ON inducks_entry(issuecode)")
     cur.execute("CREATE INDEX idx_entryurl_story ON inducks_entryurl(storycode)")
+    cur.execute("CREATE INDEX idx_entryurl_entry ON inducks_entryurl(entrycode)")
 
 def build():
     t_start = time.time()

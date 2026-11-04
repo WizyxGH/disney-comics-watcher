@@ -6,7 +6,9 @@ the Source/Inducks links don't each spawn a preview card.
 """
 
 import json
+import os
 import re
+import sys
 import html as html_lib
 import time
 import requests

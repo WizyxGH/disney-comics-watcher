@@ -5,6 +5,7 @@ Each case is a title that was once resolved wrongly in production.
     python -m unittest discover -s tests/regression -v
 """
 import unittest
+from unittest import mock
 
 from fake_inducks import FakeInducks
 from src.dbi import isv_search
@@ -24,8 +25,17 @@ class IssueCodeDetection(unittest.TestCase):
     # period wins over the one that ended, even when the old one has the number.
     def test_relaunched_magazine_goes_to_running_period(self):
         self.assertEqual(self.resolve("Μίκυ Μάους #646 ΚΑΤΙ ΚΡΥΒΕΤΑΙ ΣΤΗΝ ΟΜΙΧΛΗ", "gr"), "gr/MMB 646")
+        self.assertEqual(self.resolve("Μίκυ Μάους #647 Η ΜΠΑΛΑΝΤΑ ΤΟΥ ΤΖΩΝ ΡΟΜΠΑΞ", "gr"), "gr/MMB 647")
         self.assertEqual(self.resolve("Κόμιξ #148", "gr"), "gr/KXB 148")
         self.assertEqual(self.resolve("Zio Paperone 41", "it"), "it/ZPP 41")
+
+    def test_relaunched_magazine_without_dates(self):
+        # Even without publication dates (e.g. Turso), an ancient number is not attributed to the root series
+        isv_search._STATS_CACHE.clear()
+        with mock.patch("src.dbi.isv_search._check_db_has_filledoldestdate", return_value=False):
+            self.assertEqual(self.resolve("Μίκυ Μάους #647 Η ΜΠΑΛΑΝΤΑ ΤΟΥ ΤΖΩΝ ΡΟΜΠΑΞ", "gr"), "gr/MMB 647")
+            self.assertEqual(self.resolve("Κόμιξ #148", "gr"), "gr/KXB 148")
+            self.assertEqual(self.resolve("Zio Paperone 41", "it"), "it/ZPP 41")
 
     def test_dead_series_kept_when_number_continues_it(self):
         # The dump is behind: 304 directly follows the last known Κόμιξ.

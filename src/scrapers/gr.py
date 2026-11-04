@@ -45,8 +45,10 @@ def discover_kathimerini() -> list[dict]:
                         cid = "464D"
                     elif "ντόναλντ" in title_lower or "donald" in title_lower:
                         cid = "464A"
-                    elif "super miky" in title_lower:
+                    elif "super miky" in title_lower or "σούπερ μίκυ" in title_lower:
                         cid = "464C"
+                    elif "editor" in title_lower or "επιλογή" in title_lower:
+                        cid = "464E"
 
                     # 1. High-resolution PressReader cover (1200px)
                     img_url = f"https://i.prcdn.co/img?cid={cid}&page=1&height=1200" if cid else None

@@ -112,6 +112,45 @@ class GreekEnricherTests(unittest.TestCase):
         self.assertEqual(stories[1]["start_page"], 47)
         self.assertEqual(stories[2]["start_page"], 73)
 
+    def test_fetch_pressreader_manifest_fast_mocked(self):
+        from unittest.mock import MagicMock
+        from src.gr_enricher import fetch_pressreader_issue_manifest
+
+        mock_session = MagicMock()
+        mock_auth_resp = MagicMock()
+        mock_auth_resp.status_code = 200
+        mock_auth_resp.json.return_value = {"bearerToken": "mock_token"}
+
+        mock_info_resp = MagicMock()
+        mock_info_resp.status_code = 200
+        mock_info_resp.json.return_value = {
+            "Pages": 100,
+            "Issue": {"Issue": "464b2026103000000000001001", "IssueDate": "2026-10-30T00:00:00"}
+        }
+
+        mock_pk_resp = MagicMock()
+        mock_pk_resp.status_code = 200
+        mock_pk_resp.json.return_value = {
+            "PageKeys": [
+                {"PageNumber": 1, "Key": "key1"},
+                {"PageNumber": 2, "Key": "key2"},
+                {"PageNumber": 3, "Key": "key3"},
+                {"PageNumber": 4, "Key": "key4"},
+            ]
+        }
+
+        mock_session.post.return_value = mock_auth_resp
+        mock_session.get.side_effect = [mock_info_resp, mock_pk_resp]
+
+        manifest = fetch_pressreader_issue_manifest("464B", "miky-maous", session=mock_session)
+        self.assertIsNotNone(manifest)
+        self.assertEqual(manifest["total_pages"], 100)
+        self.assertTrue(manifest["pages"][1]["is_hd"])
+        self.assertTrue(manifest["pages"][3]["is_hd"])
+        self.assertFalse(manifest["pages"][5]["is_hd"])
+        self.assertIn("key3", manifest["summary_page_url"])
+        self.assertEqual(len(manifest["pages"]), 100)
+
 
 if __name__ == "__main__":
     unittest.main()

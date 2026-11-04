@@ -2,13 +2,14 @@
 gr_enricher.py
 ==============
 Extracts and enriches story metadata for Greek Disney comics published by
-Kathimerini (Μίκυ Μάους, Κόμιξ, Ντόναλντ, Super Μίκυ) using official article
+Kathimerini (Μίκυ Μάους, Κόμιξ, Ντόναλντ, Super Μίκυ, Editor's Choice) using official article
 announcements and PressReader CDN assets.
 """
 
 import os
 import re
 import unicodedata
+import urllib.parse
 from bs4 import BeautifulSoup
 
 from src.db import query_db
@@ -18,6 +19,17 @@ PRESSREADER_CIDS = {
     "gr/KXB": "464D",  # Κόμιξ
     "gr/NTB": "464A",  # Ντόναλντ
     "gr/SMB": "464C",  # Super Μίκυ
+    "gr/ECA": "464E",  # Editor's Choice
+    "gr/ECCD": "464E", # Editor's Choice
+}
+
+PRESSREADER_SLUGS = {
+    "gr/MMB": "miky-maous",
+    "gr/KXB": "komix",
+    "gr/NTB": "donald",
+    "gr/SMB": "super-miky",
+    "gr/ECA": "editors-choice",
+    "gr/ECCD": "editors-choice",
 }
 
 
@@ -33,6 +45,113 @@ def get_pressreader_cover_url(issue_path: str, height: int = 1200) -> str | None
     if cid:
         return f"https://i.prcdn.co/img?cid={cid}&page=1&height={height}"
     return None
+
+
+def fetch_pressreader_issue_manifest(cid: str, slug: str = "miky-maous", session=None) -> dict | None:
+    """
+    Fetches the complete issue manifest from PressReader for a Greek magazine:
+    - Obtains guest bearer token
+    - Queries IssueInfo (total page count, issue key, publication date)
+    - Queries PageKeys to unlock HD previews (pages 1-4)
+    - Assembles the optimal URL for all pages (HD 1200px for preview pages, scale=55 for interior pages)
+    """
+    import requests
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Origin": "https://disneymagazinesbykathimerini.pressreader.com",
+        "Referer": "https://disneymagazinesbykathimerini.pressreader.com/",
+    }
+
+    try:
+        s = session or requests.Session()
+        s.headers.update(headers)
+
+        # 1. Initialize anonymous bearer token
+        auth_resp = s.post(
+            "https://disneymagazinesbykathimerini.pressreader.com/authentication/v1/initialize",
+            json={"tickets": [], "language": "el-GR", "url": f"https://disneymagazinesbykathimerini.pressreader.com/{slug}"},
+            timeout=8
+        )
+        if auth_resp.status_code != 200:
+            return None
+        token = auth_resp.json().get("bearerToken")
+        if not token:
+            return None
+
+        s.headers["Authorization"] = f"Bearer {token}"
+
+        # 2. Get Issue Info
+        info_resp = s.get(
+            f"https://ingress.pressreader.com/services/IssueInfo/GetIssueInfoByCid?cid={cid.lower()}",
+            timeout=8
+        )
+        if info_resp.status_code != 200:
+            return None
+
+        issue_data = info_resp.json()
+        issue_info = issue_data.get("Issue", {})
+        issue_key = issue_info.get("Issue")
+        total_pages = issue_data.get("Pages") or 100
+        issue_date = issue_info.get("IssueDate")
+
+        # 3. Get Preview PageKeys (pages 1 to 4)
+        preview_tickets = {}
+        if issue_key:
+            pk_resp = s.get(
+                f"https://ingress.pressreader.com/services/IssueInfo/GetPageKeys?issue={issue_key}&pageNumber=0&preview=true",
+                timeout=8
+            )
+            if pk_resp.status_code == 200:
+                pks = pk_resp.json().get("PageKeys", [])
+                for pk in pks:
+                    p_num = pk.get("PageNumber")
+                    p_key = pk.get("Key")
+                    if p_num and p_key:
+                        preview_tickets[p_num] = p_key
+
+        # 4. Generate optimal URL for every page from 1 to total_pages
+        pages_manifest = {}
+        for p in range(1, total_pages + 1):
+            if p in preview_tickets:
+                ticket_enc = urllib.parse.quote(preview_tickets[p], safe="")
+                pages_manifest[p] = {
+                    "page": p,
+                    "url": f"https://i.prcdn.co/img?file={issue_key}&page={p}&height=1200&ticket={ticket_enc}",
+                    "is_hd": True,
+                    "resolution": "1200px"
+                }
+            elif p == 1:
+                pages_manifest[p] = {
+                    "page": p,
+                    "url": f"https://i.prcdn.co/img?cid={cid}&page=1&height=1200",
+                    "is_hd": True,
+                    "resolution": "1200px"
+                }
+            else:
+                pages_manifest[p] = {
+                    "page": p,
+                    "url": f"https://i.prcdn.co/img?cid={cid}&page={p}&scale=55",
+                    "is_hd": False,
+                    "resolution": "330px"
+                }
+
+        cover_url = pages_manifest.get(1, {}).get("url") or f"https://i.prcdn.co/img?cid={cid}&page=1&height=1200"
+        summary_url = pages_manifest.get(3, {}).get("url")
+
+        return {
+            "cid": cid,
+            "slug": slug,
+            "issue_key": issue_key,
+            "issue_date": issue_date,
+            "total_pages": total_pages,
+            "cover_url": cover_url,
+            "summary_page_url": summary_url,
+            "pages": pages_manifest
+        }
+    except Exception as e:
+        print(f"  [warn] Failed to fetch PressReader manifest for {cid}: {e}")
+        return None
 
 
 def parse_kathimerini_stories(html_or_soup) -> list[dict]:
@@ -82,7 +201,6 @@ def parse_kathimerini_stories(html_or_soup) -> list[dict]:
             page_str = m_num.group(1).strip()
             rest = m_num.group(2).strip()
             
-            # Rest often contains Hero + Title: e.g. "ΤΖΩΝ ΡΟΜΠΑΞ Η ΜΠΑΛΑΝΤΑ ΤΟΥ ΤΖΩΝ ΡΟΜΠΑΞ"
             stories.append({
                 "start_page": int(page_str),
                 "title": rest,
@@ -127,7 +245,6 @@ def match_italian_source_issue(stories: list[dict], pub_code: str) -> str | None
     candidates = []
     for s in stories:
         title = s.get("title", "")
-        # Look for matching entry in inducks_entry for Greek translations or Italian equivalents
         for word in title.split():
             if len(word) > 4:
                 rows = query_db("""
@@ -150,7 +267,7 @@ def match_italian_source_issue(stories: list[dict], pub_code: str) -> str | None
 def enrich_gr_metadata(info: dict) -> dict:
     """
     Main enricher function called before Greek DBI generation.
-    Enriches info with stories list, pagination, and PressReader HD covers.
+    Enriches info with stories list, pagination, and PressReader HD covers & pages manifest.
     """
     issue_path = info.get("issue_path", "")
     article_html = info.get("article_html") or info.get("raw_html")
@@ -167,10 +284,31 @@ def enrich_gr_metadata(info: dict) -> dict:
         except Exception as e:
             print(f"  [warn] Could not fetch Kathimerini article for enrichment: {e}")
 
-    # Set PressReader HD cover URL
-    pr_cover = get_pressreader_cover_url(issue_path)
-    if pr_cover:
-        info["cover_url"] = pr_cover
+    pub_code = issue_path.split()[0] if issue_path else ""
+    cid = PRESSREADER_CIDS.get(pub_code)
+    slug = PRESSREADER_SLUGS.get(pub_code, "miky-maous")
+
+    if not cid:
+        for prefix, c in PRESSREADER_CIDS.items():
+            if issue_path.startswith(prefix):
+                cid = c
+                slug = PRESSREADER_SLUGS.get(prefix, slug)
+                break
+
+    # Fetch complete PressReader manifest (total pages, HD preview tickets, all page URLs)
+    manifest = None
+    if cid and not info.get("_skip_pressreader_network"):
+        manifest = fetch_pressreader_issue_manifest(cid, slug)
+        if manifest:
+            info["cover_url"] = manifest["cover_url"]
+            info["summary_page_url"] = manifest["summary_page_url"]
+            info["pages"] = manifest["total_pages"]
+            info["pressreader_manifest"] = manifest
+
+    if not info.get("cover_url"):
+        pr_cover = get_pressreader_cover_url(issue_path)
+        if pr_cover:
+            info["cover_url"] = pr_cover
 
     if not article_html:
         return info
@@ -178,8 +316,6 @@ def enrich_gr_metadata(info: dict) -> dict:
     parsed_stories = parse_kathimerini_stories(article_html)
     if not parsed_stories:
         return info
-
-    pub_code = issue_path.split()[0] if issue_path else ""
 
     # 1. Komix layout
     if parsed_stories[0].get("format") == "komix":
@@ -191,7 +327,6 @@ def enrich_gr_metadata(info: dict) -> dict:
         return info
 
     # 2. Numbered layout (Miky Maous, Donald, Super Miky)
-    # Calculate page lengths from start_page differences
     for i in range(len(parsed_stories)):
         current = parsed_stories[i]
         next_p = parsed_stories[i + 1]["start_page"] if i + 1 < len(parsed_stories) else None
@@ -209,7 +344,6 @@ def enrich_gr_metadata(info: dict) -> dict:
                 WHERE e.issuecode = ? AND sv.storycode NOT LIKE 'Q%'
             """, (source_issue,))
             if source_rows:
-                # Set cover code from source issue
                 cover_row = next((r for r in source_rows if r[0] == 'a'), None)
                 if cover_row and cover_row[2]:
                     info["cover_code"] = cover_row[2]

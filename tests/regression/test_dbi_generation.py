@@ -84,5 +84,34 @@ class AkuankkaStoryCodes(unittest.TestCase):
         self.assertEqual(codes["kansi-561"], "")
 
 
+
+
+class GreekEnricherTests(unittest.TestCase):
+    def test_parse_kathimerini_stories_komix(self):
+        from src.gr_enricher import parse_kathimerini_stories
+        sample_html = """
+        <p>Η περιπέτεια και το γέλιο συνεχίζονται στις νέες ιστορίες Κόμιξ που κυκλοφορούν στα περίπτερα.</p>
+        <p>ΕΝΑ ΜΩΡΟ ΓΙΑ ΔΥΟ Two Men and a Baby: Μια ιστορία του David Gerstein, από το πενάκι του Vicar</p>
+        <p>ΟΙ ΜΑΓΙΣΣΕΣ ΤΟΥ ΚΑΣΤΡΟΥ ΜΑΛΚΟΤ The Witches of Malcot Castle: Ένα σενάριο του Lars Jensen εικονογραφημένο από τον Marco Rota</p>
+        """
+        stories = parse_kathimerini_stories(sample_html)
+        self.assertEqual(len(stories), 2)
+        self.assertEqual(stories[0]["title"], "Two Men and a Baby")
+        self.assertEqual(stories[1]["title"], "The Witches of Malcot Castle")
+
+    def test_parse_kathimerini_stories_numbered(self):
+        from src.gr_enricher import parse_kathimerini_stories
+        sample_html = """
+        <p>07 ΤΖΩΝ ΡΟΜΠΑΞ Η ΜΠΑΛΑΝΤΑ ΤΟΥ ΤΖΩΝ ΡΟΜΠΑΞ</p>
+        <p>47 ΜΙΚΡΟΙ ΕΞΕΡΕΥΝΗΤΕΣ ΤΟ ΑΡΧΙΠΕΛΑΓΟΣ ΤΩΝ ΧΕΛΩΝΩΝ Α ‘ μέρος</p>
+        <p>73 ΜΙΚΡΟΙ ΕΞΕΡΕΥΝΗΤΕΣ ΤΟ ΑΡΧΙΠΕΛΑΓΟΣ ΤΩΝ ΧΕΛΩΝΩΝ Β’ μέρος</p>
+        """
+        stories = parse_kathimerini_stories(sample_html)
+        self.assertEqual(len(stories), 3)
+        self.assertEqual(stories[0]["start_page"], 7)
+        self.assertEqual(stories[1]["start_page"], 47)
+        self.assertEqual(stories[2]["start_page"], 73)
+
+
 if __name__ == "__main__":
     unittest.main()

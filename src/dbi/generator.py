@@ -184,6 +184,21 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
             except Exception as e:
                 print(f"  [warn] Failed to enrich LTB: {e}")
 
+        if publication_type == "gr":
+            try:
+                from src.gr_enricher import enrich_gr_metadata
+                info["issue_path"] = issue_path
+                info = enrich_gr_metadata(info)
+                if info.get("date"):
+                    data["date"] = info["date"]
+                if info.get("pages"):
+                    data["pages"] = info["pages"]
+                if info.get("stories"):
+                    from src.dbi.story_rules import apply_story_rules
+                    info["stories"] = apply_story_rules(info["stories"])
+            except Exception as e:
+                print(f"  [warn] Failed to enrich Greek comic: {e}")
+
         if not info.get("cover_code") and info.get("cover_url") and info.get("stories"):
             # A reprinted cover (LTB 610a = D 28817, the Nordic pocket books' cover): found from
             # the image among the covers of the issues printing the same stories.

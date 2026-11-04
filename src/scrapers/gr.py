@@ -13,12 +13,12 @@ from src.utils import get_session
 def discover_kathimerini() -> list[dict]:
     """
     Scrapes the Kathimerini Disney section (Greece).
-    Extracts articles announcing new magazines.
+    Extracts articles announcing new magazines with full story summaries
+    and high-resolution PressReader covers.
     """
     result = []
     try:
         s = get_session()
-        # KATHIMERINI_URL is imported from config
         from src.config import KATHIMERINI_URL
         r = s.get(KATHIMERINI_URL, headers={"User-Agent": "Mozilla/5.0"}, timeout=15)
         if r.status_code != 200:
@@ -37,20 +37,34 @@ def discover_kathimerini() -> list[dict]:
                     if any(x['url'] == url for x in result):
                         continue
                         
-                    # 1. Try PressReader high-res cover
-                    img_url = None
+                    title_lower = title_text.lower()
+                    cid = None
+                    if "μίκυ μάους" in title_lower or "miky" in title_lower:
+                        cid = "464B"
+                    elif "κόμιξ" in title_lower or "komix" in title_lower:
+                        cid = "464D"
+                    elif "ντόναλντ" in title_lower or "donald" in title_lower:
+                        cid = "464A"
+                    elif "super miky" in title_lower:
+                        cid = "464C"
 
-                    # 1. Fetch cover and date from the Kathimerini article itself (most reliable)
+                    # 1. High-resolution PressReader cover (1200px)
+                    img_url = f"https://i.prcdn.co/img?cid={cid}&page=1&height=1200" if cid else None
+
+                    # 2. Fetch date, fallback cover, and story content from the Kathimerini article
+                    date_val = None
+                    article_html_content = None
                     try:
-                        date_val = None
                         r_art = s.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
                         if r_art.status_code == 200:
+                            article_html_content = r_art.text
                             art_soup = BeautifulSoup(r_art.text, 'html.parser')
-                            for img in art_soup.find_all('img'):
-                                src = img.get('src', '')
-                                if src and ('uploads' in src or 'img' in src) and src.startswith('http'):
-                                    img_url = src
-                                    break
+                            if not img_url:
+                                for img in art_soup.find_all('img'):
+                                    src = img.get('src', '')
+                                    if src and ('uploads' in src or 'img' in src) and src.startswith('http'):
+                                        img_url = src
+                                        break
                                     
                             time_elem = art_soup.find('time')
                             if time_elem:
@@ -60,22 +74,6 @@ def discover_kathimerini() -> list[dict]:
                     except Exception as e:
                         print(f"  [warn] Failed to fetch Kathimerini article {url}: {e}")
 
-                    # 2. Fallback: PressReader CID-based cover (often blocked)
-                    if not img_url:
-                        title_lower = title_text.lower()
-                        cid = None
-                        if "μίκυ μάους" in title_lower:
-                            cid = "464B"
-                        elif "κόμιξ" in title_lower:
-                            cid = "464D"
-                        elif "ντόναλντ" in title_lower:
-                            cid = "464A"
-                        elif "super miky" in title_lower:
-                            cid = "464C"
-                        if cid:
-                            img_url = f"https://i.prcdn.co/img?cid={cid}&page=1&height=1000"
-
-                        
                     # Extract a unique ID from the URL (e.g. 564262477)
                     m = re.search(r'/(\d+)/', url)
                     art_id = m.group(1) if m else url.split('/')[-2]
@@ -84,14 +82,14 @@ def discover_kathimerini() -> list[dict]:
                         "id": art_id,
                         "title": title_text,
                         "url": url,
-                        "price": "N/A (Kiosk)",  # Usually distributed with Sunday newspaper
+                        "price": "N/A (Kiosk)",  # Distributed through kiosks / newsstands
                         "cover_url": img_url,
                         "date": date_val,
                         "summary": "",
-                        "publisher": "Kathimerini"
+                        "publisher": "Kathimerini",
+                        "article_html": article_html_content
                     })
     except Exception as e:
         print(f"  [warn] discover_kathimerini failed: {e}")
         
     return result
-

@@ -1055,8 +1055,8 @@
   "kathi-gr:564490864": "released",
   "panini-it:340073": "announced",
   "_health": {
-    "ES": {
-      "empty_runs": 4,
+    "Panini IT": {
+      "empty_runs": 1,
       "alerted": false
     }
   },
@@ -1085,5 +1085,6 @@
   "egmont-de:200/03387": "released",
   "ltb-de:weihnachten_band_32": "released",
   "ltb-de:spezial_band_133": "released",
-  "fi:fi-aa2026-45": "released"
+  "fi:fi-aa2026-45": "released",
+  "kathi-gr:564562054": "released"
 }

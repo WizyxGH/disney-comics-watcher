@@ -145,6 +145,33 @@ NL_KEY_PREFIX = "nl:"
 UK_KEY_PREFIX = "uk:"
 SE_KEY_PREFIX = "se:"
 
+DONALDDUCK_NL_BASE = os.environ.get("DONALDDUCK_NL_BASE", "https://shop.donaldduck.nl")
+DONALDDUCK_NL_COLLECTIONS = [
+    "albums-duck",
+    "club-donald-duck",
+    "donald-duck-detectives",
+    "club-donald-duck-boeken",
+]
+
+ANDEBY_DK_API_BASE = os.environ.get("ANDEBY_DK_API_BASE", "https://www.andeby.dk/wp-json/wp/v2")
+ANDEBY_DK_SLUGS = [
+    ("udgivelse-aa", "dk/AA", "Anders And & Co."),
+    ("udgivelse-jumbo", "dk/JB", "Jumbobog"),
+    ("udgivelse-tema", "dk/JT", "Temabog"),
+    ("udgivelse-aac", "dk/AAC", "Anders And Classic"),
+    ("udgivelse-aaj", "dk/AJ", "Anders And Junior"),
+]
+
+SERIE_NO_BASE = os.environ.get("SERIE_NO_BASE", "https://serie.no")
+SERIE_NO_CATEGORIES = [
+    "/produkt/donaldduck/donald-pocket/donald-pocket3/",
+    "/produkt/donaldduck/donald-pocket/donald-temapocket/",
+    "/produkt/donaldduck/donald-pocket/donald-feriepocket/",
+    "/produkt/donaldduck/norskdonald/",
+    "/produkt/donaldduck/disneys-ikoner/",
+    "/produkt/donaldduck/carl-barks-og-don-rosa/",
+]
+
 # Publisher of each source's releases, as Inducks names it (or part of the
 # name: its advanced search matches "Panini" in "Disney Italia, Panini Comics").
 # Narrows "Search on Inducks" to the right homonym; a scraper that reads the
@@ -160,6 +187,9 @@ PROVIDER_PUBLISHERS = {
     PANINI_IT_KEY_PREFIX:      "Panini",
     PANINI_BR_KEY_PREFIX:      "Panini",
     NAHDET_MISR_EG_KEY_PREFIX: "Nahdet Misr",
+    DK_KEY_PREFIX:             "Egmont",
+    NO_KEY_PREFIX:             "Egmont",
+    NL_KEY_PREFIX:             "DPG Media",
 }
 
 STATE_FILE    = "state.json"

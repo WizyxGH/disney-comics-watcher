@@ -1059,8 +1059,8 @@
   "es:341705": "announced",
   "es:341714": "announced",
   "es:341699": "announced",
-  "panini-it:340613": "announced",
-  "panini-it:340631": "announced",
+  "panini-it:340613": "released",
+  "panini-it:340631": "released",
   "is:d1f7893f-fc43-4aa6-bf03-888543b0e19d": "released",
   "is:2cd11449-0a87-408f-867b-df8a825278bd": "released",
   "is:ea55b58e-3e3b-4af6-acdc-dcc8b4f2a0b6": "released",
@@ -1075,7 +1075,7 @@
   "is:84b1252d-d124-4df6-a7d3-6f836582e2c4": "released",
   "panini-it:340463": "announced",
   "glenat:9782344079768": "announced",
-  "panini-it:340337": "announced",
+  "panini-it:340337": "released",
   "egmont-de:200/03410": "released",
   "egmont-de:200/03387": "released",
   "ltb-de:weihnachten_band_32": "released",
@@ -1116,7 +1116,7 @@
   "dk:udgivelse-aa_18_2026": "released",
   "dk:udgivelse-aa_44_2026": "released",
   "dk:udgivelse-aa_19_2026": "released",
-  "dk:udgivelse-aa_45_2026": "announced",
+  "dk:udgivelse-aa_45_2026": "released",
   "dk:udgivelse-aa_20_2026": "released",
   "dk:udgivelse-aa_46_2026": "announced",
   "dk:udgivelse-aa_21_2026": "released",
@@ -1367,5 +1367,6 @@
   "nl:10911404032342": "released",
   "nl:10911393841494": "released",
   "nl:10911389876566": "released",
-  "nl:10911388500310": "released"
+  "nl:10911388500310": "released",
+  "ltb-de:LTB_Kleine_Helden_Band_1": "released"
 }

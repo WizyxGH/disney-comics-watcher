@@ -140,6 +140,8 @@ def inducks_button(issue_path: str | None, raw_title: str, country: str, info: d
     Italia's, Panini's Paperinik 119 is it/PPK)."""
     info = info or {}
     known = bool(issue_path) and "UNK" not in issue_path and "/" in issue_path
+    if known:
+        issue_path = re.sub(r"\s+", " ", issue_path.strip())
     if known and not re.search(r"\d", issue_path):
         # Only the publication is known.
         return {"text": "View issues", "url": f"https://inducks.org/publication.php?c={quote_plus(issue_path)}"}

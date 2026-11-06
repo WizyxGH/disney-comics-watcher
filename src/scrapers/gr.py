@@ -68,13 +68,35 @@ def discover_kathimerini() -> list[dict]:
                                         img_url = src
                                         break
                                     
-                            time_elem = art_soup.find('time')
-                            if time_elem:
-                                m_date = re.search(r'(\d{2})\.(\d{2})\.(\d{4})', time_elem.text)
-                                if m_date:
-                                    date_val = f"{m_date.group(1)}/{m_date.group(2)}/{m_date.group(3)}"
+                            # Check body text for actual kiosk release date (e.g. "αυτή την Παρασκευή 06/11")
+                            body_text = art_soup.get_text()
+                            m_rel = re.search(r'(?:παρασκευή|τετάρτη|κυκλοφορε[ίι]|περίπτερα)[^0-9\n]*(\d{1,2})[/.-](\d{1,2})(?:[/.-](\d{2,4}))?', body_text, re.IGNORECASE)
+                            if m_rel:
+                                d = int(m_rel.group(1))
+                                m_val = int(m_rel.group(2))
+                                y = int(m_rel.group(3)) if m_rel.group(3) else datetime.now().year
+                                if y < 100: y += 2000
+                                date_val = f"{d:02d}/{m_val:02d}/{y}"
+                            else:
+                                time_elem = art_soup.find('time')
+                                if time_elem:
+                                    m_date = re.search(r'(\d{2})\.(\d{2})\.(\d{4})', time_elem.text)
+                                    if m_date:
+                                        date_val = f"{m_date.group(1)}/{m_date.group(2)}/{m_date.group(3)}"
                     except Exception as e:
                         print(f"  [warn] Failed to fetch Kathimerini article {url}: {e}")
+
+                    # Extract issue number and map to Inducks 2nd series code (gr/MMB, gr/KXB, gr/NTB, gr/SMB)
+                    m_num = re.search(r'#?\s*(\d{1,4})\b', title_text)
+                    issue_nr = m_num.group(1) if m_num else ""
+                    greek_pub_map = {
+                        "464B": "gr/MMB",
+                        "464D": "gr/KXB",
+                        "464A": "gr/NTB",
+                        "464C": "gr/SMB",
+                        "464E": "gr/ECA"
+                    }
+                    canonical_issue_path = f"{greek_pub_map[cid]} {issue_nr}" if (cid in greek_pub_map and issue_nr) else None
 
                     # Extract a unique ID from the URL (e.g. 564262477)
                     m = re.search(r'/(\d+)/', url)
@@ -84,6 +106,7 @@ def discover_kathimerini() -> list[dict]:
                         "id": art_id,
                         "title": title_text,
                         "url": url,
+                        "issue_path": canonical_issue_path,
                         "price": "N/A (Kiosk)",  # Distributed through kiosks / newsstands
                         "cover_url": img_url,
                         "date": date_val,

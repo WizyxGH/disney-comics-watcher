@@ -1056,7 +1056,7 @@
   "panini-it:340073": "released",
   "_health": {
     "ES": {
-      "empty_runs": 1,
+      "empty_runs": 2,
       "alerted": false
     }
   },
@@ -1078,7 +1078,7 @@
   "is:6ed2aea5-4096-4a26-af5c-3b8124e4616e": "released",
   "is:4a762c1f-a868-49ec-bb2c-5ad905b09e96": "released",
   "is:84b1252d-d124-4df6-a7d3-6f836582e2c4": "released",
-  "panini-it:340463": "announced",
+  "panini-it:340463": "released",
   "glenat:9782344079768": "announced",
   "panini-it:340337": "released",
   "egmont-de:200/03410": "released",
@@ -1374,5 +1374,13 @@
   "nl:10911389876566": "released",
   "nl:10911388500310": "released",
   "ltb-de:LTB_Kleine_Helden_Band_1": "released",
-  "panini-it:347793": "announced"
+  "panini-it:347793": "announced",
+  "panini-it:340079": "announced",
+  "panini-it:342402": "announced",
+  "panini-it:342411": "announced",
+  "panini-it:342414": "announced",
+  "panini-it:342453": "announced",
+  "hr:19261": "released",
+  "no:269609": "announced",
+  "no:269585": "announced"
 }

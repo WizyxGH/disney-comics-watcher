@@ -1056,7 +1056,7 @@
   "panini-it:340073": "released",
   "_health": {
     "ES": {
-      "empty_runs": 1,
+      "empty_runs": 2,
       "alerted": false
     }
   },
@@ -1384,5 +1384,7 @@
   "no:269609": "announced",
   "no:269585": "announced",
   "panini-it:342507": "announced",
-  "panini-it:342522": "announced"
+  "panini-it:342522": "announced",
+  "hr:18886": "released",
+  "hr:13970": "released"
 }

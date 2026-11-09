@@ -234,7 +234,7 @@ def _is_placeholder_cover(url: str | None) -> bool:
         'coverabbildung-nicht-verfugbar',
     ))
 
-def _get_inputfilename_for_issue(issue_path: str) -> str:
+def _get_inputfilename_for_issue(issue_path: str) -> tuple[str, str | None]:
     from src.db import query_db
     import re
     try:
@@ -248,76 +248,84 @@ def _get_inputfilename_for_issue(issue_path: str) -> str:
 
         # 1. Exact issue match in inducks_issue
         rows = query_db("""
-            SELECT inf.path, inf.filename
+            SELECT inf.path, inf.filename, inf.inputfilecode
             FROM inducks_issue iss
             JOIN inducks_inputfile inf ON iss.inputfilecode = inf.inputfilecode
             WHERE iss.issuecode = ? OR iss.issuecode = ? OR (iss.publicationcode = ? AND iss.issuenumber = ?)
         """, (issue_path, issue_path.replace(" ", ""), full_pub, num))
         if rows and rows[0][0] and rows[0][1]:
             p, fn = rows[0][0].strip("/"), rows[0][1]
-            return f"{p}/{fn}"
+            code = str(rows[0][2]) if len(rows[0]) > 2 and rows[0][2] else None
+            return f"{p}/{fn}", code
 
         # 2. Candidate input files for this publication
         files = query_db("""
-            SELECT DISTINCT inf.path, inf.filename
+            SELECT DISTINCT inf.path, inf.filename, inf.inputfilecode
             FROM inducks_inputfile inf
             JOIN inducks_issue iss ON iss.inputfilecode = inf.inputfilecode
             WHERE iss.publicationcode = ?
         """, (full_pub,))
 
         if not files:
-            return f"issues/{country}/{pub.lower()}.dbi"
+            return f"issues/{country}/{pub.lower()}.dbi", None
         if len(files) == 1:
             p, fn = files[0][0].strip("/"), files[0][1]
-            return f"{p}/{fn}"
+            code = str(files[0][2]) if len(files[0]) > 2 and files[0][2] else None
+            return f"{p}/{fn}", code
 
         # 3. Multiple files: parse numeric issue number and match ranges (e.g. ltb601-700.dbi)
         num_clean = re.sub(r"[^0-9]", "", num)
         if num_clean:
             val = int(num_clean)
             range_candidates = []
-            for p, fn in files:
+            for item in files:
+                p, fn = item[0], item[1]
+                code = str(item[2]) if len(item) > 2 and item[2] else None
                 m = re.search(r"(\d+)-(\d+)", fn)
                 if m:
-                    range_candidates.append((int(m.group(1)), int(m.group(2)), p, fn))
+                    range_candidates.append((int(m.group(1)), int(m.group(2)), p, fn, code))
             if range_candidates:
-                for start, end, p, fn in range_candidates:
+                for start, end, p, fn, code in range_candidates:
                     if start <= val <= end:
-                        return f"{p.strip('/')}/{fn}"
+                        return f"{p.strip('/')}/{fn}", code
                 range_candidates.sort(key=lambda x: x[1])
-                return f"{range_candidates[-1][2].strip('/')}/{range_candidates[-1][3]}"
+                return f"{range_candidates[-1][2].strip('/')}/{range_candidates[-1][3]}", range_candidates[-1][4]
 
             thresh_candidates = []
-            for p, fn in files:
+            for item in files:
+                p, fn = item[0], item[1]
+                code = str(item[2]) if len(item) > 2 and item[2] else None
                 m = re.search(r"(\d+)", fn)
                 if m:
-                    thresh_candidates.append((int(m.group(1)), p, fn))
+                    thresh_candidates.append((int(m.group(1)), p, fn, code))
             if thresh_candidates:
                 thresh_candidates.sort(key=lambda x: x[0])
                 chosen = thresh_candidates[0]
-                for t_val, p, fn in thresh_candidates:
+                for t_val, p, fn, code in thresh_candidates:
                     if val >= t_val:
-                        chosen = (t_val, p, fn)
-                return f"{chosen[1].strip('/')}/{chosen[2]}"
+                        chosen = (t_val, p, fn, code)
+                return f"{chosen[1].strip('/')}/{chosen[2]}", chosen[3]
 
         # 4. Fallback: file of most recent issue in publication
         recent = query_db("""
-            SELECT inf.path, inf.filename
+            SELECT inf.path, inf.filename, inf.inputfilecode
             FROM inducks_issue iss
             JOIN inducks_inputfile inf ON iss.inputfilecode = inf.inputfilecode
             WHERE iss.publicationcode = ?
             ORDER BY iss.issuecode DESC LIMIT 1
         """, (full_pub,))
         if recent and recent[0][0] and recent[0][1]:
-            return f"{recent[0][0].strip('/')}/{recent[0][1]}"
+            code = str(recent[0][2]) if len(recent[0]) > 2 and recent[0][2] else None
+            return f"{recent[0][0].strip('/')}/{recent[0][1]}", code
 
-        return f"{files[0][0].strip('/')}/{files[0][1]}"
+        code = str(files[0][2]) if len(files[0]) > 2 and files[0][2] else None
+        return f"{files[0][0].strip('/')}/{files[0][1]}", code
     except Exception as e:
         print(f"  [warn] _get_inputfilename_for_issue: {e}")
 
     country_fallback = issue_path.split("/", 1)[0] if "/" in issue_path else "misc"
     pub_fallback = (issue_path.split("/", 1)[1] if "/" in issue_path else issue_path).split()[0].lower()
-    return f"issues/{country_fallback}/{pub_fallback}.dbi"
+    return f"issues/{country_fallback}/{pub_fallback}.dbi", None
 
 
 def _dispatch_notification(
@@ -439,8 +447,18 @@ def _dispatch_notification(
                 u_part = f"{i_part}a"
                 upload_url = f"https://inducks.org/sendscan.php?c={quote_plus(country_part)}&s={s_part}&i={i_part}&u={u_part}"
                 
-                input_file = _get_inputfilename_for_issue(issue_path)
-                edit_url = f"https://inducks.org/cvsedit.php?inputfilename={quote_plus(input_file)}&induckscode={i_part}"
+                if does_issue_exist_in_inducks(issue_path):
+                    edit_url = f"https://inducks.org/cvsedit.php?issuecode={quote_plus(issue_path)}"
+                else:
+                    input_file, input_code = _get_inputfilename_for_issue(issue_path)
+                    params = {
+                        "inputfilename": input_file,
+                        "induckscode": issue_part,
+                        "new": "1",
+                    }
+                    if input_code:
+                        params["inputfilecode"] = input_code
+                    edit_url = f"https://inducks.org/cvsedit.php?{urlencode(params)}"
                 
                 dm_buttons = [
                     [

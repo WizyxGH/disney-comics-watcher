@@ -56,6 +56,39 @@ class InducksButton(unittest.TestCase):
         button = inducks_button("fi/AA2026-44", "Aku Ankka 44/2026", "fi")
         self.assertEqual(self.query(button), {"country": "fi", "title1": "AA", "entrycodeh3": "2026-44"})
 
+    def test_cvsedit_url_for_new_issue_includes_new_param(self):
+        from src.notifications import _get_inputfilename_for_issue
+        from urllib.parse import urlencode, quote_plus
+        from src.utils import does_issue_exist_in_inducks
+
+        # it/TL 3701 does not exist in fake database
+        self.assertFalse(does_issue_exist_in_inducks("it/TL 3701"))
+        input_file, input_code = _get_inputfilename_for_issue("it/TL 3701")
+        self.assertEqual(input_file, "issues/it/tl2000.dbi")
+        self.assertEqual(input_code, "1914")
+
+        params = {
+            "inputfilename": input_file,
+            "induckscode": "TL 3701",
+            "new": "1",
+        }
+        if input_code:
+            params["inputfilecode"] = input_code
+        url = f"https://inducks.org/cvsedit.php?{urlencode(params)}"
+        self.assertIn("new=1", url)
+        self.assertIn("inputfilename=issues%2Fit%2Ftl2000.dbi", url)
+        self.assertIn("induckscode=TL+3701", url)
+        self.assertIn("inputfilecode=1914", url)
+
+    def test_cvsedit_url_for_existing_issue_uses_issuecode(self):
+        from src.utils import does_issue_exist_in_inducks
+        from urllib.parse import quote_plus
+
+        # it/TL 3700 exists in fake database
+        self.assertTrue(does_issue_exist_in_inducks("it/TL 3700"))
+        url = f"https://inducks.org/cvsedit.php?issuecode={quote_plus('it/TL 3700')}"
+        self.assertEqual(url, "https://inducks.org/cvsedit.php?issuecode=it%2FTL+3700")
+
 
 class CoverFilename(unittest.TestCase):
     # A code respaced as Inducks spaces it keeps the cover saved before.

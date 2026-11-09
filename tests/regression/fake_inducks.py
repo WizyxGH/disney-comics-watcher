@@ -85,7 +85,8 @@ def _build() -> sqlite3.Connection:
         CREATE TABLE inducks_publication (publicationcode TEXT, countrycode TEXT, title TEXT);
         CREATE TABLE inducks_publicationname (publicationcode TEXT, publicationname TEXT);
         CREATE TABLE inducks_issue (issuecode TEXT, publicationcode TEXT, issuenumber TEXT,
-                                    filledoldestdate TEXT, fullyindexed TEXT);
+                                    filledoldestdate TEXT, fullyindexed TEXT, inputfilecode TEXT);
+        CREATE TABLE inducks_inputfile (inputfilecode TEXT, path TEXT, filename TEXT);
         CREATE TABLE inducks_story (storycode TEXT);
         CREATE TABLE inducks_storyversion (storyversioncode TEXT, storycode TEXT, entirepages TEXT,
                                            rowsperpage TEXT);
@@ -97,8 +98,9 @@ def _build() -> sqlite3.Connection:
         for alt in alts:
             conn.execute("INSERT INTO inducks_publicationname VALUES (?,?)", (code, alt))
         for number, date, *issuecode in issues:
-            conn.execute("INSERT INTO inducks_issue VALUES (?,?,?,?,?)",
-                         (issuecode[0] if issuecode else f"{code} {number}", code, number, date, "N"))
+            conn.execute("INSERT INTO inducks_issue VALUES (?,?,?,?,?,?)",
+                         (issuecode[0] if issuecode else f"{code} {number}", code, number, date, "N", "1914" if code == "it/TL" else "1"))
+    conn.execute("INSERT INTO inducks_inputfile VALUES (?,?,?)", ("1914", "issues/it", "tl2000.dbi"))
     conn.executemany("INSERT INTO inducks_story VALUES (?)", [(s,) for s in STORIES])
     conn.executemany("INSERT INTO inducks_storyversion VALUES (?,?,?,?)", STORY_VERSIONS)
     conn.executemany("INSERT INTO inducks_entry VALUES (?,?,?,?,?)", ENTRIES)

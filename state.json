@@ -1055,7 +1055,7 @@
   "kathi-gr:564490864": "released",
   "panini-it:340073": "released",
   "_health": {
-    "Panini IT": {
+    "ES": {
       "empty_runs": 1,
       "alerted": false
     }
@@ -1153,7 +1153,7 @@
   "dk:udgivelse-tema_3_2026": "released",
   "dk:udgivelse-tema_4_2026": "released",
   "dk:udgivelse-tema_5_2026": "released",
-  "dk:udgivelse-tema_6_2026": "announced",
+  "dk:udgivelse-tema_6_2026": "released",
   "dk:udgivelse-aac_1_2026": "released",
   "dk:udgivelse-aac_2_2026": "released",
   "dk:udgivelse-aac_3_2026": "released",
@@ -1170,7 +1170,7 @@
   "dk:udgivelse-aaj_8_2026": "released",
   "dk:udgivelse-aaj_9_2026": "released",
   "dk:udgivelse-aaj_10_2026": "released",
-  "dk:udgivelse-aaj_11_2026": "announced",
+  "dk:udgivelse-aaj_11_2026": "released",
   "dk:udgivelse-aaj_12_2026": "announced",
   "no:1073760049": "announced",
   "no:269637": "announced",
@@ -1382,5 +1382,7 @@
   "panini-it:342453": "announced",
   "hr:19261": "released",
   "no:269609": "announced",
-  "no:269585": "announced"
+  "no:269585": "announced",
+  "panini-it:342507": "announced",
+  "panini-it:342522": "announced"
 }

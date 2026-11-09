@@ -16,6 +16,9 @@ DSE  62a    ?              1 c
 DSE  62B     h3 PK: Meno Tre all'Alba - Variant Simone Di Meo [issdate:2026-10-29] [price:8.90 EUR] [inx:-]
 DSE  62Ba   ?              1 c
 
+GCDN131      h3 I Grandi Classici 131 [issdate:2026-11-15] [price:5.50 EUR] [inx:-]
+GCDN131a    ?              1 c                      CV
+
 IVDT  3      h3 I Viaggi di Topolino 3 [issdate:2026-11-06] [price:5.50 EUR] [inx:-]
 IVDT  3a    ?              1 c                      CV
 
@@ -39,4 +42,7 @@ TL 3702Ba   ?              1 c                      CV
 
 TL 3703      h3 Topolino: Holiday Celebration 3703 [issdate:2026-11-11] [price:5.90 EUR] [inx:-]
 TL 3703a    ?              1 c
+
+ZPP 101      h3 Zio Paperone 101 [issdate:2026-11-15] [price:3.90 EUR] [inx:-]
+ZPP 101a    ?              1 c                      CV
 

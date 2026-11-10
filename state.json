@@ -1056,7 +1056,7 @@
   "panini-it:340073": "released",
   "_health": {
     "ES": {
-      "empty_runs": 3,
+      "empty_runs": 4,
       "alerted": false
     }
   },
@@ -1087,7 +1087,7 @@
   "ltb-de:spezial_band_133": "released",
   "fi:fi-aa2026-45": "released",
   "kathi-gr:564562054": "released",
-  "panini-it:342432": "announced",
+  "panini-it:342432": "released",
   "dk:udgivelse-aa_1_2025": "released",
   "dk:udgivelse-aa_28_2026": "released",
   "dk:udgivelse-aa_2_2026": "released",
@@ -1374,7 +1374,7 @@
   "nl:10911389876566": "released",
   "nl:10911388500310": "released",
   "ltb-de:LTB_Kleine_Helden_Band_1": "released",
-  "panini-it:347793": "announced",
+  "panini-it:347793": "released",
   "panini-it:340079": "announced",
   "panini-it:342402": "announced",
   "panini-it:342411": "announced",
@@ -1387,5 +1387,7 @@
   "panini-it:342522": "announced",
   "hr:18886": "released",
   "hr:13970": "released",
-  "is:ed3921f0-809d-4a79-8743-cc87c9c4bf2a": "released"
+  "is:ed3921f0-809d-4a79-8743-cc87c9c4bf2a": "released",
+  "ltb-de:ltb_nikolaus_band_5": "released",
+  "fi:fi-aa2026-46": "released"
 }

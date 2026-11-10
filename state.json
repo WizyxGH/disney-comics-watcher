@@ -1056,7 +1056,7 @@
   "panini-it:340073": "released",
   "_health": {
     "ES": {
-      "empty_runs": 4,
+      "empty_runs": 5,
       "alerted": false
     }
   },
@@ -1389,5 +1389,9 @@
   "hr:13970": "released",
   "is:ed3921f0-809d-4a79-8743-cc87c9c4bf2a": "released",
   "ltb-de:ltb_nikolaus_band_5": "released",
-  "fi:fi-aa2026-46": "released"
+  "fi:fi-aa2026-46": "released",
+  "fr_kiosk:14067_3882-3883": "released",
+  "fr_kiosk:15190_40": "released",
+  "panini-it:349079": "announced",
+  "panini-it:340433": "released"
 }

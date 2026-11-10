@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Disney Comics Agenda — Calendrier des sorties BD Disney</title>
-  <meta name="description" content="Agenda minimaliste des sorties et parutions de bandes dessinées Disney par pays (France, Italie, Allemagne, USA...).">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📅</text></svg>">
+  <title>Disney Comics Agenda — Release Schedule</title>
+  <meta name="description" content="Minimalist international release calendar and agenda for Disney comics and magazines.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='4' width='18' height='18' rx='2' ry='2'></rect><line x1='16' y1='2' x2='16' y2='6'></line><line x1='8' y1='2' x2='8' y2='6'></line><line x1='3' y1='10' x2='21' y2='10'></line></svg>">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -14,17 +14,34 @@
   <header class="site-header">
     <div class="container header-inner">
       <div class="brand">
-        <span class="brand-icon">📚</span>
+        <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
         <div class="brand-text">
           <h1>Disney Comics Agenda</h1>
-          <p class="subtitle">Calendrier des parutions et sorties internationales</p>
+          <p class="subtitle">International release schedule and comic calendar</p>
         </div>
       </div>
       <div class="header-actions">
-        <span id="releases-count-badge" class="badge badge-muted">Chargement...</span>
-        <button id="theme-toggle" class="btn btn-icon" title="Changer de thème" aria-label="Changer de thème">
-          <span class="icon-sun">☀️</span>
-          <span class="icon-moon">🌙</span>
+        <span id="releases-count-badge" class="badge badge-muted">Loading...</span>
+        <button id="theme-toggle" class="btn btn-icon" title="Toggle theme" aria-label="Toggle theme">
+          <svg class="icon-sun" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
         </button>
       </div>
     </div>
@@ -33,58 +50,120 @@
   <!-- Main Content -->
   <main class="container main-content">
 
-    <!-- Filters Section -->
-    <section class="filters-panel" aria-label="Filtres">
+    <!-- Minimalist Filter Bar -->
+    <section class="filters-panel" aria-label="Filters">
       
-      <!-- Country Filters (Primary) -->
-      <div class="filter-group">
-        <div class="filter-header">
-          <span class="filter-title">Filtrer par pays</span>
-          <span id="active-country-label" class="filter-hint">Tous les pays</span>
-        </div>
-        <div id="country-chips" class="chips-container" role="radiogroup" aria-label="Pays">
-          <!-- Dynamically populated country pills -->
+      <!-- Country Dropdown (Simple Select Menu) -->
+      <div class="filter-item filter-country">
+        <label for="country-select" class="filter-label">Country</label>
+        <div class="select-wrapper">
+          <select id="country-select" class="select-input" aria-label="Filter by country">
+            <option value="all">All countries</option>
+          </select>
+          <svg class="select-arrow" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
         </div>
       </div>
 
-      <!-- Secondary Controls: Search & Status -->
-      <div class="controls-row">
-        <div class="status-tabs" role="tablist" aria-label="Statut des sorties">
-          <button class="tab-btn active" data-status="all" role="tab" aria-selected="true">Toutes</button>
-          <button class="tab-btn" data-status="upcoming" role="tab" aria-selected="false">À paraître</button>
-          <button class="tab-btn" data-status="released" role="tab" aria-selected="false">Disponibles</button>
+      <!-- Status Tabs -->
+      <div class="filter-item filter-status">
+        <label class="filter-label">Status</label>
+        <div class="status-tabs" role="tablist" aria-label="Release status">
+          <button class="tab-btn active" data-status="all" role="tab" aria-selected="true">All</button>
+          <button class="tab-btn" data-status="upcoming" role="tab" aria-selected="false">Upcoming</button>
+          <button class="tab-btn" data-status="released" role="tab" aria-selected="false">Released</button>
         </div>
+      </div>
 
+      <!-- View Switch (Calendar vs List) -->
+      <div class="filter-item filter-view">
+        <label class="filter-label">View</label>
+        <div class="status-tabs" role="tablist" aria-label="Display mode">
+          <button id="view-calendar-btn" class="tab-btn active" data-view="calendar" role="tab" aria-selected="true">Calendar</button>
+          <button id="view-list-btn" class="tab-btn" data-view="list" role="tab" aria-selected="false">List</button>
+        </div>
+      </div>
+
+      <!-- Search Box -->
+      <div class="filter-item filter-search">
+        <label for="search-input" class="filter-label">Search</label>
         <div class="search-box">
-          <span class="search-icon">🔍</span>
-          <input type="search" id="search-input" placeholder="Rechercher un titre, héros, éditeur..." aria-label="Recherche">
-          <button id="clear-search" class="clear-btn" style="display: none;" title="Effacer" aria-label="Effacer la recherche">✕</button>
+          <svg class="search-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="search" id="search-input" placeholder="Title, character, publisher..." aria-label="Search">
+          <button id="clear-search" class="clear-btn" style="display: none;" title="Clear search" aria-label="Clear search">✕</button>
         </div>
       </div>
 
     </section>
 
-    <!-- Results Overview -->
-    <div class="results-header">
-      <div id="results-count" class="results-count">Affichage des sorties...</div>
-      <div class="sort-indicator">Classées par date de sortie</div>
-    </div>
-
-    <!-- Agenda Timeline View -->
-    <div id="agenda-container" class="agenda-timeline">
-      <!-- Loading skeleton -->
-      <div class="loading-state">
-        <div class="spinner"></div>
-        <p>Chargement des sorties...</p>
+    <!-- Monthly Calendar View -->
+    <section id="calendar-view" class="calendar-section" aria-label="Monthly Calendar">
+      <div class="calendar-nav-bar">
+        <div class="cal-nav-controls">
+          <button id="cal-prev-btn" class="btn btn-icon" title="Previous month" aria-label="Previous month">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+          <h2 id="cal-month-title" class="cal-month-title">Month Year</h2>
+          <button id="cal-next-btn" class="btn btn-icon" title="Next month" aria-label="Next month">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <button id="cal-today-btn" class="btn btn-sm btn-subtle">Today</button>
+        </div>
+        <div class="cal-nav-meta">
+          <span id="cal-month-count" class="badge badge-muted">0 releases</span>
+        </div>
       </div>
-    </div>
+
+      <!-- 7-column Calendar Grid -->
+      <div class="calendar-table">
+        <div class="calendar-weekdays">
+          <div class="weekday-col">Mon</div>
+          <div class="weekday-col">Tue</div>
+          <div class="weekday-col">Wed</div>
+          <div class="weekday-col">Thu</div>
+          <div class="weekday-col">Fri</div>
+          <div class="weekday-col">Sat</div>
+          <div class="weekday-col">Sun</div>
+        </div>
+        <div id="calendar-days-grid" class="calendar-days-grid">
+          <!-- Dynamically populated day cells -->
+        </div>
+      </div>
+    </section>
+
+    <!-- List / Timeline View -->
+    <section id="list-view" class="list-section" style="display: none;" aria-label="List View">
+      <div class="results-header">
+        <div id="results-count" class="results-count">Loading releases...</div>
+        <div class="sort-indicator">Sorted chronologically</div>
+      </div>
+
+      <div id="agenda-container" class="agenda-timeline">
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Loading release schedule...</p>
+        </div>
+      </div>
+    </section>
 
     <!-- Empty State -->
     <div id="empty-state" class="empty-state" style="display: none;">
-      <span class="empty-icon">🔍</span>
-      <h3>Aucune sortie trouvée</h3>
-      <p>Essayez de réinitialiser vos critères de recherche ou de sélectionner un autre pays.</p>
-      <button id="reset-filters-btn" class="btn btn-secondary">Réinitialiser les filtres</button>
+      <svg class="empty-icon-svg" viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        <line x1="8" y1="11" x2="14" y2="11"></line>
+      </svg>
+      <h3>No releases found</h3>
+      <p>Try selecting another country or clearing your search query.</p>
+      <button id="reset-filters-btn" class="btn btn-secondary">Reset filters</button>
     </div>
 
   </main>
@@ -92,21 +171,21 @@
   <!-- Footer -->
   <footer class="site-footer">
     <div class="container footer-inner">
-      <p>Disney Comics Agenda — Données synchronisées automatiquement via DisneyComicsWatcher.</p>
+      <p>Disney Comics Agenda — Synchronized automatically via DisneyComicsWatcher.</p>
       <p class="footer-meta">
-        <span id="last-update">Mise à jour : --</span> • 
+        <span id="last-update">Updated: --</span> • 
         <a href="https://github.com/WizyxGH/disney-comics-watcher" target="_blank" rel="noopener">GitHub</a> • 
         <a href="https://inducks.org" target="_blank" rel="noopener">I.N.D.U.C.K.S.</a>
       </p>
     </div>
   </footer>
 
-  <!-- Lightbox Modal for HD Covers -->
+  <!-- Lightbox Modal for Details & HD Covers -->
   <div id="cover-modal" class="modal" aria-hidden="true" role="dialog">
     <div class="modal-backdrop"></div>
     <div class="modal-content">
-      <button class="modal-close" aria-label="Fermer">✕</button>
-      <img id="modal-image" src="" alt="Couverture" class="modal-image">
+      <button class="modal-close" aria-label="Close">✕</button>
+      <img id="modal-image" src="" alt="Cover" class="modal-image">
       <div id="modal-caption" class="modal-caption"></div>
     </div>
   </div>

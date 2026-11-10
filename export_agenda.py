@@ -17,30 +17,30 @@ PARIS_TZ = ZoneInfo("Europe/Paris")
 
 COUNTRY_INFO = {
     "fr": {"name": "France", "flag": "🇫🇷"},
-    "it": {"name": "Italie", "flag": "🇮🇹"},
-    "de": {"name": "Allemagne", "flag": "🇩🇪"},
-    "us": {"name": "États-Unis", "flag": "🇺🇸"},
-    "gr": {"name": "Grèce", "flag": "🇬🇷"},
-    "br": {"name": "Brésil", "flag": "🇧🇷"},
-    "bg": {"name": "Bulgarie", "flag": "🇧🇬"},
-    "cz": {"name": "Tchéquie", "flag": "🇨🇿"},
-    "es": {"name": "Espagne", "flag": "🇪🇸"},
-    "fi": {"name": "Finlande", "flag": "🇫🇮"},
-    "nl": {"name": "Pays-Bas", "flag": "🇳🇱"},
-    "dk": {"name": "Danemark", "flag": "🇩🇰"},
-    "no": {"name": "Norvège", "flag": "🇳🇴"},
-    "se": {"name": "Suède", "flag": "🇸🇪"},
-    "pl": {"name": "Pologne", "flag": "🇵🇱"},
-    "eg": {"name": "Égypte", "flag": "🇪🇬"},
-    "is": {"name": "Islande", "flag": "🇮🇸"},
-    "hr": {"name": "Croatie", "flag": "🇭🇷"},
-    "ee": {"name": "Estonie", "flag": "🇪🇪"},
-    "lv": {"name": "Lettonie", "flag": "🇱🇻"},
-    "lt": {"name": "Lituanie", "flag": "🇱🇹"},
-    "rs": {"name": "Serbie", "flag": "🇷🇸"},
-    "si": {"name": "Slovénie", "flag": "🇸🇮"},
-    "uk": {"name": "Royaume-Uni", "flag": "🇬🇧"},
-    "cn": {"name": "Chine", "flag": "🇨🇳"},
+    "it": {"name": "Italy", "flag": "🇮🇹"},
+    "de": {"name": "Germany", "flag": "🇩🇪"},
+    "us": {"name": "United States", "flag": "🇺🇸"},
+    "gr": {"name": "Greece", "flag": "🇬🇷"},
+    "br": {"name": "Brazil", "flag": "🇧🇷"},
+    "bg": {"name": "Bulgaria", "flag": "🇧🇬"},
+    "cz": {"name": "Czech Republic", "flag": "🇨🇿"},
+    "es": {"name": "Spain", "flag": "🇪🇸"},
+    "fi": {"name": "Finland", "flag": "🇫🇮"},
+    "nl": {"name": "Netherlands", "flag": "🇳🇱"},
+    "dk": {"name": "Denmark", "flag": "🇩🇰"},
+    "no": {"name": "Norway", "flag": "🇳🇴"},
+    "se": {"name": "Sweden", "flag": "🇸🇪"},
+    "pl": {"name": "Poland", "flag": "🇵🇱"},
+    "eg": {"name": "Egypt", "flag": "🇪🇬"},
+    "is": {"name": "Iceland", "flag": "🇮🇸"},
+    "hr": {"name": "Croatia", "flag": "🇭🇷"},
+    "ee": {"name": "Estonia", "flag": "🇪🇪"},
+    "lv": {"name": "Latvia", "flag": "🇱🇻"},
+    "lt": {"name": "Lithuania", "flag": "🇱🇹"},
+    "rs": {"name": "Serbia", "flag": "🇷🇸"},
+    "si": {"name": "Slovenia", "flag": "🇸🇮"},
+    "uk": {"name": "United Kingdom", "flag": "🇬🇧"},
+    "cn": {"name": "China", "flag": "🇨🇳"},
 }
 
 RAW_COVERS_BASE = "https://raw.githubusercontent.com/WizyxGH/disney-comics-watcher/datas/covers/"
@@ -62,18 +62,18 @@ def parse_date_str(val):
     # Month Year or other formats
     return None
 
-def format_french_date(iso_date):
+def format_english_date(iso_date):
     if not iso_date:
         return ""
     months = [
-        "", "janvier", "février", "mars", "avril", "mai", "juin",
-        "juillet", "août", "septembre", "octobre", "novembre", "décembre"
+        "", "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
     ]
-    days = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"]
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     try:
         dt = datetime.strptime(iso_date, "%Y-%m-%d").date()
         day_name = days[dt.weekday()]
-        return f"{day_name} {dt.day} {months[dt.month]} {dt.year}"
+        return f"{day_name}, {months[dt.month]} {dt.day}, {dt.year}"
     except Exception:
         return iso_date
 
@@ -128,7 +128,7 @@ def parse_dbi_content(content: str, country: str) -> list[dict]:
             "country_name": c_info["name"],
             "country_flag": c_info["flag"],
             "date": issdate,
-            "formatted_date": format_french_date(issdate) if issdate else None,
+            "formatted_date": format_english_date(issdate) if issdate else None,
             "price": price,
             "pages": pages,
             "ean": ean,
@@ -224,7 +224,7 @@ def discover_from_scrapers() -> list[dict]:
                         "country_flag": c_info["flag"],
                         "publisher": pub,
                         "date": iso_date,
-                        "formatted_date": format_french_date(iso_date) if iso_date else None,
+                        "formatted_date": format_english_date(iso_date) if iso_date else None,
                         "price": price,
                         "pages": b.get("pages"),
                         "ean": ean,

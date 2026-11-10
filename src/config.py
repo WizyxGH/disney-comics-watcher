@@ -4,7 +4,8 @@ from zoneinfo import ZoneInfo
 
 SUPPORTED_COUNTRIES = {
     "fr", "us", "de", "gr", "it", "br", "eg", "bg", "hr", "ee", "lv", "lt",
-    "pl", "cz", "rs", "si", "cn", "dk", "es", "fi", "is", "no", "nl", "uk", "se"
+    "pl", "cz", "rs", "si", "cn", "dk", "es", "fi", "is", "no", "nl", "uk", "se",
+    "mx", "tr"
 }
 
 # Keywords for automatic discovery on Direct Editeurs + MLP
@@ -144,6 +145,8 @@ NO_KEY_PREFIX = "no:"
 NL_KEY_PREFIX = "nl:"
 UK_KEY_PREFIX = "uk:"
 SE_KEY_PREFIX = "se:"
+PANINI_MX_KEY_PREFIX = "panini_mx:"
+TR_KEY_PREFIX = "tr:"
 
 DONALDDUCK_NL_BASE = os.environ.get("DONALDDUCK_NL_BASE", "https://shop.donaldduck.nl")
 DONALDDUCK_NL_COLLECTIONS = [
@@ -190,6 +193,8 @@ PROVIDER_PUBLISHERS = {
     DK_KEY_PREFIX:             "Egmont",
     NO_KEY_PREFIX:             "Egmont",
     NL_KEY_PREFIX:             "DPG Media",
+    PANINI_MX_KEY_PREFIX:      "Panini",
+    TR_KEY_PREFIX:             "Beta Kids",
 }
 
 STATE_FILE    = "state.json"

@@ -9,7 +9,7 @@ from src.config import (
     NAHDET_MISR_EG_KEY_PREFIX, BG_KEY_PREFIX, HR_KEY_PREFIX, EE_KEY_PREFIX, LV_KEY_PREFIX,
     LT_KEY_PREFIX, PL_KEY_PREFIX, CZ_KEY_PREFIX, RS_KEY_PREFIX, SI_KEY_PREFIX, CN_KEY_PREFIX,
     DK_KEY_PREFIX, ES_KEY_PREFIX, FI_KEY_PREFIX, IS_KEY_PREFIX, NO_KEY_PREFIX, NL_KEY_PREFIX,
-    UK_KEY_PREFIX, SE_KEY_PREFIX, LTB_DE_KEY_PREFIX, PROVIDER_PUBLISHERS,
+    UK_KEY_PREFIX, SE_KEY_PREFIX, PANINI_MX_KEY_PREFIX, TR_KEY_PREFIX, LTB_DE_KEY_PREFIX, PROVIDER_PUBLISHERS,
     NOTIFY_BACKENDS, DISCORD_WEBHOOK_URL, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID,
     HEALTH_ALERT_RUNS, EMPTY_RETRY_DELAY_S,
 )
@@ -42,6 +42,8 @@ from src.scrapers.no import discover_no, fetch_no_details
 from src.scrapers.nl import discover_nl, fetch_nl_details
 from src.scrapers.uk import discover_uk, fetch_uk_details
 from src.scrapers.se import discover_se, fetch_se_details
+from src.scrapers.mx import discover_panini_mx, fetch_panini_mx_details
+from src.scrapers.tr import discover_tr, fetch_tr_details
 
 
 # A release older than this is catch-up, not news: it only happens when a
@@ -214,6 +216,8 @@ def main():
         ("NL", NL_KEY_PREFIX, discover_nl, "nl", "announced", fetch_nl_details, False),
         ("UK", UK_KEY_PREFIX, discover_uk, "uk", "announced", fetch_uk_details, False),
         ("SE", SE_KEY_PREFIX, discover_se, "se", "announced", fetch_se_details, False),
+        ("Panini MX", PANINI_MX_KEY_PREFIX, discover_panini_mx, "mx", "announced", fetch_panini_mx_details, False),
+        ("Beta Kids TR", TR_KEY_PREFIX, discover_tr, "tr", "released", fetch_tr_details, False),
     ]
     
     import concurrent.futures

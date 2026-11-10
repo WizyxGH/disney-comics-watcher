@@ -41,6 +41,8 @@ COUNTRY_INFO = {
     "si": {"name": "Slovenia", "flag": "🇸🇮"},
     "uk": {"name": "United Kingdom", "flag": "🇬🇧"},
     "cn": {"name": "China", "flag": "🇨🇳"},
+    "mx": {"name": "Mexico", "flag": "🇲🇽"},
+    "tr": {"name": "Turkey", "flag": "🇹🇷"},
 }
 
 RAW_COVERS_BASE = "https://raw.githubusercontent.com/WizyxGH/disney-comics-watcher/datas/covers/"
@@ -229,6 +231,18 @@ def discover_from_scrapers() -> list[dict]:
         scrapers.append(("gr", "Kathimerini", discover_kathimerini))
     except Exception as e:
         print(f"  [warn] scrapers.gr: {e}")
+
+    try:
+        from src.scrapers.mx import discover_panini_mx
+        scrapers.append(("mx", "Panini Comics México", discover_panini_mx))
+    except Exception as e:
+        print(f"  [warn] scrapers.mx: {e}")
+
+    try:
+        from src.scrapers.tr import discover_tr
+        scrapers.append(("tr", "Beta Kids", discover_tr))
+    except Exception as e:
+        print(f"  [warn] scrapers.tr: {e}")
 
     results = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=len(scrapers) or 1) as ex:

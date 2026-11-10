@@ -7,7 +7,8 @@ from src.dbi.utils import _format_date_for_dbi, _format_price_for_dbi, sort_dbi_
 from src.dbi.mappers import (
     resolve_magazine_metadata, resolve_us_metadata, resolve_de_metadata, 
     resolve_gr_metadata, resolve_glenat_metadata, resolve_it_metadata, resolve_br_metadata,
-    resolve_eg_metadata, resolve_bg_metadata, resolve_hr_metadata, resolve_ee_metadata, resolve_lv_metadata, resolve_lt_metadata, resolve_pl_metadata, resolve_cz_metadata, resolve_rs_metadata, resolve_si_metadata, resolve_cn_metadata, resolve_dk_metadata, resolve_es_metadata, resolve_fi_metadata, resolve_is_metadata, resolve_no_metadata, resolve_nl_metadata, resolve_uk_metadata, resolve_se_metadata
+    resolve_eg_metadata, resolve_bg_metadata, resolve_hr_metadata, resolve_ee_metadata, resolve_lv_metadata, resolve_lt_metadata, resolve_pl_metadata, resolve_cz_metadata, resolve_rs_metadata, resolve_si_metadata, resolve_cn_metadata, resolve_dk_metadata, resolve_es_metadata, resolve_fi_metadata, resolve_is_metadata, resolve_no_metadata, resolve_nl_metadata, resolve_uk_metadata, resolve_se_metadata,
+    resolve_mx_metadata, resolve_tr_metadata
 )
 
 _RESOLVERS = {
@@ -35,6 +36,8 @@ _RESOLVERS = {
     "nl":       resolve_nl_metadata,
     "uk":       resolve_uk_metadata,
     "se":       resolve_se_metadata,
+    "mx":       resolve_mx_metadata,
+    "tr":       resolve_tr_metadata,
     "glenat":   resolve_glenat_metadata,
     # magazine needs overrides -> handled separately
 }

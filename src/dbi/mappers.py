@@ -182,5 +182,7 @@ resolve_no_metadata = lambda info: resolve_comic_metadata(info, "no")
 resolve_nl_metadata = lambda info: resolve_comic_metadata(info, "nl")
 resolve_uk_metadata = lambda info: resolve_comic_metadata(info, "uk")
 resolve_se_metadata = lambda info: resolve_comic_metadata(info, "se")
+resolve_mx_metadata = lambda info: resolve_comic_metadata(info, "mx")
+resolve_tr_metadata = lambda info: resolve_comic_metadata(info, "tr")
 
 _resolve_generic_metadata = resolve_comic_metadata

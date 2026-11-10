@@ -97,6 +97,18 @@ def parse_dbi_content(content: str, country: str) -> list[dict]:
         m_date = re.search(r'\[issdate:([^\]]+)\]', rest)
         if m_date:
             issdate = parse_date_str(m_date.group(1))
+        else:
+            # Try inferring year & month from issue code / title (e.g. DS2026-05, MAC2026-07, 05/2026)
+            m_ym = re.search(r'(202\d)[/-](\d{1,2})|(\d{1,2})[/-](202\d)', f"{issue_code} {rest}")
+            if m_ym:
+                y = m_ym.group(1) or m_ym.group(4)
+                m = m_ym.group(2) or m_ym.group(3)
+                try:
+                    m_int = int(m)
+                    if 1 <= m_int <= 12:
+                        issdate = f"{y}-{m_int:02d}-01"
+                except Exception:
+                    pass
 
         price = None
         m_price = re.search(r'\[price:([^\]]+)\]', rest)
@@ -180,15 +192,35 @@ def discover_from_scrapers() -> list[dict]:
         print(f"  [warn] scrapers.it: {e}")
 
     try:
-        from src.scrapers.de import discover_lustiges_taschenbuch_de
-        scrapers.append(("de", "Egmont LTB", discover_lustiges_taschenbuch_de))
+        from src.scrapers.de import discover_lustiges_taschenbuch_de, fetch_lustiges_taschenbuch_de_details
+        def get_ltb_with_dates():
+            b_list = discover_lustiges_taschenbuch_de()
+            def fetch_single(b):
+                if b.get("url"):
+                    det = fetch_lustiges_taschenbuch_de_details(b["url"])
+                    if det.get("date"):
+                        b["date"] = det["date"]
+                    if det.get("name") and " - " not in b["title"]:
+                        b["title"] += f" - {det['name']}"
+                return b
+            with concurrent.futures.ThreadPoolExecutor(max_workers=10) as ltb_ex:
+                return list(ltb_ex.map(fetch_single, b_list))
+        scrapers.append(("de", "Egmont LTB", get_ltb_with_dates))
     except Exception as e:
-        print(f"  [warn] scrapers.de: {e}")
+        print(f"  [warn] scrapers.de LTB: {e}")
 
     try:
-        from src.scrapers.us import discover_dynamite, discover_marvel
+        from src.scrapers.us import discover_dynamite, discover_marvel, fetch_marvel_details
+        def get_marvel_with_dates():
+            m_list = discover_marvel()
+            for b in m_list:
+                if b.get("url"):
+                    det = fetch_marvel_details(b["url"])
+                    if det.get("date"):
+                        b["date"] = det["date"]
+            return m_list
         scrapers.append(("us", "Dynamite Entertainment", discover_dynamite))
-        scrapers.append(("us", "Marvel Comics", discover_marvel))
+        scrapers.append(("us", "Marvel Comics", get_marvel_with_dates))
     except Exception as e:
         print(f"  [warn] scrapers.us: {e}")
 

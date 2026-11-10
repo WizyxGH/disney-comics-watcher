@@ -23,6 +23,7 @@
   const now = new Date();
   let calYear = now.getFullYear();
   let calMonth = now.getMonth(); // 0-indexed (0 = Jan, 10 = Nov)
+  let selectedDateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
   // DOM Elements
   const countrySelectEl = document.getElementById('country-select');
@@ -49,6 +50,10 @@
   const calTodayBtn = document.getElementById('cal-today-btn');
   const calMonthCountEl = document.getElementById('cal-month-count');
   const calendarDaysGridEl = document.getElementById('calendar-days-grid');
+  const dayDetailsEl = document.getElementById('calendar-day-details');
+  const dayDetailsTitleEl = document.getElementById('day-details-title');
+  const dayDetailsBadgeEl = document.getElementById('day-details-badge');
+  const dayDetailsCardsEl = document.getElementById('day-details-cards');
 
   // Modal Elements
   const modalEl = document.getElementById('cover-modal');
@@ -148,20 +153,12 @@
   }
 
   /**
-   * Pick smart initial calendar month (current month or first upcoming)
+   * Set initial calendar view to today's month & year
    */
   function initInitialCalendarDate() {
-    const todayStr = new Date().toISOString().slice(0, 10);
-    // Find first upcoming or today release
-    const upcoming = allReleases.find(r => r.date && r.date >= todayStr);
-    if (upcoming && upcoming.date) {
-      const [y, m] = upcoming.date.split('-');
-      calYear = parseInt(y, 10);
-      calMonth = parseInt(m, 10) - 1;
-    } else {
-      calYear = now.getFullYear();
-      calMonth = now.getMonth();
-    }
+    const today = new Date();
+    calYear = today.getFullYear();
+    calMonth = today.getMonth();
   }
 
   /**
@@ -354,6 +351,7 @@
   calTodayBtn.addEventListener('click', () => {
     calYear = now.getFullYear();
     calMonth = now.getMonth();
+    selectedDateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     renderMonthlyCalendar(getFilteredReleases());
   });
 
@@ -381,18 +379,22 @@
     calMonthCountEl.textContent = `${monthReleasesCount} release${monthReleasesCount !== 1 ? 's' : ''}`;
 
     // Compute Calendar Days
-    // First day of month
     const firstDay = new Date(calYear, calMonth, 1);
-    // JS getDay(): 0 = Sun, 1 = Mon ... We want 0 = Mon, 6 = Sun
     let startDayOfWeek = (firstDay.getDay() + 6) % 7;
-
-    // Total days in current month
     const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-
-    // Days in previous month
     const daysInPrevMonth = new Date(calYear, calMonth, 0).getDate();
 
     const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+    // Pick sensible selectedDateStr within this month
+    if (!selectedDateStr || !selectedDateStr.startsWith(ymPrefix)) {
+      if (todayStr.startsWith(ymPrefix)) {
+        selectedDateStr = todayStr;
+      } else {
+        const sortedDates = Object.keys(releasesByDate).sort();
+        selectedDateStr = sortedDates.length > 0 ? sortedDates[0] : `${ymPrefix}-01`;
+      }
+    }
 
     let html = '';
 
@@ -410,15 +412,28 @@
     for (let d = 1; d <= daysInMonth; d++) {
       const dateStr = `${ymPrefix}-${String(d).padStart(2, '0')}`;
       const isToday = dateStr === todayStr;
+      const isSelected = dateStr === selectedDateStr;
       const dayReleases = releasesByDate[dateStr] || [];
       const hasReleases = dayReleases.length > 0;
 
       html += `
-        <div class="cal-day-cell ${isToday ? 'cal-day-today' : ''} ${hasReleases ? 'cal-day-has-events' : ''}">
+        <div class="cal-day-cell ${isToday ? 'cal-day-today' : ''} ${isSelected ? 'cal-day-selected' : ''} ${hasReleases ? 'cal-day-has-events' : ''}" 
+             data-date="${dateStr}"
+             role="button"
+             tabindex="0"
+             title="${hasReleases ? `${dayReleases.length} release(s)` : 'No releases'}">
           <div class="cal-day-header">
             <span class="cal-day-num ${isToday ? 'badge-today' : ''}">${d}</span>
             ${hasReleases ? `<span class="cal-day-event-count">${dayReleases.length}</span>` : ''}
           </div>
+          
+          <!-- Mobile dots indicator -->
+          <div class="cal-day-mobile-dots">
+            ${dayReleases.slice(0, 3).map(r => `<span class="cal-dot ${r.status === 'upcoming' ? 'dot-upcoming' : 'dot-released'}"></span>`).join('')}
+            ${dayReleases.length > 3 ? `<span class="cal-dot-more">+</span>` : ''}
+          </div>
+
+          <!-- Desktop pills stack -->
           <div class="cal-events-stack">
             ${dayReleases.map(renderCalendarEventPill).join('')}
           </div>
@@ -439,14 +454,75 @@
 
     calendarDaysGridEl.innerHTML = html;
 
+    // Attach click listeners on day cells to select day
+    calendarDaysGridEl.querySelectorAll('.cal-day-cell[data-date]').forEach(cell => {
+      cell.addEventListener('click', (e) => {
+        // If clicking on an individual event pill inside, pill handler handles modal
+        if (e.target.closest('.cal-event-pill')) return;
+        const clickedDate = cell.dataset.date;
+        selectCalendarDate(clickedDate, releasesByDate[clickedDate] || []);
+      });
+      cell.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          const clickedDate = cell.dataset.date;
+          selectCalendarDate(clickedDate, releasesByDate[clickedDate] || []);
+        }
+      });
+    });
+
     // Attach click listeners to calendar event pills for lightbox modal
     calendarDaysGridEl.querySelectorAll('.cal-event-pill').forEach(pill => {
       pill.addEventListener('click', (e) => {
+        e.stopPropagation();
         const id = pill.dataset.id;
         const item = allReleases.find(r => r.id === id);
         if (item) {
           openReleaseModal(item);
         }
+      });
+    });
+
+    // Render selected day's detailed cards below calendar
+    renderSelectedDayDetails(selectedDateStr, releasesByDate[selectedDateStr] || []);
+  }
+
+  function selectCalendarDate(dateStr, releases) {
+    selectedDateStr = dateStr;
+    calendarDaysGridEl.querySelectorAll('.cal-day-cell[data-date]').forEach(c => {
+      c.classList.toggle('cal-day-selected', c.dataset.date === dateStr);
+    });
+    renderSelectedDayDetails(dateStr, releases);
+  }
+
+  function renderSelectedDayDetails(dateStr, releases) {
+    if (!dayDetailsEl) return;
+
+    if (!releases || releases.length === 0) {
+      dayDetailsEl.style.display = 'none';
+      return;
+    }
+
+    dayDetailsEl.style.display = 'block';
+
+    const firstItem = releases[0];
+    const formatted = firstItem.formatted_date || dateStr;
+
+    dayDetailsTitleEl.textContent = `Releases on ${formatted}`;
+    dayDetailsBadgeEl.textContent = `${releases.length} release${releases.length !== 1 ? 's' : ''}`;
+    dayDetailsCardsEl.innerHTML = releases.map(renderComicCard).join('');
+
+    // Attach click listener for covers
+    dayDetailsCardsEl.querySelectorAll('.card-cover img').forEach(img => {
+      img.addEventListener('click', (e) => {
+        const card = e.target.closest('.comic-card');
+        const id = card.dataset.id;
+        const item = allReleases.find(r => r.id === id);
+        if (item) {
+          openReleaseModal(item);
+        }
+      });
+      img.addEventListener('error', function () {
+        handleCoverError(this);
       });
     });
   }

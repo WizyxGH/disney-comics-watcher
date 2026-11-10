@@ -524,8 +524,9 @@ body {
   display: flex;
   flex-direction: column;
   background: var(--bg-card);
-  transition: background-color 0.15s ease;
+  transition: background-color 0.15s ease, outline 0.15s ease;
   position: relative;
+  cursor: pointer;
 }
 
 .cal-day-cell:nth-child(7n) {
@@ -536,10 +537,18 @@ body {
   background: var(--bg-subtle);
 }
 
+.cal-day-cell.cal-day-selected {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+  background: color-mix(in srgb, var(--primary) 8%, var(--bg-card));
+  z-index: 2;
+}
+
 .cal-day-outside {
   background: color-mix(in srgb, var(--bg-app) 70%, transparent);
   color: var(--text-muted);
   opacity: 0.45;
+  cursor: default;
 }
 
 .cal-day-outside:hover {
@@ -574,6 +583,57 @@ body {
   background: var(--bg-subtle);
   padding: 0.05rem 0.35rem;
   border-radius: var(--radius-pill);
+}
+
+/* Mobile dots indicator inside calendar cells */
+.cal-day-mobile-dots {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  margin-top: 4px;
+}
+
+.cal-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.cal-dot.dot-upcoming {
+  background-color: #0284c7;
+}
+
+.cal-dot.dot-released {
+  background-color: #059669;
+}
+
+.cal-dot-more {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Day Details Panel below calendar */
+.calendar-day-details {
+  border-top: 1px solid var(--border);
+  padding: 1.25rem;
+  background: var(--bg-subtle);
+}
+
+.day-details-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.day-details-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 .cal-events-stack {

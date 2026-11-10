@@ -98,9 +98,13 @@ jobs:
           DISCORD_ROLE_IDS: ${{ secrets.DISCORD_ROLE_IDS }}
         run: python check_magazines.py
 
+      # 5b. Generate Agenda Data
+      - name: Generate Agenda Data
+        if: always()
+        run: python export_agenda.py web/data/releases.json
 
       # 6. Push updated state and data to the datas branch
-      - name: Save state, issues and covers
+      - name: Save state, issues, covers and agenda
         if: always() # Always save, even on partial error
         run: |
           # Save data to /tmp before switching branches
@@ -114,6 +118,11 @@ jobs:
           
           # Exclude covers_updated to prevent infinite nesting
           rsync -a --exclude='covers_updated' covers/ /tmp/covers_updated/ 2>/dev/null || true
+
+          # Save agenda releases.json
+          if [ -f web/data/releases.json ]; then
+            cp web/data/releases.json /tmp/releases.json
+          fi
 
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -136,15 +145,19 @@ jobs:
           mkdir -p issues covers
           cp -r /tmp/issues_updated/* issues/ 2>/dev/null || true
           cp -r /tmp/covers_updated/* covers/ 2>/dev/null || true
+          if [ -f /tmp/releases.json ]; then
+            cp /tmp/releases.json releases.json
+          fi
           
           # Write state and cache, and commit if there are changes
           # Use -A so deleted files in issues/ and covers/ are tracked and committed
           git add -A state.json
+          if [ -f "releases.json" ]; then git add releases.json; fi
           if [ -d "issues" ]; then git add -A issues/; fi
           if [ -d "covers" ]; then git add -A covers/; fi
           
           if git diff --cached --quiet; then
-            echo "No changes in state, issues, or covers — nothing to commit."
+            echo "No changes in state, issues, covers, or releases — nothing to commit."
           else
             git commit -m "update datas: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
             git push origin datas --force

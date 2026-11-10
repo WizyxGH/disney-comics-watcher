@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Disney Comics Agenda — Calendrier des sorties BD Disney</title>
+  <meta name="description" content="Agenda minimaliste des sorties et parutions de bandes dessinées Disney par pays (France, Italie, Allemagne, USA...).">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📅</text></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top bar / Navigation -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <span class="brand-icon">📚</span>
+        <div class="brand-text">
+          <h1>Disney Comics Agenda</h1>
+          <p class="subtitle">Calendrier des parutions et sorties internationales</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span id="releases-count-badge" class="badge badge-muted">Chargement...</span>
+        <button id="theme-toggle" class="btn btn-icon" title="Changer de thème" aria-label="Changer de thème">
+          <span class="icon-sun">☀️</span>
+          <span class="icon-moon">🌙</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container main-content">
+
+    <!-- Filters Section -->
+    <section class="filters-panel" aria-label="Filtres">
+      
+      <!-- Country Filters (Primary) -->
+      <div class="filter-group">
+        <div class="filter-header">
+          <span class="filter-title">Filtrer par pays</span>
+          <span id="active-country-label" class="filter-hint">Tous les pays</span>
+        </div>
+        <div id="country-chips" class="chips-container" role="radiogroup" aria-label="Pays">
+          <!-- Dynamically populated country pills -->
+        </div>
+      </div>
+
+      <!-- Secondary Controls: Search & Status -->
+      <div class="controls-row">
+        <div class="status-tabs" role="tablist" aria-label="Statut des sorties">
+          <button class="tab-btn active" data-status="all" role="tab" aria-selected="true">Toutes</button>
+          <button class="tab-btn" data-status="upcoming" role="tab" aria-selected="false">À paraître</button>
+          <button class="tab-btn" data-status="released" role="tab" aria-selected="false">Disponibles</button>
+        </div>
+
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="search" id="search-input" placeholder="Rechercher un titre, héros, éditeur..." aria-label="Recherche">
+          <button id="clear-search" class="clear-btn" style="display: none;" title="Effacer" aria-label="Effacer la recherche">✕</button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Results Overview -->
+    <div class="results-header">
+      <div id="results-count" class="results-count">Affichage des sorties...</div>
+      <div class="sort-indicator">Classées par date de sortie</div>
+    </div>
+
+    <!-- Agenda Timeline View -->
+    <div id="agenda-container" class="agenda-timeline">
+      <!-- Loading skeleton -->
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Chargement des sorties...</p>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div id="empty-state" class="empty-state" style="display: none;">
+      <span class="empty-icon">🔍</span>
+      <h3>Aucune sortie trouvée</h3>
+      <p>Essayez de réinitialiser vos critères de recherche ou de sélectionner un autre pays.</p>
+      <button id="reset-filters-btn" class="btn btn-secondary">Réinitialiser les filtres</button>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>Disney Comics Agenda — Données synchronisées automatiquement via DisneyComicsWatcher.</p>
+      <p class="footer-meta">
+        <span id="last-update">Mise à jour : --</span> • 
+        <a href="https://github.com/WizyxGH/disney-comics-watcher" target="_blank" rel="noopener">GitHub</a> • 
+        <a href="https://inducks.org" target="_blank" rel="noopener">I.N.D.U.C.K.S.</a>
+      </p>
+    </div>
+  </footer>
+
+  <!-- Lightbox Modal for HD Covers -->
+  <div id="cover-modal" class="modal" aria-hidden="true" role="dialog">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <button class="modal-close" aria-label="Fermer">✕</button>
+      <img id="modal-image" src="" alt="Couverture" class="modal-image">
+      <div id="modal-caption" class="modal-caption"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

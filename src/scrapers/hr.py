@@ -3,17 +3,51 @@ from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 from src.utils import get_session
 
+NON_DISNEY = [
+    'hot wheels', 'barbie', 'minecraft', 'peppa', 'paw patrol', 'lego',
+    'spiderman', 'spider-man', 'marvel', 'avengers', 'batman', 'superman', 'jurassic'
+]
+
+ACTIVITY_EXCLUDE = [
+    'bojanka', 'bojank', 'crtam', 'naljepnic', 'kupalic', 'učimo', 'ucimo',
+    'prvi sat', 'prve riječi', 'prve rijeci', 'pjesmom', 'modna', 'pogodi tko sam',
+    'rastemo zajedno', 'moja mala biblioteka', 'traži i nađi', 'trazi i nadi',
+    'pričaj mi priču', 'pricaj mi pricu', 'sretan rođendan', 'pjevaj, pleši'
+]
+
+def _is_valid_disney_comic_hr(title: str) -> bool:
+    t = title.lower()
+    # 1. Reject non-Disney brands
+    if any(nd in t for nd in NON_DISNEY):
+        return False
+    # 2. Reject preschool / coloring / activity books
+    if any(act in t for act in ACTIVITY_EXCLUDE):
+        return False
+    # 3. Must be an actual Disney comic or magazine
+    if any(k in t for k in [
+        'miki maus', 'patkograd', 'paško', 'pasko', 'džepni', 'dzepni',
+        'donald', 'barks', 'pustolovni miki'
+    ]):
+        return True
+    
+    # Official Disney graphic novel / filmska priča u stripu
+    if 'u stripu' in t or 'strip' in t:
+        if any(d in t for d in ['disney', 'winnie', 'snježno kraljevstvo', 'zootropola', 'vaiana', 'auti', 'stitch']):
+            return True
+            
+    return False
+
 def discover_hr() -> list[dict]:
     """
     Discovers Croatian Disney comics and magazines from Egmont Croatia (shop.egmont.hr).
     Covers Miki Maus, Paško Patak, Patkograd (Carl Barks), and Disney comic albums.
+    Strictly filters out non-Disney brands (e.g. Hot Wheels, Spiderman) and preschool toys/coloring books.
     """
     s = get_session()
     result = []
     seen = set()
 
     search_queries = ["miki", "pasko", "strip", "disney"]
-    base_url = "https://shop.egmont.hr/"
 
     for q in search_queries:
         url = f"https://shop.egmont.hr/?s={q}&post_type=product"
@@ -32,14 +66,8 @@ def discover_hr() -> list[dict]:
                 title_elem = li.find(class_='woocommerce-loop-product__title')
                 title = title_elem.text.strip() if title_elem else "Unknown"
 
-                # Filter out non-comic children activity items if needed
-                lower_title = title.lower()
-                is_comic = any(k in lower_title for k in [
-                    'miki maus', 'paško', 'patko', 'strip', 'disney princeza', 
-                    'donald', 'barks', 'patkograd', 'winnie pooh: filmska',
-                    'zootropola', 'vaiana: filmska', 'auti: filmska'
-                ])
-                if not is_comic and q == 'disney':
+                # Filter strictly for valid Disney comics
+                if not _is_valid_disney_comic_hr(title):
                     continue
 
                 price_elem = li.find('span', class_='price')
@@ -71,7 +99,7 @@ def discover_hr() -> list[dict]:
 
                 seen.add(book_id)
 
-                # Determine issue_path if possible
+                lower_title = title.lower()
                 issue_path = None
                 if m := re.search(r'miki maus\s*(\d+)/(\d+)', lower_title):
                     issue_path = f"hr/MMH{m.group(2)}-{int(m.group(1)):02d}"

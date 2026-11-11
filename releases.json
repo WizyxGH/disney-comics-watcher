@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-11T01:21:42.607406+01:00",
-  "total_count": 304,
+  "generated_at": "2026-11-11T08:24:43.246975+01:00",
+  "total_count": 300,
   "countries": [
     {
       "code": "fr",
@@ -18,19 +18,19 @@
       "code": "de",
       "name": "Germany",
       "flag": "🇩🇪",
-      "count": 38
-    },
-    {
-      "code": "it",
-      "name": "Italy",
-      "flag": "🇮🇹",
-      "count": 14
+      "count": 37
     },
     {
       "code": "gr",
       "name": "Greece",
       "flag": "🇬🇷",
       "count": 13
+    },
+    {
+      "code": "it",
+      "name": "Italy",
+      "flag": "🇮🇹",
+      "count": 11
     },
     {
       "code": "bg",
@@ -320,23 +320,6 @@
       "cover_url": "https://cdn11.bigcommerce.com/s-fle6qzf7oq/images/stencil/original/products/60700/60147/TNAladdin05ABUSTOS__19380.1787950233.jpg?c=1",
       "url": "https://disney.dynamite.com/products.php?productId=60700",
       "source": "scraper",
-      "status": "upcoming"
-    },
-    {
-      "id": "it_TL_3702B",
-      "issue_code": "TL 3702B",
-      "title": "Topolino 3702 Variant Lucca Comics",
-      "country": "it",
-      "country_name": "Italy",
-      "country_flag": "🇮🇹",
-      "date": "2026-11-19",
-      "formatted_date": "Thursday, November 19, 2026",
-      "price": "8.00 EUR",
-      "pages": null,
-      "ean": null,
-      "cover_url": "https://raw.githubusercontent.com/WizyxGH/disney-comics-watcher/datas/covers/it_tl_3702ba_001.jpg",
-      "url": "https://inducks.org/issue.php?c=it%2FTL+3702B",
-      "source": "dbi",
       "status": "upcoming"
     },
     {
@@ -707,23 +690,6 @@
       "status": "released"
     },
     {
-      "id": "it_TL_3702",
-      "issue_code": "TL 3702",
-      "title": "Topolino 3702",
-      "country": "it",
-      "country_name": "Italy",
-      "country_flag": "🇮🇹",
-      "date": "2026-11-04",
-      "formatted_date": "Wednesday, November 4, 2026",
-      "price": "3.50 EUR",
-      "pages": null,
-      "ean": null,
-      "cover_url": "https://raw.githubusercontent.com/WizyxGH/disney-comics-watcher/datas/covers/it_tl_3702a_001.jpg",
-      "url": "https://inducks.org/issue.php?c=it%2FTL+3702",
-      "source": "dbi",
-      "status": "released"
-    },
-    {
       "id": "de_weihnachten_band_32",
       "issue_code": null,
       "title": "weihnachten - Nr.\n  32 Frohes Fest in Entenhausen 32",
@@ -913,23 +879,6 @@
       "cover_url": "https://www.images.hachette-livre.fr/media/imgArticle/GLENAT/2026/9782344075197-001-X.jpeg",
       "url": "https://www.glenat.com/glenat-disney/les-ages-dor-de-donald-tome-03-9782344075197",
       "source": "scraper",
-      "status": "released"
-    },
-    {
-      "id": "it_TL_3701B",
-      "issue_code": "TL 3701B",
-      "title": "Topolino 3701 Variant Lucca Comics 3701",
-      "country": "it",
-      "country_name": "Italy",
-      "country_flag": "🇮🇹",
-      "date": "2026-10-28",
-      "formatted_date": "Wednesday, October 28, 2026",
-      "price": "9.00 EUR",
-      "pages": null,
-      "ean": null,
-      "cover_url": "https://raw.githubusercontent.com/WizyxGH/disney-comics-watcher/datas/covers/it_tl_3701ba_001.jpg",
-      "url": "https://inducks.org/issue.php?c=it%2FTL+3701B",
-      "source": "dbi",
       "status": "released"
     },
     {
@@ -1160,7 +1109,7 @@
       "pages": null,
       "ean": "12228_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/ed/ed4704424caf41eb0904db9092da94e9.jpg",
-      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=F233C468D16BB0F48DA6C27A4CE7F4B3",
+      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=9F1CE0DA3E4D2538B5EB2435F36A33E9",
       "source": "scraper",
       "status": "released"
     },
@@ -1231,7 +1180,7 @@
       "pages": null,
       "ean": "13159_597",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/5f/5f662a891434dbec65d59e9bf7898563.jpg",
-      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=F233C468D16BB0F48DA6C27A4CE7F4B3",
+      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=9F1CE0DA3E4D2538B5EB2435F36A33E9",
       "source": "scraper",
       "status": "released"
     },
@@ -1661,7 +1610,7 @@
       "pages": null,
       "ean": "14068_76",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/a9/a944fd8df9bf4edf2ee81c41895ec88f.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=F233C468D16BB0F48DA6C27A4CE7F4B3",
+      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=9F1CE0DA3E4D2538B5EB2435F36A33E9",
       "source": "scraper",
       "status": "released"
     },
@@ -1679,7 +1628,7 @@
       "pages": null,
       "ean": "15420_1",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/f6/f61e2812c435ff4898d656cb6e28ba5d.jpg",
-      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=F233C468D16BB0F48DA6C27A4CE7F4B3",
+      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=9F1CE0DA3E4D2538B5EB2435F36A33E9",
       "source": "scraper",
       "status": "released"
     },
@@ -1697,7 +1646,7 @@
       "pages": null,
       "ean": "14016_256",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/8a/8af5e0d59de3b21adc1e20c048bfd283.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_256;jsessionid=F233C468D16BB0F48DA6C27A4CE7F4B3",
+      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_256;jsessionid=9F1CE0DA3E4D2538B5EB2435F36A33E9",
       "source": "scraper",
       "status": "released"
     },
@@ -2019,7 +1968,7 @@
       "pages": null,
       "ean": "18658_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/e1/e1ab93323e556c5618ab556bcf721c01.jpg",
-      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=F233C468D16BB0F48DA6C27A4CE7F4B3",
+      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=9F1CE0DA3E4D2538B5EB2435F36A33E9",
       "source": "scraper",
       "status": "released"
     },
@@ -2518,23 +2467,6 @@
       "cover_url": "https://www.lustiges-taschenbuch.de/sites/default/files/cover/LTB-608.jpg",
       "url": "https://www.lustiges-taschenbuch.de/ausgaben/alle-ausgaben/ltb-608",
       "source": "scraper",
-      "status": "released"
-    },
-    {
-      "id": "de_DSTP2026-03",
-      "issue_code": "DSTP2026-03",
-      "title": "Disney Stars präsentiert 03/2026 - 100 Jahre Winnie Puuh",
-      "country": "de",
-      "country_name": "Germany",
-      "country_flag": "🇩🇪",
-      "date": "2026-03-01",
-      "formatted_date": "Sunday, March 1, 2026",
-      "price": "5.99 EUR",
-      "pages": null,
-      "ean": null,
-      "cover_url": "https://raw.githubusercontent.com/WizyxGH/disney-comics-watcher/datas/covers/de_dstp2026_03a_001.jpg",
-      "url": "https://inducks.org/issue.php?c=de%2FDSTP2026-03",
-      "source": "dbi",
       "status": "released"
     },
     {

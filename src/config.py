@@ -195,6 +195,10 @@ PROVIDER_PUBLISHERS = {
     NL_KEY_PREFIX:             "DPG Media",
     PANINI_MX_KEY_PREFIX:      "Panini",
     TR_KEY_PREFIX:             "Beta Kids",
+    HR_KEY_PREFIX:             "Egmont",
+    RS_KEY_PREFIX:             "Egmont",
+    LT_KEY_PREFIX:             "Egmont",
+    SE_KEY_PREFIX:             "Story House Egmont",
 }
 
 STATE_FILE    = "state.json"

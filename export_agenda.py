@@ -244,6 +244,30 @@ def discover_from_scrapers() -> list[dict]:
     except Exception as e:
         print(f"  [warn] scrapers.tr: {e}")
 
+    try:
+        from src.scrapers.hr import discover_hr
+        scrapers.append(("hr", "Egmont Hrvatska", discover_hr))
+    except Exception as e:
+        print(f"  [warn] scrapers.hr: {e}")
+
+    try:
+        from src.scrapers.rs import discover_rs
+        scrapers.append(("rs", "Egmont Srbija", discover_rs))
+    except Exception as e:
+        print(f"  [warn] scrapers.rs: {e}")
+
+    try:
+        from src.scrapers.lt import discover_lt
+        scrapers.append(("lt", "Egmont Lietuva", discover_lt))
+    except Exception as e:
+        print(f"  [warn] scrapers.lt: {e}")
+
+    try:
+        from src.scrapers.se import discover_se
+        scrapers.append(("se", "Story House Egmont", discover_se))
+    except Exception as e:
+        print(f"  [warn] scrapers.se: {e}")
+
     results = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=len(scrapers) or 1) as ex:
         futs = {ex.submit(fn): (cc, pub) for cc, pub, fn in scrapers}

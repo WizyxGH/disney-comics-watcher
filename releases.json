@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-11T16:46:35.325220+01:00",
-  "total_count": 364,
+  "generated_at": "2026-11-11T23:24:45.358322+01:00",
+  "total_count": 367,
   "countries": [
     {
       "code": "fr",
@@ -45,16 +45,16 @@
       "count": 15
     },
     {
+      "code": "se",
+      "name": "Sweden",
+      "flag": "🇸🇪",
+      "count": 11
+    },
+    {
       "code": "bg",
       "name": "Bulgaria",
       "flag": "🇧🇬",
       "count": 11
-    },
-    {
-      "code": "se",
-      "name": "Sweden",
-      "flag": "🇸🇪",
-      "count": 8
     },
     {
       "code": "mx",
@@ -776,6 +776,60 @@
       "status": "released"
     },
     {
+      "id": "se_tidsam_5979_202601",
+      "issue_code": null,
+      "title": "Kalle Anka Jul i Ankeborg",
+      "country": "se",
+      "country_name": "Sweden",
+      "country_flag": "🇸🇪",
+      "publisher": "Story House Egmont",
+      "date": "2026-11-10",
+      "formatted_date": "Tuesday, November 10, 2026",
+      "price": "99.00 kr",
+      "pages": null,
+      "ean": "tidsam_5979_202601",
+      "cover_url": "https://www.tidsam.se/covers/hq/cover_5979_202601.jpg",
+      "url": "https://www.tidsam.se/magazines/kalle-anka-jul-i-ankeborg-5979-sv/",
+      "source": "scraper",
+      "status": "released"
+    },
+    {
+      "id": "se_tidsam_4810_202611",
+      "issue_code": null,
+      "title": "Kalle Anka Junior nr 11/2026",
+      "country": "se",
+      "country_name": "Sweden",
+      "country_flag": "🇸🇪",
+      "publisher": "Story House Egmont",
+      "date": "2026-11-10",
+      "formatted_date": "Tuesday, November 10, 2026",
+      "price": "46.90 kr",
+      "pages": null,
+      "ean": "tidsam_4810_202611",
+      "cover_url": "https://www.tidsam.se/covers/hq/cover_4810_202611.jpg",
+      "url": "https://www.tidsam.se/magazines/kalle-anka-junior-dbn-4810-sv/",
+      "source": "scraper",
+      "status": "released"
+    },
+    {
+      "id": "se_tidsam_4869_202601",
+      "issue_code": null,
+      "title": "Kalle Anka Önskar God Jul",
+      "country": "se",
+      "country_name": "Sweden",
+      "country_flag": "🇸🇪",
+      "publisher": "Story House Egmont",
+      "date": "2026-11-10",
+      "formatted_date": "Tuesday, November 10, 2026",
+      "price": "169.00 kr",
+      "pages": null,
+      "ean": "tidsam_4869_202601",
+      "cover_url": "https://www.tidsam.se/covers/hq/cover_4869_202601.jpg",
+      "url": "https://www.tidsam.se/magazines/kalle-anka-onskar-god-jul-4869-sv/",
+      "source": "scraper",
+      "status": "released"
+    },
+    {
       "id": "fr_CF___40",
       "issue_code": "CF   40",
       "title": "Les Chroniques de Fantomiald",
@@ -840,6 +894,23 @@
       "ean": null,
       "cover_url": "https://raw.githubusercontent.com/WizyxGH/disney-comics-watcher/datas/covers/fi_aa2026_46a_001.jpg",
       "url": "https://inducks.org/issue.php?c=fi%2FAA2026-46",
+      "source": "dbi",
+      "status": "released"
+    },
+    {
+      "id": "se_KAJ2026-11",
+      "issue_code": "KAJ2026-11",
+      "title": "Kalle Anka Junior nr 11/2026",
+      "country": "se",
+      "country_name": "Sweden",
+      "country_flag": "🇸🇪",
+      "date": "2026-11-10",
+      "formatted_date": "Tuesday, November 10, 2026",
+      "price": "46.90 EUR",
+      "pages": null,
+      "ean": null,
+      "cover_url": "https://raw.githubusercontent.com/WizyxGH/disney-comics-watcher/datas/covers/se_kaj2026_11a_001.jpg",
+      "url": "https://inducks.org/issue.php?c=se%2FKAJ2026-11",
       "source": "dbi",
       "status": "released"
     },
@@ -1463,7 +1534,7 @@
       "pages": null,
       "ean": "tidsam_0687_202611",
       "cover_url": "https://www.tidsam.se/covers/hq/cover_0687_202611.jpg",
-      "url": "https://www.tidsam.se/magazines/kalle-ankas-pocket-589-0687-sv/",
+      "url": "https://www.tidsam.se/magazines/kalle-ankas-pocket-586-0687-sv/",
       "source": "scraper",
       "status": "released"
     },
@@ -1551,7 +1622,7 @@
       "pages": null,
       "ean": "12228_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/ed/ed4704424caf41eb0904db9092da94e9.jpg",
-      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=D307E954A04278C2B861655041596600",
+      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=298E1E41E3A3C921A83D2DF4B4DFEF90",
       "source": "scraper",
       "status": "released"
     },
@@ -1622,7 +1693,7 @@
       "pages": null,
       "ean": "13159_597",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/5f/5f662a891434dbec65d59e9bf7898563.jpg",
-      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=D307E954A04278C2B861655041596600",
+      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=298E1E41E3A3C921A83D2DF4B4DFEF90",
       "source": "scraper",
       "status": "released"
     },
@@ -2088,7 +2159,7 @@
       "pages": null,
       "ean": "14068_76",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/a9/a944fd8df9bf4edf2ee81c41895ec88f.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=D307E954A04278C2B861655041596600",
+      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=298E1E41E3A3C921A83D2DF4B4DFEF90",
       "source": "scraper",
       "status": "released"
     },
@@ -2106,7 +2177,7 @@
       "pages": null,
       "ean": "15420_1",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/f6/f61e2812c435ff4898d656cb6e28ba5d.jpg",
-      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=D307E954A04278C2B861655041596600",
+      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=298E1E41E3A3C921A83D2DF4B4DFEF90",
       "source": "scraper",
       "status": "released"
     },
@@ -2124,7 +2195,7 @@
       "pages": null,
       "ean": "14016_256",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/8a/8af5e0d59de3b21adc1e20c048bfd283.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_256;jsessionid=D307E954A04278C2B861655041596600",
+      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_256;jsessionid=298E1E41E3A3C921A83D2DF4B4DFEF90",
       "source": "scraper",
       "status": "released"
     },
@@ -2179,24 +2250,6 @@
       "ean": "57955",
       "cover_url": "https://cdn11.bigcommerce.com/s-fle6qzf7oq/images/stencil/original/products/57955/57727/TNLiloStitch62603CovAGANUCHEAU__86567.1777499437.jpg?c=1",
       "url": "https://disney.dynamite.com/products.php?productId=57955",
-      "source": "scraper",
-      "status": "released"
-    },
-    {
-      "id": "se_tidsam_4810_202609",
-      "issue_code": null,
-      "title": "Kalle Anka Junior nr 9/2026",
-      "country": "se",
-      "country_name": "Sweden",
-      "country_flag": "🇸🇪",
-      "publisher": "Story House Egmont",
-      "date": "2026-09-15",
-      "formatted_date": "Tuesday, September 15, 2026",
-      "price": "46.90 kr",
-      "pages": null,
-      "ean": "tidsam_4810_202609",
-      "cover_url": "https://www.tidsam.se/covers/hq/cover_4810_202609.jpg",
-      "url": "https://www.tidsam.se/magazines/kalle-anka-junior-dbn-4810-sv/",
       "source": "scraper",
       "status": "released"
     },
@@ -2464,7 +2517,7 @@
       "pages": null,
       "ean": "18658_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/e1/e1ab93323e556c5618ab556bcf721c01.jpg",
-      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=D307E954A04278C2B861655041596600",
+      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=298E1E41E3A3C921A83D2DF4B4DFEF90",
       "source": "scraper",
       "status": "released"
     },

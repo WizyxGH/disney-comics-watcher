@@ -54,6 +54,8 @@
   const dayDetailsTitleEl = document.getElementById('day-details-title');
   const dayDetailsBadgeEl = document.getElementById('day-details-badge');
   const dayDetailsCardsEl = document.getElementById('day-details-cards');
+  const closeDrawerBtn = document.getElementById('close-drawer-btn');
+  const drawerBackdrop = document.getElementById('drawer-backdrop');
 
   // Modal Elements
   const modalEl = document.getElementById('cover-modal');
@@ -226,12 +228,16 @@
     viewListBtn.classList.toggle('active', activeView === 'list');
     viewListBtn.setAttribute('aria-selected', activeView === 'list');
 
+    document.body.classList.toggle('calendar-mode', activeView === 'calendar');
+    document.body.classList.toggle('list-mode', activeView === 'list');
+
     if (activeView === 'calendar') {
-      calendarViewEl.style.display = 'block';
+      calendarViewEl.style.display = 'flex';
       listViewEl.style.display = 'none';
     } else {
       calendarViewEl.style.display = 'none';
       listViewEl.style.display = 'block';
+      closeDayDrawer();
     }
   }
 
@@ -444,6 +450,10 @@
     // 3. Trailing days from next month to fill grid
     const totalRendered = startDayOfWeek + daysInMonth;
     const remaining = (7 - (totalRendered % 7)) % 7;
+    const totalCells = totalRendered + remaining;
+    const numRows = Math.ceil(totalCells / 7);
+    calendarDaysGridEl.style.setProperty('--cal-rows', numRows);
+
     for (let j = 1; j <= remaining; j++) {
       html += `
         <div class="cal-day-cell cal-day-outside">
@@ -482,8 +492,15 @@
       });
     });
 
-    // Render selected day's detailed cards below calendar
-    renderSelectedDayDetails(selectedDateStr, releasesByDate[selectedDateStr] || []);
+    // If day details drawer was already open, refresh it for current date
+    if (dayDetailsEl && dayDetailsEl.classList.contains('open')) {
+      const activeReleases = releasesByDate[selectedDateStr] || [];
+      if (activeReleases.length > 0) {
+        openDayDrawer(selectedDateStr, activeReleases);
+      } else {
+        closeDayDrawer();
+      }
+    }
   }
 
   function selectCalendarDate(dateStr, releases) {
@@ -491,18 +508,25 @@
     calendarDaysGridEl.querySelectorAll('.cal-day-cell[data-date]').forEach(c => {
       c.classList.toggle('cal-day-selected', c.dataset.date === dateStr);
     });
-    renderSelectedDayDetails(dateStr, releases);
+    if (releases && releases.length > 0) {
+      openDayDrawer(dateStr, releases);
+    } else {
+      closeDayDrawer();
+    }
   }
 
-  function renderSelectedDayDetails(dateStr, releases) {
+  function closeDayDrawer() {
+    if (dayDetailsEl) dayDetailsEl.classList.remove('open');
+    if (drawerBackdrop) drawerBackdrop.classList.remove('open');
+  }
+
+  function openDayDrawer(dateStr, releases) {
     if (!dayDetailsEl) return;
 
     if (!releases || releases.length === 0) {
-      dayDetailsEl.style.display = 'none';
+      closeDayDrawer();
       return;
     }
-
-    dayDetailsEl.style.display = 'block';
 
     const firstItem = releases[0];
     const formatted = firstItem.formatted_date || dateStr;
@@ -525,7 +549,22 @@
         handleCoverError(this);
       });
     });
+
+    dayDetailsEl.classList.add('open');
+    if (drawerBackdrop) drawerBackdrop.classList.add('open');
   }
+
+  if (closeDrawerBtn) {
+    closeDrawerBtn.addEventListener('click', closeDayDrawer);
+  }
+  if (drawerBackdrop) {
+    drawerBackdrop.addEventListener('click', closeDayDrawer);
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeDayDrawer();
+    }
+  });
 
   function renderCalendarEventPill(item) {
     const isUpcoming = item.status === 'upcoming';

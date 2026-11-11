@@ -10,48 +10,81 @@
 
 <hr/>
 
-**Disney Comics Watcher** is an open-source, automated bot designed to monitor new releases of Disney magazines and comic books in France, the US, Germany, Greece, Italy, Brazil, Egypt, and 9 Eastern European countries (Bulgaria, Croatia, Estonia, Latvia, Lithuania, Poland, Czech Republic, Serbia, Slovenia).
+**Disney Comics Watcher** is an open-source, automated platform designed to monitor new releases and announcements of Disney magazines and comic books across **27 countries worldwide** (France, USA, Germany, Italy, Brazil, Mexico, Turkey, Greece, Spain, Netherlands, United Kingdom, Denmark, Norway, Sweden, Finland, Iceland, Egypt, Poland, Czech Republic, Bulgaria, Croatia, Estonia, Latvia, Lithuania, Serbia, Slovenia, and China).
+
+It combines real-time notification dispatch (Telegram, Discord), automated Inducks `.dbi` skeleton generation, and an interactive **web agenda** application.
 
 > ⭐️ **If you like this project, please consider giving it a star on GitHub! It helps a lot!** ⭐️
 
+---
 
-It seamlessly tracks publication dates and automatically sends real-time notifications to a dedicated Telegram channel for every new issue or announcement. Perfect for collectors, Inducks contributors, and Disney comics fans!
+## 🎯 Features
 
-### 📱 Join our Telegram Channel
-
-Stay updated with all the latest Disney comics releases directly on your phone!
-👉 **[Join the Disney Comics Watcher Telegram Channel here](https://t.me/infobddisney)**
+- **Worldwide Coverage (27 Countries)** — Monitors publishers across Europe, North & South America, the Middle East, and Asia.
+- **Interactive Web Agenda** — Clean, responsive web app with monthly calendar and chronological list views, instant search, country filtering, cover previews, and dark/light themes.
+- **New Magazine Issues & Announcements** — Extracts cover art, issue numbers, retail prices, barcodes (EAN), and precise publication dates.
+- **Multi-Platform Notifications** — Real-time alerts dispatched to Telegram channels/topics and Discord servers with country-role pings.
+- **Inducks Pre-Indexing** — Automatically generates and maintains `.dbi` skeleton files for seamless integration into the [Inducks database](https://inducks.org/), with automatic cleanup when issues get indexed.
+- **Gemini AI Integration** — Analyzes magazine covers to extract character appearances and featured story titles.
+- **Local & Remote Cover Archive** — Automatically downloads and archives high-quality cover images.
 
 ---
 
-## 🎯 Features & Notifications
+## 📡 Monitored Countries & Publishers
 
-- **Global Coverage** — Tracks releases from publishers in France, USA, Germany, Greece, Italy, Brazil, Egypt, and Croatia!
-- **New magazine issues** — Complete with cover image, issue number, retail price, and publication dates.
-- **Comic book announcements** — Notifies you when an upcoming comic book appears as "to be published" in official catalogs.
-- **Release day alerts** — Alerts you on the exact day the publication date is reached in bookstores.
-- **Gemini AI integration** — Automatically analyzes magazine covers to detect featured characters and extract the main story titles!
-- **Inducks pre-indexing** — Automatically generates `.dbi` skeleton files for all monitored countries for seamless contributions to the [Inducks database](https://inducks.org/). It also automatically cleans up these files by removing issues once they are indexed.
-- **Local cover archive** — Automatically downloads and saves high-quality cover images to a local `covers/` folder.
+| Country | Code | Publisher / Source | What it covers |
+|---|:---:|---|---|
+| 🇫🇷 France | `fr` | Direct Éditeurs, MLP, Glénat | Kiosk magazines (*Picsou*, *Mickey*, *Fantomiald*) and Glénat albums |
+| 🇺🇸 United States | `us` | Marvel, Fantagraphics, Dynamite | US comic book series, collections, and omnibuses |
+| 🇩🇪 Germany | `de` | Egmont Ehapa, Lustiges Taschenbuch | *Micky Maus*, *LTB*, and German albums |
+| 🇮🇹 Italy | `it` | Panini Comics Italia | *Topolino*, *Paperinik*, and special Panini editions |
+| 🇧🇷 Brazil | `br` | Panini Brasil | Brazilian editions (*Tio Patinhas*, *Pato Donald*, *Mickey*) |
+| 🇲🇽 Mexico | `mx` | Panini Comics México | Mexican releases (*Pato Donald*, *Mickey*, *Colección Clásicos*) |
+| 🇹🇷 Turkey | `tr` | Beta Kids (D&R) | Turkish graphic novels (*Disney En Güzel Maceralar*) |
+| 🇬🇷 Greece | `gr` | Kathimerini | Greek weekly & monthly Disney magazines (*Komix*, *Miky Maous*) |
+| 🇪🇸 Spain | `es` | Panini España | Spanish Disney publications and albums |
+| 🇳🇱 Netherlands | `nl` | DPG Media (Donald Duck Shop) | *Donald Duck Weekblad*, pocket books, and specials |
+| 🇬🇧 United Kingdom | `uk` | Panini / Titan / Hachette UK | UK Disney magazines and graphic novel collections |
+| 🇩🇰 Denmark | `dk` | Egmont Publishing / Andeby | Danish Disney releases (*Anders And & Co.*) |
+| 🇳🇴 Norway | `no` | Egmont Kids Media / Donald | Norwegian releases (*Donald Duck & Co*) |
+| 🇸🇪 Sweden | `se` | Story House Egmont / Kalle Anka | Swedish releases (*Kalle Anka & C:o*) |
+| 🇫🇮 Finland | `fi` | Sanoma (Aku Ankka API) | Finnish issues (*Aku Ankka*, taskukirjat) |
+| 🇮🇸 Iceland | `is` | Edda Útgáfa | Icelandic pocket books (*Andrés Önd Syrpa*) |
+| 🇪🇬 Egypt | `eg` | Nahdet Misr | Egyptian Arabic magazines (*Miki*, *Super Miki*) |
+| 🇵🇱 Poland | `pl` | Egmont Polska | Polish releases (*Kaczor Donald*, *Gigant Poleca*) |
+| 🇨🇿 Czech Republic | `cz` | Egmont CZ | Czech pocket books and magazines (*Kačer Donald*) |
+| 🇧🇬 Bulgaria | `bg` | Egmont Bulgaria | Bulgarian Disney issues (*Мики Маус*) |
+| 🇭🇷 Croatia | `hr` | Egmont d.o.o. | Croatian Disney releases |
+| 🇪🇪 Estonia | `ee` | Egmont Estonia | Estonian magazines (*Miki Hiir*) |
+| 🇱🇻 Latvia | `lv` | Egmont Latvija | Latvian issues (*Miks Pele*) |
+| 🇱🇹 Lithuania | `lt` | Egmont Lietuva | Lithuanian issues (*Antulis Donaldas*) |
+| 🇷🇸 Serbia | `rs` | Egmont Serbia | Serbian Disney releases |
+| 🇸🇮 Slovenia | `si` | Egmont Slovenia | Slovenian Disney releases |
+| 🇨🇳 China | `cn` | DRP / Disney China | Chinese translations and local editions |
 
 ---
 
-## 📡 Monitored Sources & Publishers
+## 🌐 Web Agenda Application
 
-| Source | What it covers |
-|---|---|
-| [direct-editeurs.fr](https://direct-editeurs.fr) | Active kiosk magazines (Picsou, Mickey, Fantomiald, Donald…) |
-| [catalogueproduits.mlp.fr](https://catalogueproduits.mlp.fr) | Complementary kiosk issues missing from Direct Éditeurs (Picsou Soir, Destin de Picsou…) |
-| [glenat.com](https://www.glenat.com/livres-glenat-disney/) | Disney comic books and graphic novels by Glénat (Picsou, Mickey, Don Rosa, Romano Scarpa…) |
-| [marvel.com](https://www.marvel.com/) | US Disney comic books published by Marvel (Uncle Scrooge...) |
-| [fantagraphics.com](https://www.fantagraphics.com/) | US Disney comic books published by Fantagraphics |
-| [egmont-shop.de](https://www.egmont-shop.de/) | German Disney comic books and magazines published by Egmont Ehapa |
-| [lustiges-taschenbuch.de](https://www.lustiges-taschenbuch.de/) | Story data enricher for German LTB series |
-| [kathimerini.gr](https://www.kathimerini.gr/k/disney/) | Greek Disney comic books and magazines published by Kathimerini |
-| [panini.it](https://www.panini.it/) | Italian Disney comic books and magazines published by Panini Comics (Topolino, Paperinik...) |
-| [panini.com.br](https://panini.com.br/) | Brazilian Disney comic books and magazines published by Panini Brasil (Mickey, Tio Patinhas...) |
-| [nahdetmisrbookstore.com](https://nahdetmisrbookstore.com/) | Egyptian Disney comic books and magazines published by Nahdet Misr (Miki, Super Miki...) |
-| Eastern European publishers | Prepared architecture for Bulgaria (bg), Croatia (hr), Estonia (ee), Latvia (lv), Lithuania (lt), Poland (pl), Czech Republic (cz), Serbia (rs), Slovenia (si) |
+The project features a lightweight, standalone responsive web app located in `web/`:
+
+- **Monthly Calendar Grid** — Displays all issues day by day with real-time badges and day inspection.
+- **Chronological List View** — Browse upcoming and recently released issues in order.
+- **Dynamic Filters** — Filter by country (simple clean dropdown menu) and release status (*All*, *Upcoming*, *Released*).
+- **Fast Search** — Real-time filter across titles, publishers, series names, and EAN numbers.
+- **Light & Dark Themes** — Automatic system preference detection with manual toggle.
+- **Mobile Responsive** — Optimized for both desktop displays and mobile touch devices.
+
+### Launching the Web App locally:
+
+```bash
+# 1. Export fresh releases data (merges local DBI issues + live scraper catalogs)
+python export_agenda.py web/data/releases.json
+
+# 2. Start a local HTTP server
+python -m http.server 8000 --directory web
+```
+Then navigate to `http://localhost:8000` in your browser.
 
 ---
 
@@ -130,6 +163,8 @@ You can easily run the monitoring script locally without configuring global syst
    TELEGRAM_THREAD_ID_IT=your_test_thread_id_it
    TELEGRAM_THREAD_ID_BR=your_test_thread_id_br
    TELEGRAM_THREAD_ID_EG=your_test_thread_id_eg
+   TELEGRAM_THREAD_ID_MX=your_test_thread_id_mx
+   TELEGRAM_THREAD_ID_TR=your_test_thread_id_tr
    TELEGRAM_THREAD_ID_BG=your_test_thread_id_bg
    TELEGRAM_THREAD_ID_HR=your_test_thread_id_hr
    TELEGRAM_THREAD_ID_EE=your_test_thread_id_ee
@@ -139,11 +174,19 @@ You can easily run the monitoring script locally without configuring global syst
    TELEGRAM_THREAD_ID_CZ=your_test_thread_id_cz
    TELEGRAM_THREAD_ID_RS=your_test_thread_id_rs
    TELEGRAM_THREAD_ID_SI=your_test_thread_id_si
+   TELEGRAM_THREAD_ID_DK=your_test_thread_id_dk
+   TELEGRAM_THREAD_ID_NO=your_test_thread_id_no
+   TELEGRAM_THREAD_ID_SE=your_test_thread_id_se
+   TELEGRAM_THREAD_ID_FI=your_test_thread_id_fi
+   TELEGRAM_THREAD_ID_IS=your_test_thread_id_is
+   TELEGRAM_THREAD_ID_NL=your_test_thread_id_nl
+   TELEGRAM_THREAD_ID_UK=your_test_thread_id_uk
+   TELEGRAM_THREAD_ID_ES=your_test_thread_id_es
    # Optional: Add GEMINI_API_KEY for AI cover analysis
    ```
-3. Run the test suite:
+3. Run the regression tests:
    ```powershell
-   python tests/test_telegram_notif.py
+   python -m unittest discover -s tests/regression -v
    ```
 
 ---
@@ -152,7 +195,7 @@ You can easily run the monitoring script locally without configuring global syst
 
 We would absolutely love your help to make **Disney Comics Watcher** even better! 
 
-Whether you want to add support for a new country, improve the Gemini AI prompts, fix bugs, or refine the Inducks `.dbi` generator, all contributions are highly appreciated!
+Whether you want to add support for a new country, improve the Gemini AI prompts, fix bugs, refine the Inducks `.dbi` generator, or enhance the web agenda, all contributions are highly appreciated!
 
 ### How to contribute:
 1. **Fork** the repository
@@ -162,10 +205,9 @@ Whether you want to add support for a new country, improve the Gemini AI prompts
 5. **Open a Pull Request** 🚀
 
 ### Ideas for future contributions:
-- Adding support for other countries (Netherlands, Spain, Scandinavia...)
-- Improving the Telegram message formatting
-- Enhancing the Gemini AI character detection
-- Adding new comic book publishers
+- Adding support for additional publishers and countries
+- Enriching story metadata and variant cover detection
+- Improving the web agenda UX and offline caching (PWA)
 
 ---
 

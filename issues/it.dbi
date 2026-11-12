@@ -28,6 +28,12 @@ SUD 123a    ?              1 c
 TL 3703      h3 Topolino 3703 [issdate:2026-11-11] [price:3.50 EUR] [inx:-]
 TL 3703a    ?              1 c                      CV
 
+TL 3704      h3 Topolino 3704 [issdate:2026-11-18] [price:3.50 EUR] [inx:-]
+TL 3704a    ?              1 c                      CV
+
+TL 3704B     h3 Topolino 3704 [issdate:2026-11-18] [price:7.90 EUR] [inx:-]
+TL 3704Ba   ?              1 c                      CV
+
 ZPP 101      h3 Zio Paperone 101 [issdate:2026-11-15] [price:3.90 EUR] [inx:-]
 ZPP 101a    ?              1 c                      CV
 

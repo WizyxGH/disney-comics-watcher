@@ -1056,7 +1056,7 @@
   "panini-it:340073": "released",
   "_health": {
     "ES": {
-      "empty_runs": 1,
+      "empty_runs": 2,
       "alerted": false
     }
   },
@@ -1471,5 +1471,14 @@
   "lt:donaldas-ir-kiti--nuotykiai-zuvies-milzines-pilve-ir-laime-nesantis-suo-8ys8e": "released",
   "lt:donaldas-ir-kiti--slapta-vagiu-mokykla-ir-sunkios-giminystes-grandines-8ysbj": "released",
   "lt:donaldas-ir-kiti--neatpazintas-skraidantis-objektas-ir-gryno-aukso-planeta-8vl7b": "released",
-  "lt:donaldas-ir-kiti--neimanomas-nusikaltimas-ir-dieviska-galia-8tof1": "released"
+  "lt:donaldas-ir-kiti--neimanomas-nusikaltimas-ir-dieviska-galia-8tof1": "released",
+  "fr_kiosk:14016_257": "released",
+  "lt:donaldas-ir-kiti--tinginiu-planeta--mulkiai-sutemose-ir-kai-kelia-perbega-ragana": "released",
+  "lt:donaldas-ir-kiti--kosmoso-kaubojai-ir-klastinga-aukle": "released",
+  "lt:donaldas-ir-kiti-kipsai-is-anapus-ir-sukciu-viesbutis": "released",
+  "lt:megagiga-nr-15-donaldas-ir-kiti-aukso-skonis-ir-pinigu-kvapas": "released",
+  "lt:donaldas-ir-kiti-pabaisos-ir-vaiduokliai": "released",
+  "lt:donaldas-ir-kiti-nuskendes-atlantidos-miestas-ir-pabegimas-nuo-aborigenu": "released",
+  "lt:donaldas-tavo-kiseneje-nr-4-nuotykiu-ieskotojai": "released",
+  "lt:donaldas-dosnus-atlygis-uz-radybas-ir-pasele-nuotykiai-kalejime": "released"
 }

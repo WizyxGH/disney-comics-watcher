@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-12T13:01:52.572752+01:00",
-  "total_count": 371,
+  "generated_at": "2026-11-12T20:46:12.636439+01:00",
+  "total_count": 370,
   "countries": [
     {
       "code": "fr",
@@ -79,12 +79,6 @@
       "name": "Brazil",
       "flag": "🇧🇷",
       "count": 2
-    },
-    {
-      "code": "fi",
-      "name": "Finland",
-      "flag": "🇫🇮",
-      "count": 1
     },
     {
       "code": "is",
@@ -645,7 +639,7 @@
       "pages": null,
       "ean": "14016_257",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/af/af35e5b41d0bd4be8d89f9c7bd1454f3.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_257;jsessionid=C3A34ACCCCF2E9A4BA38FE06936CBDC2",
+      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_257;jsessionid=C43F98827E8065392BBDF2BC77C7B1FA",
       "source": "scraper",
       "status": "released"
     },
@@ -947,23 +941,6 @@
       "ean": null,
       "cover_url": "https://raw.githubusercontent.com/WizyxGH/disney-comics-watcher/datas/covers/de_ltbnl_0005a_001.jpg",
       "url": "https://inducks.org/issue.php?c=de%2FLTBNL++5",
-      "source": "dbi",
-      "status": "released"
-    },
-    {
-      "id": "fi_AA2026-46",
-      "issue_code": "AA2026-46",
-      "title": "Aku Ankka 46/26",
-      "country": "fi",
-      "country_name": "Finland",
-      "country_flag": "🇫🇮",
-      "date": "2026-11-10",
-      "formatted_date": "Tuesday, November 10, 2026",
-      "price": null,
-      "pages": null,
-      "ean": null,
-      "cover_url": "https://raw.githubusercontent.com/WizyxGH/disney-comics-watcher/datas/covers/fi_aa2026_46a_001.jpg",
-      "url": "https://inducks.org/issue.php?c=fi%2FAA2026-46",
       "source": "dbi",
       "status": "released"
     },
@@ -1656,7 +1633,7 @@
       "pages": null,
       "ean": "12228_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/ed/ed4704424caf41eb0904db9092da94e9.jpg",
-      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=C3A34ACCCCF2E9A4BA38FE06936CBDC2",
+      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=C43F98827E8065392BBDF2BC77C7B1FA",
       "source": "scraper",
       "status": "released"
     },
@@ -1727,7 +1704,7 @@
       "pages": null,
       "ean": "13159_597",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/5f/5f662a891434dbec65d59e9bf7898563.jpg",
-      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=C3A34ACCCCF2E9A4BA38FE06936CBDC2",
+      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=C43F98827E8065392BBDF2BC77C7B1FA",
       "source": "scraper",
       "status": "released"
     },
@@ -1836,6 +1813,24 @@
       "ean": "tidsam_5398_202605",
       "cover_url": "https://www.tidsam.se/covers/hq/cover_5398_202605.jpg",
       "url": "https://www.tidsam.se/magazines/kallepreresorstorbritanni-5398-sv/",
+      "source": "scraper",
+      "status": "released"
+    },
+    {
+      "id": "gr_564490819",
+      "issue_code": null,
+      "title": "Μίκυ Μάους #643 Ο ΝΕΟΣ ΔΙΟΙΚΗΤΗΣ",
+      "country": "gr",
+      "country_name": "Greece",
+      "country_flag": "🇬🇷",
+      "publisher": "Kathimerini",
+      "date": "2026-10-09",
+      "formatted_date": "Friday, October 9, 2026",
+      "price": "N/A (Kiosk)",
+      "pages": null,
+      "ean": "564490819",
+      "cover_url": "https://i.prcdn.co/img?cid=464B&page=1&height=1200",
+      "url": "https://www.kathimerini.gr/k/disney/564490819/miky-maoys-643-o-neos-dioikitis/",
       "source": "scraper",
       "status": "released"
     },
@@ -2175,7 +2170,7 @@
       "pages": null,
       "ean": "14068_76",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/a9/a944fd8df9bf4edf2ee81c41895ec88f.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=C3A34ACCCCF2E9A4BA38FE06936CBDC2",
+      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=C43F98827E8065392BBDF2BC77C7B1FA",
       "source": "scraper",
       "status": "released"
     },
@@ -2193,7 +2188,7 @@
       "pages": null,
       "ean": "15420_1",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/f6/f61e2812c435ff4898d656cb6e28ba5d.jpg",
-      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=C3A34ACCCCF2E9A4BA38FE06936CBDC2",
+      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=C43F98827E8065392BBDF2BC77C7B1FA",
       "source": "scraper",
       "status": "released"
     },
@@ -2515,7 +2510,7 @@
       "pages": null,
       "ean": "18658_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/e1/e1ab93323e556c5618ab556bcf721c01.jpg",
-      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=C3A34ACCCCF2E9A4BA38FE06936CBDC2",
+      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=C43F98827E8065392BBDF2BC77C7B1FA",
       "source": "scraper",
       "status": "released"
     },
@@ -6031,24 +6026,6 @@
       "ean": "donaldas-dosnus-atlygis-uz-radybas-ir-pasele-nuotykiai-kalejime",
       "cover_url": "https://thumb.knygos-static.lt/UYE2n_PxKAUS5IKwCPMv6pQKtbY=/fit-in/600x600/images/books/1045844/1462890494_9799986233335dosnusatlygisuzradybasirpaselenuotykiaikalejime.jpg",
       "url": "https://www.knygos.lt/lt/knygos/donaldas-dosnus-atlygis-uz-radybas-ir-pasele-nuotykiai-kalejime/",
-      "source": "scraper",
-      "status": "upcoming"
-    },
-    {
-      "id": "gr_564490819",
-      "issue_code": null,
-      "title": "Μίκυ Μάους #643 Ο ΝΕΟΣ ΔΙΟΙΚΗΤΗΣ",
-      "country": "gr",
-      "country_name": "Greece",
-      "country_flag": "🇬🇷",
-      "publisher": "Kathimerini",
-      "date": null,
-      "formatted_date": null,
-      "price": "N/A (Kiosk)",
-      "pages": null,
-      "ean": "564490819",
-      "cover_url": "https://i.prcdn.co/img?cid=464B&page=1&height=1200",
-      "url": "https://www.kathimerini.gr/k/disney/564490819/miky-maoys-643-o-neos-dioikitis/",
       "source": "scraper",
       "status": "upcoming"
     },

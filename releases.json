@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-11-13T16:50:05.091636+01:00",
-  "total_count": 406,
+  "generated_at": "2026-11-13T22:45:21.769307+01:00",
+  "total_count": 407,
   "countries": [
     {
       "code": "fr",
       "name": "France",
       "flag": "🇫🇷",
-      "count": 157
+      "count": 158
     },
     {
       "code": "us",
@@ -668,7 +668,7 @@
       "pages": null,
       "ean": "14016_257",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/af/af35e5b41d0bd4be8d89f9c7bd1454f3.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_257;jsessionid=276ACE0398CC133A0EB2F92B65E537E0",
+      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_257;jsessionid=E75CADB2983AFF163428B9FE02A30214",
       "source": "scraper",
       "status": "released"
     },
@@ -1662,7 +1662,7 @@
       "pages": null,
       "ean": "12228_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/ed/ed4704424caf41eb0904db9092da94e9.jpg",
-      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=276ACE0398CC133A0EB2F92B65E537E0",
+      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=E75CADB2983AFF163428B9FE02A30214",
       "source": "scraper",
       "status": "released"
     },
@@ -1733,7 +1733,7 @@
       "pages": null,
       "ean": "13159_597",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/5f/5f662a891434dbec65d59e9bf7898563.jpg",
-      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=276ACE0398CC133A0EB2F92B65E537E0",
+      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=E75CADB2983AFF163428B9FE02A30214",
       "source": "scraper",
       "status": "released"
     },
@@ -2199,7 +2199,7 @@
       "pages": null,
       "ean": "14068_76",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/a9/a944fd8df9bf4edf2ee81c41895ec88f.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=276ACE0398CC133A0EB2F92B65E537E0",
+      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=E75CADB2983AFF163428B9FE02A30214",
       "source": "scraper",
       "status": "released"
     },
@@ -2217,7 +2217,7 @@
       "pages": null,
       "ean": "15420_1",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/f6/f61e2812c435ff4898d656cb6e28ba5d.jpg",
-      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=276ACE0398CC133A0EB2F92B65E537E0",
+      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=E75CADB2983AFF163428B9FE02A30214",
       "source": "scraper",
       "status": "released"
     },
@@ -2539,7 +2539,7 @@
       "pages": null,
       "ean": "18658_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/e1/e1ab93323e556c5618ab556bcf721c01.jpg",
-      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=276ACE0398CC133A0EB2F92B65E537E0",
+      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=E75CADB2983AFF163428B9FE02A30214",
       "source": "scraper",
       "status": "released"
     },
@@ -5339,6 +5339,24 @@
       "status": "released"
     },
     {
+      "id": "fr_9782723487924",
+      "issue_code": null,
+      "title": "Mickey - Le Cycle des magiciens - Tome 04",
+      "country": "fr",
+      "country_name": "France",
+      "country_flag": "🇫🇷",
+      "publisher": "Glénat",
+      "date": "2012-03-07",
+      "formatted_date": "Wednesday, March 7, 2012",
+      "price": null,
+      "pages": null,
+      "ean": "9782723487924",
+      "cover_url": "https://www.images.hachette-livre.fr/media/imgArticle/GLENAT/2012/9782723487924-T.jpg",
+      "url": "https://www.glenat.com/glenat-disney/mickey-le-cycle-des-magiciens-tome-04-9782723487924",
+      "source": "scraper",
+      "status": "released"
+    },
+    {
       "id": "fr_9782723485852",
       "issue_code": null,
       "title": "Donald - DoubleDuck - Tome 03",
@@ -6077,24 +6095,6 @@
       "status": "upcoming"
     },
     {
-      "id": "tr_0001787711001",
-      "issue_code": null,
-      "title": "Tarih Öncesi-Disney En Güzel Maceralar",
-      "country": "tr",
-      "country_name": "Turkey",
-      "country_flag": "🇹🇷",
-      "publisher": "Beta Kids",
-      "date": null,
-      "formatted_date": null,
-      "price": null,
-      "pages": null,
-      "ean": "0001787711001",
-      "cover_url": null,
-      "url": "https://www.dr.com.tr/kitap/tarih-oncesi-disney-en-guzel-maceralar/cocuk-ve-genclik/genclik-10-yas/romanoyku/urunno=0001787711001",
-      "source": "scraper",
-      "status": "upcoming"
-    },
-    {
       "id": "tr_0002185493001",
       "issue_code": null,
       "title": "Disney En Güzel Maceralar - Spor Müsabakaları",
@@ -6127,6 +6127,24 @@
       "ean": "0002180962001",
       "cover_url": null,
       "url": "https://www.dr.com.tr/kitap/siki-dostlar-disney-en-guzel-maceralar/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002180962001",
+      "source": "scraper",
+      "status": "upcoming"
+    },
+    {
+      "id": "tr_0001787711001",
+      "issue_code": null,
+      "title": "Tarih Öncesi-Disney En Güzel Maceralar",
+      "country": "tr",
+      "country_name": "Turkey",
+      "country_flag": "🇹🇷",
+      "publisher": "Beta Kids",
+      "date": null,
+      "formatted_date": null,
+      "price": null,
+      "pages": null,
+      "ean": "0001787711001",
+      "cover_url": null,
+      "url": "https://www.dr.com.tr/kitap/tarih-oncesi-disney-en-guzel-maceralar/cocuk-ve-genclik/genclik-10-yas/romanoyku/urunno=0001787711001",
       "source": "scraper",
       "status": "upcoming"
     },

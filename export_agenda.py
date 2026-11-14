@@ -188,8 +188,9 @@ def discover_from_scrapers() -> list[dict]:
         print(f"  [warn] scrapers.fr: {e}")
 
     try:
-        from src.scrapers.it import discover_panini_it
+        from src.scrapers.it import discover_panini_it, discover_giunti_it
         scrapers.append(("it", "Panini Comics", discover_panini_it))
+        scrapers.append(("it", "Giunti Editore", discover_giunti_it))
     except Exception as e:
         print(f"  [warn] scrapers.it: {e}")
 

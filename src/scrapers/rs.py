@@ -24,7 +24,7 @@ def discover_rs() -> list[dict]:
 
     for url in sources:
         try:
-            r = s.get(url, timeout=15)
+            r = s.get(url, timeout=5)
             if r.status_code != 200:
                 continue
 

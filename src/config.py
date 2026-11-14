@@ -111,6 +111,7 @@ KATHIMERINI_URL = "https://www.kathimerini.gr/k/disney/"
 KATHIMERINI_KEY_PREFIX = "kathi-gr:"
 
 PANINI_IT_KEY_PREFIX = "panini-it:"
+GIUNTI_IT_KEY_PREFIX  = "giunti-it:"
 PANINI_BR_KEY_PREFIX = "panini-br:"
 NAHDET_MISR_EG_KEY_PREFIX = "nahdet_misr_eg:"
 BG_KEY_PREFIX = "bg:"
@@ -188,6 +189,7 @@ PROVIDER_PUBLISHERS = {
     LTB_DE_KEY_PREFIX:         "Egmont",
     KATHIMERINI_KEY_PREFIX:    "Kathimerini",
     PANINI_IT_KEY_PREFIX:      "Panini",
+    GIUNTI_IT_KEY_PREFIX:      "Giunti",
     PANINI_BR_KEY_PREFIX:      "Panini",
     NAHDET_MISR_EG_KEY_PREFIX: "Nahdet Misr",
     DK_KEY_PREFIX:             "Egmont",

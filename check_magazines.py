@@ -5,7 +5,7 @@ import time
 from datetime import datetime
 from src.config import (
     PARIS_TZ, SKIP_CODIFS, OVERRIDES, GLENAT_KEY_PREFIX, FANTAGRAPHICS_KEY_PREFIX, MARVEL_KEY_PREFIX,
-    DYNAMITE_KEY_PREFIX, EGMONT_DE_KEY_PREFIX, KATHIMERINI_KEY_PREFIX, PANINI_IT_KEY_PREFIX, PANINI_BR_KEY_PREFIX,
+    DYNAMITE_KEY_PREFIX, EGMONT_DE_KEY_PREFIX, KATHIMERINI_KEY_PREFIX, PANINI_IT_KEY_PREFIX, GIUNTI_IT_KEY_PREFIX, PANINI_BR_KEY_PREFIX,
     NAHDET_MISR_EG_KEY_PREFIX, BG_KEY_PREFIX, HR_KEY_PREFIX, EE_KEY_PREFIX, LV_KEY_PREFIX,
     LT_KEY_PREFIX, PL_KEY_PREFIX, CZ_KEY_PREFIX, RS_KEY_PREFIX, SI_KEY_PREFIX, CN_KEY_PREFIX,
     DK_KEY_PREFIX, ES_KEY_PREFIX, FI_KEY_PREFIX, IS_KEY_PREFIX, NO_KEY_PREFIX, NL_KEY_PREFIX,
@@ -21,7 +21,7 @@ from src.scrapers.fr import discover_fr_kiosk, fetch_fr_kiosk_details, discover_
 from src.scrapers.us import discover_fantagraphics, discover_marvel, fetch_marvel_details, discover_dynamite, fetch_dynamite_details
 from src.scrapers.de import discover_egmont_de, fetch_egmont_de_details, discover_lustiges_taschenbuch_de, fetch_lustiges_taschenbuch_de_details
 from src.scrapers.gr import discover_kathimerini
-from src.scrapers.it import discover_panini_it, fetch_panini_it_details
+from src.scrapers.it import discover_panini_it, fetch_panini_it_details, discover_giunti_it, fetch_giunti_it_details
 from src.scrapers.br import discover_panini_br, fetch_panini_br_details
 from src.scrapers.eg import discover_nahdet_misr_eg, fetch_nahdet_misr_eg_details
 from src.scrapers.bg import discover_bg, fetch_bg_details
@@ -196,6 +196,7 @@ def main():
         ("LTB DE", LTB_DE_KEY_PREFIX, discover_lustiges_taschenbuch_de, "de", "released", fetch_lustiges_taschenbuch_de_details, False),
         ("Kathimerini GR", KATHIMERINI_KEY_PREFIX, discover_kathimerini, "gr", "released", None, False),
         ("Panini IT", PANINI_IT_KEY_PREFIX, discover_panini_it, "it", "announced", fetch_panini_it_details, False),
+        ("Giunti IT", GIUNTI_IT_KEY_PREFIX, discover_giunti_it, "it", "released", fetch_giunti_it_details, False),
         ("Panini BR", PANINI_BR_KEY_PREFIX, discover_panini_br, "br", "announced", fetch_panini_br_details, False),
         ("Nahdet Misr EG", NAHDET_MISR_EG_KEY_PREFIX, discover_nahdet_misr_eg, "eg", "released", fetch_nahdet_misr_eg_details, False),
         ("BG", BG_KEY_PREFIX, discover_bg, "bg", "announced", fetch_bg_details, False),

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-15T08:25:03.336098+01:00",
+  "generated_at": "2026-11-15T16:10:16.650776+01:00",
   "total_count": 417,
   "countries": [
     {
@@ -670,7 +670,7 @@
       "pages": null,
       "ean": "14016_257",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/af/af35e5b41d0bd4be8d89f9c7bd1454f3.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_257;jsessionid=509531F691B9FBCD923F35D64E82EF45",
+      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_257;jsessionid=322DE27BA1D6A8E507F6992A748C317D",
       "source": "scraper",
       "status": "released"
     },
@@ -1648,7 +1648,7 @@
       "pages": null,
       "ean": "12228_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/ed/ed4704424caf41eb0904db9092da94e9.jpg",
-      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=509531F691B9FBCD923F35D64E82EF45",
+      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=322DE27BA1D6A8E507F6992A748C317D",
       "source": "scraper",
       "status": "released"
     },
@@ -1720,7 +1720,7 @@
       "pages": null,
       "ean": "13159_597",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/5f/5f662a891434dbec65d59e9bf7898563.jpg",
-      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=509531F691B9FBCD923F35D64E82EF45",
+      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=322DE27BA1D6A8E507F6992A748C317D",
       "source": "scraper",
       "status": "released"
     },
@@ -2186,7 +2186,7 @@
       "pages": null,
       "ean": "14068_76",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/a9/a944fd8df9bf4edf2ee81c41895ec88f.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=509531F691B9FBCD923F35D64E82EF45",
+      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=322DE27BA1D6A8E507F6992A748C317D",
       "source": "scraper",
       "status": "released"
     },
@@ -2204,7 +2204,7 @@
       "pages": null,
       "ean": "15420_1",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/f6/f61e2812c435ff4898d656cb6e28ba5d.jpg",
-      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=509531F691B9FBCD923F35D64E82EF45",
+      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=322DE27BA1D6A8E507F6992A748C317D",
       "source": "scraper",
       "status": "released"
     },
@@ -2526,7 +2526,7 @@
       "pages": null,
       "ean": "18658_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/e1/e1ab93323e556c5618ab556bcf721c01.jpg",
-      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=509531F691B9FBCD923F35D64E82EF45",
+      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=322DE27BA1D6A8E507F6992A748C317D",
       "source": "scraper",
       "status": "released"
     },
@@ -6281,24 +6281,6 @@
       "status": "upcoming"
     },
     {
-      "id": "tr_0001787711001",
-      "issue_code": null,
-      "title": "Tarih Öncesi-Disney En Güzel Maceralar",
-      "country": "tr",
-      "country_name": "Turkey",
-      "country_flag": "🇹🇷",
-      "publisher": "Beta Kids",
-      "date": null,
-      "formatted_date": null,
-      "price": null,
-      "pages": null,
-      "ean": "0001787711001",
-      "cover_url": null,
-      "url": "https://www.dr.com.tr/kitap/tarih-oncesi-disney-en-guzel-maceralar/cocuk-ve-genclik/genclik-10-yas/romanoyku/urunno=0001787711001",
-      "source": "scraper",
-      "status": "upcoming"
-    },
-    {
       "id": "tr_0002180962001",
       "issue_code": null,
       "title": "Sıkı Dostlar - Disney En Güzel Maceralar",
@@ -6331,6 +6313,24 @@
       "ean": "0002185493001",
       "cover_url": null,
       "url": "https://www.dr.com.tr/kitap/disney-en-guzel-maceralar-spor-musabakalari/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002185493001",
+      "source": "scraper",
+      "status": "upcoming"
+    },
+    {
+      "id": "tr_0001787711001",
+      "issue_code": null,
+      "title": "Tarih Öncesi-Disney En Güzel Maceralar",
+      "country": "tr",
+      "country_name": "Turkey",
+      "country_flag": "🇹🇷",
+      "publisher": "Beta Kids",
+      "date": null,
+      "formatted_date": null,
+      "price": null,
+      "pages": null,
+      "ean": "0001787711001",
+      "cover_url": null,
+      "url": "https://www.dr.com.tr/kitap/tarih-oncesi-disney-en-guzel-maceralar/cocuk-ve-genclik/genclik-10-yas/romanoyku/urunno=0001787711001",
       "source": "scraper",
       "status": "upcoming"
     },

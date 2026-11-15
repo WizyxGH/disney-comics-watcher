@@ -1055,7 +1055,7 @@
   "kathi-gr:564490864": "released",
   "panini-it:340073": "released",
   "_health": {
-    "HR": {
+    "ES": {
       "empty_runs": 1,
       "alerted": false
     }
@@ -1383,8 +1383,8 @@
   "hr:19261": "released",
   "no:269609": "announced",
   "no:269585": "announced",
-  "panini-it:342507": "announced",
-  "panini-it:342522": "announced",
+  "panini-it:342507": "released",
+  "panini-it:342522": "released",
   "hr:18886": "released",
   "hr:13970": "released",
   "is:ed3921f0-809d-4a79-8743-cc87c9c4bf2a": "released",
@@ -1561,5 +1561,6 @@
   "giunti-it:giunti_10094219690315": "released",
   "lt:press_express_donaldas-ir-kiti-pristato": "released",
   "lt:press_express_donaldas-ir-kiti": "released",
-  "lt:press_express_donaldas-ir-kiti-1993-auksine-donaldo-kolekcija": "released"
+  "lt:press_express_donaldas-ir-kiti-1993-auksine-donaldo-kolekcija": "released",
+  "tr:0002095418001": "released"
 }

@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-11-15T01:35:29.649062+01:00",
-  "total_count": 422,
+  "generated_at": "2026-11-15T08:25:03.336098+01:00",
+  "total_count": 417,
   "countries": [
     {
       "code": "fr",
       "name": "France",
       "flag": "🇫🇷",
-      "count": 158
+      "count": 154
     },
     {
       "code": "it",
@@ -30,7 +30,7 @@
       "code": "de",
       "name": "Germany",
       "flag": "🇩🇪",
-      "count": 37
+      "count": 36
     },
     {
       "code": "hr",
@@ -670,25 +670,8 @@
       "pages": null,
       "ean": "14016_257",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/af/af35e5b41d0bd4be8d89f9c7bd1454f3.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_257;jsessionid=1F33629FB17EAB7AEB3B2D2BDAFE520C",
+      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_257;jsessionid=509531F691B9FBCD923F35D64E82EF45",
       "source": "scraper",
-      "status": "released"
-    },
-    {
-      "id": "fr_SPG_257",
-      "issue_code": "SPG 257",
-      "title": "Super Picsou Géant",
-      "country": "fr",
-      "country_name": "France",
-      "country_flag": "🇫🇷",
-      "date": "2026-11-12",
-      "formatted_date": "Thursday, November 12, 2026",
-      "price": "6.99 EUR",
-      "pages": null,
-      "ean": null,
-      "cover_url": "https://raw.githubusercontent.com/WizyxGH/disney-comics-watcher/datas/covers/fr_spg_0257a_001.jpg",
-      "url": "https://inducks.org/issue.php?c=fr%2FSPG+257",
-      "source": "dbi",
       "status": "released"
     },
     {
@@ -818,6 +801,42 @@
       "status": "released"
     },
     {
+      "id": "fr_14067_3882-3883",
+      "issue_code": null,
+      "title": "Journal de Mickey - N°3882-3883",
+      "country": "fr",
+      "country_name": "France",
+      "country_flag": "🇫🇷",
+      "publisher": "Kiosque Presse",
+      "date": "2026-11-10",
+      "formatted_date": "Tuesday, November 10, 2026",
+      "price": null,
+      "pages": null,
+      "ean": "14067_3882-3883",
+      "cover_url": "https://cdn.direct-editeurs.fr/parutions/a4/a4107727eaeae869baa936ca3489c876.jpg",
+      "url": "https://direct-editeurs.fr/magazine/14067_le-journal-de-mickey_3882-3883",
+      "source": "scraper",
+      "status": "released"
+    },
+    {
+      "id": "fr_15190_40",
+      "issue_code": null,
+      "title": "Les Chroniques de Fantomiald - N°40",
+      "country": "fr",
+      "country_name": "France",
+      "country_flag": "🇫🇷",
+      "publisher": "Kiosque Presse",
+      "date": "2026-11-10",
+      "formatted_date": "Tuesday, November 10, 2026",
+      "price": null,
+      "pages": null,
+      "ean": "15190_40",
+      "cover_url": "https://cdn.direct-editeurs.fr/parutions/62/625ff385f56e76ff4fcb4ab1ed220254.jpg",
+      "url": "https://direct-editeurs.fr/magazine/15190_les-chroniques-de-fantomiald_40",
+      "source": "scraper",
+      "status": "released"
+    },
+    {
       "id": "se_tidsam_5979_202601",
       "issue_code": null,
       "title": "Kalle Anka Jul i Ankeborg",
@@ -869,76 +888,6 @@
       "cover_url": "https://www.tidsam.se/covers/hq/cover_4869_202601.jpg",
       "url": "https://www.tidsam.se/magazines/kalle-anka-onskar-god-jul-4869-sv/",
       "source": "scraper",
-      "status": "released"
-    },
-    {
-      "id": "fr_14067_3882-3883",
-      "issue_code": null,
-      "title": "Journal de Mickey - N°3882-3883",
-      "country": "fr",
-      "country_name": "France",
-      "country_flag": "🇫🇷",
-      "publisher": "Kiosque Presse",
-      "date": "2026-11-10",
-      "formatted_date": "Tuesday, November 10, 2026",
-      "price": null,
-      "pages": null,
-      "ean": "14067_3882-3883",
-      "cover_url": "https://cdn.direct-editeurs.fr/parutions/a4/a4107727eaeae869baa936ca3489c876.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14067_le-journal-de-mickey_3882-3883",
-      "source": "scraper",
-      "status": "released"
-    },
-    {
-      "id": "fr_15190_40",
-      "issue_code": null,
-      "title": "Les Chroniques de Fantomiald - N°40",
-      "country": "fr",
-      "country_name": "France",
-      "country_flag": "🇫🇷",
-      "publisher": "Kiosque Presse",
-      "date": "2026-11-10",
-      "formatted_date": "Tuesday, November 10, 2026",
-      "price": null,
-      "pages": null,
-      "ean": "15190_40",
-      "cover_url": "https://cdn.direct-editeurs.fr/parutions/62/625ff385f56e76ff4fcb4ab1ed220254.jpg",
-      "url": "https://direct-editeurs.fr/magazine/15190_les-chroniques-de-fantomiald_40",
-      "source": "scraper",
-      "status": "released"
-    },
-    {
-      "id": "fr_CF___40",
-      "issue_code": "CF   40",
-      "title": "Les Chroniques de Fantomiald",
-      "country": "fr",
-      "country_name": "France",
-      "country_flag": "🇫🇷",
-      "date": "2026-11-10",
-      "formatted_date": "Tuesday, November 10, 2026",
-      "price": "6.99 EUR",
-      "pages": null,
-      "ean": null,
-      "cover_url": "https://raw.githubusercontent.com/WizyxGH/disney-comics-watcher/datas/covers/fr_cf_0040a_001.jpg",
-      "url": "https://inducks.org/issue.php?c=fr%2FCF+++40",
-      "source": "dbi",
-      "status": "released"
-    },
-    {
-      "id": "fr_JM_3882-83",
-      "issue_code": "JM 3882-83",
-      "title": "Journal de Mickey",
-      "country": "fr",
-      "country_name": "France",
-      "country_flag": "🇫🇷",
-      "date": "2026-11-10",
-      "formatted_date": "Tuesday, November 10, 2026",
-      "price": "4.90 EUR",
-      "pages": "116",
-      "ean": null,
-      "cover_url": "https://raw.githubusercontent.com/WizyxGH/disney-comics-watcher/datas/covers/fr_jm_3882_83a_001.jpg",
-      "url": "https://inducks.org/issue.php?c=fr%2FJM+3882-83",
-      "source": "dbi",
       "status": "released"
     },
     {
@@ -1699,7 +1648,7 @@
       "pages": null,
       "ean": "12228_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/ed/ed4704424caf41eb0904db9092da94e9.jpg",
-      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=1F33629FB17EAB7AEB3B2D2BDAFE520C",
+      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=509531F691B9FBCD923F35D64E82EF45",
       "source": "scraper",
       "status": "released"
     },
@@ -1716,7 +1665,7 @@
       "price": "14.90 €",
       "pages": null,
       "ean": "9788852260902",
-      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261114_e970d2d809d34094a5fb33045c1140b2image.jpg?v=1794631619",
+      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261115_e970d2d809d34094a5fb33045c1140b2image.jpg?v=1794720271",
       "url": "https://www.giunti.it/products/topodissea-disney-disney-walt-9788852260902",
       "source": "scraper",
       "status": "released"
@@ -1737,23 +1686,6 @@
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/75/75a38311f2d53d4a1c50a033cf6790a7.jpg",
       "url": "https://direct-editeurs.fr/magazine/14108_le-journal-de-mickey-hs_13",
       "source": "scraper",
-      "status": "released"
-    },
-    {
-      "id": "fr_JMHSN_13",
-      "issue_code": "JMHSN 13",
-      "title": "Journal de Mickey HS",
-      "country": "fr",
-      "country_name": "France",
-      "country_flag": "🇫🇷",
-      "date": "2026-10-15",
-      "formatted_date": "Thursday, October 15, 2026",
-      "price": "6.99 EUR",
-      "pages": null,
-      "ean": null,
-      "cover_url": "https://raw.githubusercontent.com/WizyxGH/disney-comics-watcher/datas/covers/fr_jmhsn_0013a_001.jpg",
-      "url": "https://inducks.org/issue.php?c=fr%2FJMHSN+13",
-      "source": "dbi",
       "status": "released"
     },
     {
@@ -1788,7 +1720,7 @@
       "pages": null,
       "ean": "13159_597",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/5f/5f662a891434dbec65d59e9bf7898563.jpg",
-      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=1F33629FB17EAB7AEB3B2D2BDAFE520C",
+      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=509531F691B9FBCD923F35D64E82EF45",
       "source": "scraper",
       "status": "released"
     },
@@ -2254,7 +2186,7 @@
       "pages": null,
       "ean": "14068_76",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/a9/a944fd8df9bf4edf2ee81c41895ec88f.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=1F33629FB17EAB7AEB3B2D2BDAFE520C",
+      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=509531F691B9FBCD923F35D64E82EF45",
       "source": "scraper",
       "status": "released"
     },
@@ -2272,7 +2204,7 @@
       "pages": null,
       "ean": "15420_1",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/f6/f61e2812c435ff4898d656cb6e28ba5d.jpg",
-      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=1F33629FB17EAB7AEB3B2D2BDAFE520C",
+      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=509531F691B9FBCD923F35D64E82EF45",
       "source": "scraper",
       "status": "released"
     },
@@ -2594,7 +2526,7 @@
       "pages": null,
       "ean": "18658_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/e1/e1ab93323e556c5618ab556bcf721c01.jpg",
-      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=1F33629FB17EAB7AEB3B2D2BDAFE520C",
+      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=509531F691B9FBCD923F35D64E82EF45",
       "source": "scraper",
       "status": "released"
     },
@@ -2954,23 +2886,6 @@
       "cover_url": "https://www.lustiges-taschenbuch.de/sites/default/files/cover/LTB-610.jpg",
       "url": "https://www.lustiges-taschenbuch.de/ausgaben/alle-ausgaben/ltb-610",
       "source": "scraper",
-      "status": "released"
-    },
-    {
-      "id": "de_DS2026-05",
-      "issue_code": "DS2026-05",
-      "title": "Disney Stitch 05/2026",
-      "country": "de",
-      "country_name": "Germany",
-      "country_flag": "🇩🇪",
-      "date": "2026-05-01",
-      "formatted_date": "Friday, May 1, 2026",
-      "price": "5.99 EUR",
-      "pages": null,
-      "ean": null,
-      "cover_url": "https://raw.githubusercontent.com/WizyxGH/disney-comics-watcher/datas/covers/de_ds2026_05a_001.jpg",
-      "url": "https://inducks.org/issue.php?c=de%2FDS2026-05",
-      "source": "dbi",
       "status": "released"
     },
     {
@@ -3590,7 +3505,7 @@
       "price": "12.00 €",
       "pages": null,
       "ean": "9788852250989",
-      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261114_c4d0a33aec2945e1bea8eb6df336b3c4.jpg?v=1794630689",
+      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261115_c4d0a33aec2945e1bea8eb6df336b3c4.jpg?v=1794719362",
       "url": "https://www.giunti.it/products/scrugulus-in-re-vere-mirabili-zio-paperone-in-un-caso-davvero-imprevedibile-disney-walt-9788852250989",
       "source": "scraper",
       "status": "released"
@@ -3608,7 +3523,7 @@
       "price": "13.90 €",
       "pages": null,
       "ean": "9788852251016",
-      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261114_a4fc071fac23404cae4f61d5b4837cd7.jpg?v=1794630667",
+      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261115_a4fc071fac23404cae4f61d5b4837cd7.jpg?v=1794719331",
       "url": "https://www.giunti.it/products/sulle-scienze-le-piu-belle-storie-disney-disney-walt-9788852251016",
       "source": "scraper",
       "status": "released"
@@ -3626,7 +3541,7 @@
       "price": "13.90 €",
       "pages": null,
       "ean": "9788852251023",
-      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261114_a24d8a9417db48eba81d5dfa22bee051.jpg?v=1794630641",
+      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261115_a24d8a9417db48eba81d5dfa22bee051.jpg?v=1794719308",
       "url": "https://www.giunti.it/products/w-i-t-c-h-volume-7-da-la-voce-del-silenzio-a-vite-riflesse-disney-walt-9788852251023",
       "source": "scraper",
       "status": "released"
@@ -3644,7 +3559,7 @@
       "price": "4.90 €",
       "pages": null,
       "ean": "9788852250972",
-      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261114_fb5734a313ec4aafbeb36aebb0742096.jpg?v=1794630599",
+      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261115_fb5734a313ec4aafbeb36aebb0742096.jpg?v=1794719261",
       "url": "https://www.giunti.it/products/principesse-prime-letture-a-fumetti-disney-princess-disney-walt-9788852250972",
       "source": "scraper",
       "status": "released"
@@ -3696,7 +3611,7 @@
       "price": "12.00 €",
       "pages": null,
       "ean": "9788852251009",
-      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261114_1473cdb579ee4423958d32df24420e3f.jpg?v=1794630518",
+      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261115_1473cdb579ee4423958d32df24420e3f.jpg?v=1794719133",
       "url": "https://www.giunti.it/products/ohana-means-family-disney-walt-9788852251009",
       "source": "scraper",
       "status": "released"
@@ -3714,7 +3629,7 @@
       "price": "4.90 €",
       "pages": null,
       "ean": "9788852250163",
-      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261114_04b028b24d6e4a66bf0433417e13d460.jpg?v=1794630476",
+      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261115_04b028b24d6e4a66bf0433417e13d460.jpg?v=1794719089",
       "url": "https://www.giunti.it/products/frozen-prime-letture-a-fumetti-disney-walt-9788852250163",
       "source": "scraper",
       "status": "released"
@@ -3732,7 +3647,7 @@
       "price": "4.90 €",
       "pages": null,
       "ean": "9788852250156",
-      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261114_026b0e3b78fc4c8ba4df66096720bf9b.jpg?v=1794630487",
+      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261115_026b0e3b78fc4c8ba4df66096720bf9b.jpg?v=1794719101",
       "url": "https://www.giunti.it/products/stitch-prime-letture-a-fumetti-disney-walt-9788852250156",
       "source": "scraper",
       "status": "released"
@@ -3750,7 +3665,7 @@
       "price": "4.90 €",
       "pages": null,
       "ean": "9788852250521",
-      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261113_6e8c0f0683274d888b9f19f3c6cfc6fb.jpg?v=1794543393",
+      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261115_6e8c0f0683274d888b9f19f3c6cfc6fb.jpg?v=1794719075",
       "url": "https://www.giunti.it/products/encanto-prime-letture-a-fumetti-disney-walt-9788852250521",
       "source": "scraper",
       "status": "released"
@@ -3804,7 +3719,7 @@
       "price": "7.90 €",
       "pages": null,
       "ean": "9788852248900",
-      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261114_30fa0d325b4a4e7686671a876f641a7c.jpg?v=1794630099",
+      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261115_30fa0d325b4a4e7686671a876f641a7c.jpg?v=1794718593",
       "url": "https://www.giunti.it/products/topoprincipe-disney-walt-9788852248900",
       "source": "scraper",
       "status": "released"
@@ -3822,7 +3737,7 @@
       "price": "9.90 €",
       "pages": null,
       "ean": "9788852246555",
-      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261114_9836577336cf4631b2ba217d9eb26f1f.jpg?v=1794630026",
+      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261115_9836577336cf4631b2ba217d9eb26f1f.jpg?v=1794718550",
       "url": "https://www.giunti.it/products/top-del-giallo-le-piu-belle-storie-disney-the-best-of-disney-walt-9788852246555",
       "source": "scraper",
       "status": "released"
@@ -4056,7 +3971,7 @@
       "price": "9.90 €",
       "pages": null,
       "ean": "9788852241857",
-      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261113_111fc44e16ba4163815f541c392eabdd.jpg?v=1794542806",
+      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261115_111fc44e16ba4163815f541c392eabdd.jpg?v=1794718191",
       "url": "https://www.giunti.it/products/crudelia-de-mon-la-mia-vera-storia-disney-villains-graphic-novel-disney-walt-9788852241857",
       "source": "scraper",
       "status": "released"
@@ -4110,7 +4025,7 @@
       "price": "13.90 €",
       "pages": null,
       "ean": "9788852241727",
-      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261112_9425b2921b5945e4a2f26642f9989323.jpg?v=1794462299",
+      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261115_9425b2921b5945e4a2f26642f9989323.jpg?v=1794718221",
       "url": "https://www.giunti.it/products/indiana-pipps-le-piu-belle-storie-disney-disney-walt-9788852241727",
       "source": "scraper",
       "status": "released"
@@ -4128,7 +4043,7 @@
       "price": "13.90 €",
       "pages": null,
       "ean": "9788852245008",
-      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261114_c06b5629c6b64293b157ddb569f9a544.jpg?v=1794629752",
+      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261115_c06b5629c6b64293b157ddb569f9a544.jpg?v=1794718174",
       "url": "https://www.giunti.it/products/w-i-t-c-h-volume-5-da-sotto-il-segno-dellombra-a-ombre-dacqua-disney-walt-9788852245008",
       "source": "scraper",
       "status": "released"
@@ -4164,7 +4079,7 @@
       "price": "14.90 €",
       "pages": null,
       "ean": "9788852240539",
-      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261114_ff1f710e6ae24604b629d3e39e89d1ac.jpg?v=1794629714",
+      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261115_ff1f710e6ae24604b629d3e39e89d1ac.jpg?v=1794718128",
       "url": "https://www.giunti.it/products/papero-da-vinci-disney-walt-9788852240539",
       "source": "scraper",
       "status": "released"
@@ -4272,7 +4187,7 @@
       "price": "13.90 €",
       "pages": null,
       "ean": "9788852240478",
-      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261114_edb541a5dc5c494bbb755f603b28cf1d.jpg?v=1794629624",
+      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261115_edb541a5dc5c494bbb755f603b28cf1d.jpg?v=1794718025",
       "url": "https://www.giunti.it/products/w-i-t-c-h-volume-4-da-il-sigillo-di-nerissa-a-il-soffio-dellodio-disney-walt-9788852240478",
       "source": "scraper",
       "status": "released"
@@ -4308,7 +4223,7 @@
       "price": "9.90 €",
       "pages": null,
       "ean": "9788852240485",
-      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261114_eba82c4d13c84e0d9fa48b259f534d54.jpg?v=1794629503",
+      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261115_eba82c4d13c84e0d9fa48b259f534d54.jpg?v=1794717862",
       "url": "https://www.giunti.it/products/halloween-le-piu-belle-storie-pocket-disney-disney-walt-9788852240485",
       "source": "scraper",
       "status": "released"
@@ -4326,7 +4241,7 @@
       "price": "9.90 €",
       "pages": null,
       "ean": "9788852240492",
-      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261114_efb66529bb7c4d53a4657e87cff9f7d7.jpg?v=1794629519",
+      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261115_efb66529bb7c4d53a4657e87cff9f7d7.jpg?v=1794717852",
       "url": "https://www.giunti.it/products/da-regalo-le-piu-belle-storie-pocket-disney-disney-walt-9788852240492",
       "source": "scraper",
       "status": "released"
@@ -4344,7 +4259,7 @@
       "price": "9.90 €",
       "pages": null,
       "ean": "9788852240515",
-      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261113_adeb710c7f5f4e5495b51a6d1b36624c.jpg?v=1794542468",
+      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261115_adeb710c7f5f4e5495b51a6d1b36624c.jpg?v=1794717862",
       "url": "https://www.giunti.it/products/reali-le-piu-belle-storie-disney-pocket-disney-walt-9788852240515",
       "source": "scraper",
       "status": "released"
@@ -4416,7 +4331,7 @@
       "price": "9.90 €",
       "pages": null,
       "ean": "9788852240324",
-      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261111_8cea3840f0ec4d2d85e63c0e656c1064.jpg?v=1794373386",
+      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261115_8cea3840f0ec4d2d85e63c0e656c1064.jpg?v=1794717836",
       "url": "https://www.giunti.it/products/u-f-o-le-piu-belle-storie-disney-pocket-disney-walt-9788852240324",
       "source": "scraper",
       "status": "released"
@@ -4614,7 +4529,7 @@
       "price": "13.90 €",
       "pages": null,
       "ean": "9788852238468",
-      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261114_8b9c712cdcc947fa8fe989d299677f6e.jpg?v=1794629347",
+      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261115_8b9c712cdcc947fa8fe989d299677f6e.jpg?v=1794717654",
       "url": "https://www.giunti.it/products/w-i-t-c-h-volume-1-20-anni-di-magia-le-piu-belle-storie-special-disney-walt-9788852238468",
       "source": "scraper",
       "status": "released"
@@ -4974,7 +4889,7 @@
       "price": "13.90 €",
       "pages": null,
       "ean": "9788852234514",
-      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261114_8fa690f76e9b439c92a9e145bd1b51de.jpg?v=1794629292",
+      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261115_8fa690f76e9b439c92a9e145bd1b51de.jpg?v=1794717619",
       "url": "https://www.giunti.it/products/le-piu-belle-storie-di-paperinik-disney-walt-9788852234514",
       "source": "scraper",
       "status": "released"
@@ -6366,9 +6281,9 @@
       "status": "upcoming"
     },
     {
-      "id": "tr_0002185493001",
+      "id": "tr_0001787711001",
       "issue_code": null,
-      "title": "Disney En Güzel Maceralar - Spor Müsabakaları",
+      "title": "Tarih Öncesi-Disney En Güzel Maceralar",
       "country": "tr",
       "country_name": "Turkey",
       "country_flag": "🇹🇷",
@@ -6377,9 +6292,9 @@
       "formatted_date": null,
       "price": null,
       "pages": null,
-      "ean": "0002185493001",
+      "ean": "0001787711001",
       "cover_url": null,
-      "url": "https://www.dr.com.tr/kitap/disney-en-guzel-maceralar-spor-musabakalari/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002185493001",
+      "url": "https://www.dr.com.tr/kitap/tarih-oncesi-disney-en-guzel-maceralar/cocuk-ve-genclik/genclik-10-yas/romanoyku/urunno=0001787711001",
       "source": "scraper",
       "status": "upcoming"
     },
@@ -6402,9 +6317,9 @@
       "status": "upcoming"
     },
     {
-      "id": "tr_0001787711001",
+      "id": "tr_0002185493001",
       "issue_code": null,
-      "title": "Tarih Öncesi-Disney En Güzel Maceralar",
+      "title": "Disney En Güzel Maceralar - Spor Müsabakaları",
       "country": "tr",
       "country_name": "Turkey",
       "country_flag": "🇹🇷",
@@ -6413,9 +6328,9 @@
       "formatted_date": null,
       "price": null,
       "pages": null,
-      "ean": "0001787711001",
+      "ean": "0002185493001",
       "cover_url": null,
-      "url": "https://www.dr.com.tr/kitap/tarih-oncesi-disney-en-guzel-maceralar/cocuk-ve-genclik/genclik-10-yas/romanoyku/urunno=0001787711001",
+      "url": "https://www.dr.com.tr/kitap/disney-en-guzel-maceralar-spor-musabakalari/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002185493001",
       "source": "scraper",
       "status": "upcoming"
     },
@@ -6546,24 +6461,6 @@
       "status": "upcoming"
     },
     {
-      "id": "tr_0002088535001",
-      "issue_code": null,
-      "title": "Disney Sanat En Güzel Maceralar Serisi",
-      "country": "tr",
-      "country_name": "Turkey",
-      "country_flag": "🇹🇷",
-      "publisher": "Beta Kids",
-      "date": null,
-      "formatted_date": null,
-      "price": null,
-      "pages": null,
-      "ean": "0002088535001",
-      "cover_url": null,
-      "url": "https://www.dr.com.tr/kitap/disney-sanat-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088535001",
-      "source": "scraper",
-      "status": "upcoming"
-    },
-    {
       "id": "tr_0002088534001",
       "issue_code": null,
       "title": "Disney Müzik En Güzel Maceralar Serisi",
@@ -6578,6 +6475,24 @@
       "ean": "0002088534001",
       "cover_url": null,
       "url": "https://www.dr.com.tr/kitap/disney-muzik-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088534001",
+      "source": "scraper",
+      "status": "upcoming"
+    },
+    {
+      "id": "tr_0002088535001",
+      "issue_code": null,
+      "title": "Disney Sanat En Güzel Maceralar Serisi",
+      "country": "tr",
+      "country_name": "Turkey",
+      "country_flag": "🇹🇷",
+      "publisher": "Beta Kids",
+      "date": null,
+      "formatted_date": null,
+      "price": null,
+      "pages": null,
+      "ean": "0002088535001",
+      "cover_url": null,
+      "url": "https://www.dr.com.tr/kitap/disney-sanat-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088535001",
       "source": "scraper",
       "status": "upcoming"
     },
@@ -6690,24 +6605,6 @@
       "status": "upcoming"
     },
     {
-      "id": "tr_0002088537001",
-      "issue_code": null,
-      "title": "Disney Süper Kahraman En Güzel Maceralar Serisi",
-      "country": "tr",
-      "country_name": "Turkey",
-      "country_flag": "🇹🇷",
-      "publisher": "Beta Kids",
-      "date": null,
-      "formatted_date": null,
-      "price": null,
-      "pages": null,
-      "ean": "0002088537001",
-      "cover_url": null,
-      "url": "https://www.dr.com.tr/kitap/disney-super-kahraman-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088537001",
-      "source": "scraper",
-      "status": "upcoming"
-    },
-    {
       "id": "tr_0002088529001",
       "issue_code": null,
       "title": "Disney Antik Mısır En Güzel Maceralar Serisi",
@@ -6722,6 +6619,24 @@
       "ean": "0002088529001",
       "cover_url": null,
       "url": "https://www.dr.com.tr/kitap/disney-antik-misir-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088529001",
+      "source": "scraper",
+      "status": "upcoming"
+    },
+    {
+      "id": "tr_0002088537001",
+      "issue_code": null,
+      "title": "Disney Süper Kahraman En Güzel Maceralar Serisi",
+      "country": "tr",
+      "country_name": "Turkey",
+      "country_flag": "🇹🇷",
+      "publisher": "Beta Kids",
+      "date": null,
+      "formatted_date": null,
+      "price": null,
+      "pages": null,
+      "ean": "0002088537001",
+      "cover_url": null,
+      "url": "https://www.dr.com.tr/kitap/disney-super-kahraman-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088537001",
       "source": "scraper",
       "status": "upcoming"
     },
@@ -6942,24 +6857,6 @@
       "status": "upcoming"
     },
     {
-      "id": "tr_0002095418001",
-      "issue_code": null,
-      "title": "Disney Twisted-Wonderland Vol. 2 (Disney Twiste...",
-      "country": "tr",
-      "country_name": "Turkey",
-      "country_flag": "🇹🇷",
-      "publisher": "Beta Kids",
-      "date": null,
-      "formatted_date": null,
-      "price": null,
-      "pages": null,
-      "ean": "0002095418001",
-      "cover_url": null,
-      "url": "https://www.dr.com.tr/kitap/disney-twisted-wonderland-vol-2-disney-twisted-wonderland-/wakana-hazuki/foreign-languages/graphic-novel/graphic-novel/urunno=0002095418001",
-      "source": "scraper",
-      "status": "upcoming"
-    },
-    {
       "id": "tr_0002096059001",
       "issue_code": null,
       "title": "Disney Witch - Kayboluş",
@@ -6974,6 +6871,24 @@
       "ean": "0002096059001",
       "cover_url": null,
       "url": "https://www.dr.com.tr/kitap/disney-witch-kaybolus/kolektif/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002096059001",
+      "source": "scraper",
+      "status": "upcoming"
+    },
+    {
+      "id": "tr_0001965081001",
+      "issue_code": null,
+      "title": "Disney Kötüler Şehri",
+      "country": "tr",
+      "country_name": "Turkey",
+      "country_flag": "🇹🇷",
+      "publisher": "Beta Kids",
+      "date": null,
+      "formatted_date": null,
+      "price": null,
+      "pages": null,
+      "ean": "0001965081001",
+      "cover_url": null,
+      "url": "https://www.dr.com.tr/kitap/disney-kotuler-sehri/cocuk-ve-genclik/genclik-10-yas/fantastik-bilim-kurgu/urunno=0001965081001",
       "source": "scraper",
       "status": "upcoming"
     },

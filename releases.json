@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-16T08:30:52.701274+01:00",
-  "total_count": 415,
+  "generated_at": "2026-11-16T18:44:07.656141+01:00",
+  "total_count": 417,
   "countries": [
     {
       "code": "fr",
@@ -12,7 +12,7 @@
       "code": "it",
       "name": "Italy",
       "flag": "🇮🇹",
-      "count": 60
+      "count": 59
     },
     {
       "code": "us",
@@ -24,7 +24,7 @@
       "code": "tr",
       "name": "Turkey",
       "flag": "🇹🇷",
-      "count": 37
+      "count": 38
     },
     {
       "code": "de",
@@ -36,7 +36,7 @@
       "code": "hr",
       "name": "Croatia",
       "flag": "🇭🇷",
-      "count": 15
+      "count": 17
     },
     {
       "code": "gr",
@@ -687,7 +687,7 @@
       "pages": null,
       "ean": "14016_257",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/af/af35e5b41d0bd4be8d89f9c7bd1454f3.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_257;jsessionid=022E7035CEDC48E76F7A6026B1EBE14A",
+      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_257;jsessionid=BBC945D093D26113FC8FB54C1553C580",
       "source": "scraper",
       "status": "released"
     },
@@ -1097,7 +1097,7 @@
       "price": "6,50 €",
       "pages": null,
       "ean": "341363",
-      "cover_url": null,
+      "cover_url": "https://www.panini.it/media/catalog/product/1/w/1wdmix041sp3_0_1.jpg",
       "url": "https://www.panini.it/shp_ita_it/disney-mix-speciale-43-1wdmix041sp3-it08.html",
       "source": "scraper",
       "status": "released"
@@ -1117,24 +1117,6 @@
       "ean": "340469",
       "cover_url": "https://www.panini.it/media/catalog/product/1/w/1wsudi123_0_1.jpeg",
       "url": "https://www.panini.it/shp_ita_it/paperino-in-team-paperino-topolino-e-le-feste-in-compagnia-1wsudi123-it08.html",
-      "source": "scraper",
-      "status": "released"
-    },
-    {
-      "id": "it_340442",
-      "issue_code": null,
-      "title": "Topolino Sosia di Re Sorcio",
-      "country": "it",
-      "country_name": "Italy",
-      "country_flag": "🇮🇹",
-      "publisher": "Panini Comics",
-      "date": "2026-11-03",
-      "formatted_date": "Tuesday, November 3, 2026",
-      "price": "5,50 €",
-      "pages": null,
-      "ean": "340442",
-      "cover_url": "https://www.panini.it/media/catalog/product/1/W/1WTOCL003_0.jpg",
-      "url": "https://www.panini.it/shp_ita_it/topolino-sosia-di-re-sorcio-1wtocl003-it08.html",
       "source": "scraper",
       "status": "released"
     },
@@ -1648,7 +1630,7 @@
       "pages": null,
       "ean": "12228_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/ed/ed4704424caf41eb0904db9092da94e9.jpg",
-      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=022E7035CEDC48E76F7A6026B1EBE14A",
+      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=BBC945D093D26113FC8FB54C1553C580",
       "source": "scraper",
       "status": "released"
     },
@@ -1720,7 +1702,7 @@
       "pages": null,
       "ean": "13159_597",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/5f/5f662a891434dbec65d59e9bf7898563.jpg",
-      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=022E7035CEDC48E76F7A6026B1EBE14A",
+      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=BBC945D093D26113FC8FB54C1553C580",
       "source": "scraper",
       "status": "released"
     },
@@ -2186,7 +2168,7 @@
       "pages": null,
       "ean": "14068_76",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/a9/a944fd8df9bf4edf2ee81c41895ec88f.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=022E7035CEDC48E76F7A6026B1EBE14A",
+      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=BBC945D093D26113FC8FB54C1553C580",
       "source": "scraper",
       "status": "released"
     },
@@ -2204,7 +2186,7 @@
       "pages": null,
       "ean": "15420_1",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/f6/f61e2812c435ff4898d656cb6e28ba5d.jpg",
-      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=022E7035CEDC48E76F7A6026B1EBE14A",
+      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=BBC945D093D26113FC8FB54C1553C580",
       "source": "scraper",
       "status": "released"
     },
@@ -2526,7 +2508,7 @@
       "pages": null,
       "ean": "18658_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/e1/e1ab93323e556c5618ab556bcf721c01.jpg",
-      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=022E7035CEDC48E76F7A6026B1EBE14A",
+      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=BBC945D093D26113FC8FB54C1553C580",
       "source": "scraper",
       "status": "released"
     },
@@ -2813,6 +2795,23 @@
       "ean": null,
       "cover_url": "https://raw.githubusercontent.com/WizyxGH/disney-comics-watcher/datas/covers/de_esp2026_06a_001.jpg",
       "url": "https://inducks.org/issue.php?c=de%2FESP2026-06",
+      "source": "dbi",
+      "status": "released"
+    },
+    {
+      "id": "hr_MMH2026-06",
+      "issue_code": "MMH2026-06",
+      "title": "Miki Maus 6/2026",
+      "country": "hr",
+      "country_name": "Croatia",
+      "country_flag": "🇭🇷",
+      "date": "2026-06-01",
+      "formatted_date": "Monday, June 1, 2026",
+      "price": "4.50 EUR",
+      "pages": null,
+      "ean": null,
+      "cover_url": "https://raw.githubusercontent.com/WizyxGH/disney-comics-watcher/datas/covers/hr_mmh2026_06a_001.jpg",
+      "url": "https://inducks.org/issue.php?c=hr%2FMMH2026-06",
       "source": "dbi",
       "status": "released"
     },
@@ -6191,6 +6190,24 @@
       "status": "released"
     },
     {
+      "id": "tr_0001787710001",
+      "issue_code": null,
+      "title": "Yıldızlararası-Disney En Güzel Maceralar",
+      "country": "tr",
+      "country_name": "Turkey",
+      "country_flag": "🇹🇷",
+      "publisher": "Beta Kids",
+      "date": null,
+      "formatted_date": null,
+      "price": null,
+      "pages": null,
+      "ean": "0001787710001",
+      "cover_url": null,
+      "url": "https://www.dr.com.tr/kitap/yildizlararasi-disney-en-guzel-maceralar/cocuk-ve-genclik/genclik-10-yas/romanoyku/urunno=0001787710001",
+      "source": "scraper",
+      "status": "upcoming"
+    },
+    {
       "id": "tr_0002185492001",
       "issue_code": null,
       "title": "Disney En Güzel Maceralar  Ekoloji",
@@ -6223,24 +6240,6 @@
       "ean": "0002180961001",
       "cover_url": null,
       "url": "https://www.dr.com.tr/kitap/disney-en-guzel-maceralar-korsanlar/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002180961001",
-      "source": "scraper",
-      "status": "upcoming"
-    },
-    {
-      "id": "tr_0001787710001",
-      "issue_code": null,
-      "title": "Yıldızlararası-Disney En Güzel Maceralar",
-      "country": "tr",
-      "country_name": "Turkey",
-      "country_flag": "🇹🇷",
-      "publisher": "Beta Kids",
-      "date": null,
-      "formatted_date": null,
-      "price": null,
-      "pages": null,
-      "ean": "0001787710001",
-      "cover_url": null,
-      "url": "https://www.dr.com.tr/kitap/yildizlararasi-disney-en-guzel-maceralar/cocuk-ve-genclik/genclik-10-yas/romanoyku/urunno=0001787710001",
       "source": "scraper",
       "status": "upcoming"
     },
@@ -6443,9 +6442,9 @@
       "status": "upcoming"
     },
     {
-      "id": "tr_0002088533001",
+      "id": "tr_0002088540001",
       "issue_code": null,
-      "title": "Disney Mitoloji En Güzel Maceralar Serisi",
+      "title": "Disney Yarış En Güzel Maceralar Serisi",
       "country": "tr",
       "country_name": "Turkey",
       "country_flag": "🇹🇷",
@@ -6454,9 +6453,9 @@
       "formatted_date": null,
       "price": null,
       "pages": null,
-      "ean": "0002088533001",
+      "ean": "0002088540001",
       "cover_url": null,
-      "url": "https://www.dr.com.tr/kitap/disney-mitoloji-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088533001",
+      "url": "https://www.dr.com.tr/kitap/disney-yaris-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088540001",
       "source": "scraper",
       "status": "upcoming"
     },
@@ -6479,9 +6478,9 @@
       "status": "upcoming"
     },
     {
-      "id": "tr_0002088530001",
+      "id": "tr_0002088533001",
       "issue_code": null,
-      "title": "Disney Canavarlar En Güzel Maceralar Serisi",
+      "title": "Disney Mitoloji En Güzel Maceralar Serisi",
       "country": "tr",
       "country_name": "Turkey",
       "country_flag": "🇹🇷",
@@ -6490,9 +6489,9 @@
       "formatted_date": null,
       "price": null,
       "pages": null,
-      "ean": "0002088530001",
+      "ean": "0002088533001",
       "cover_url": null,
-      "url": "https://www.dr.com.tr/kitap/disney-canavarlar-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088530001",
+      "url": "https://www.dr.com.tr/kitap/disney-mitoloji-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088533001",
       "source": "scraper",
       "status": "upcoming"
     },
@@ -6533,6 +6532,24 @@
       "status": "upcoming"
     },
     {
+      "id": "tr_0002088530001",
+      "issue_code": null,
+      "title": "Disney Canavarlar En Güzel Maceralar Serisi",
+      "country": "tr",
+      "country_name": "Turkey",
+      "country_flag": "🇹🇷",
+      "publisher": "Beta Kids",
+      "date": null,
+      "formatted_date": null,
+      "price": null,
+      "pages": null,
+      "ean": "0002088530001",
+      "cover_url": null,
+      "url": "https://www.dr.com.tr/kitap/disney-canavarlar-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088530001",
+      "source": "scraper",
+      "status": "upcoming"
+    },
+    {
       "id": "tr_0002088531001",
       "issue_code": null,
       "title": "Disney Dedektif En Güzel Maceralar Serisi",
@@ -6569,24 +6586,6 @@
       "status": "upcoming"
     },
     {
-      "id": "tr_0002088537001",
-      "issue_code": null,
-      "title": "Disney Süper Kahraman En Güzel Maceralar Serisi",
-      "country": "tr",
-      "country_name": "Turkey",
-      "country_flag": "🇹🇷",
-      "publisher": "Beta Kids",
-      "date": null,
-      "formatted_date": null,
-      "price": null,
-      "pages": null,
-      "ean": "0002088537001",
-      "cover_url": null,
-      "url": "https://www.dr.com.tr/kitap/disney-super-kahraman-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088537001",
-      "source": "scraper",
-      "status": "upcoming"
-    },
-    {
       "id": "tr_0002088529001",
       "issue_code": null,
       "title": "Disney Antik Mısır En Güzel Maceralar Serisi",
@@ -6601,6 +6600,24 @@
       "ean": "0002088529001",
       "cover_url": null,
       "url": "https://www.dr.com.tr/kitap/disney-antik-misir-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088529001",
+      "source": "scraper",
+      "status": "upcoming"
+    },
+    {
+      "id": "tr_0002088537001",
+      "issue_code": null,
+      "title": "Disney Süper Kahraman En Güzel Maceralar Serisi",
+      "country": "tr",
+      "country_name": "Turkey",
+      "country_flag": "🇹🇷",
+      "publisher": "Beta Kids",
+      "date": null,
+      "formatted_date": null,
+      "price": null,
+      "pages": null,
+      "ean": "0002088537001",
+      "cover_url": null,
+      "url": "https://www.dr.com.tr/kitap/disney-super-kahraman-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088537001",
       "source": "scraper",
       "status": "upcoming"
     },
@@ -7033,6 +7050,24 @@
       "ean": "0011364602",
       "cover_url": "https://www.trafika.online/images/product/medium/20261102_162510-JYaS.webp",
       "url": "https://www.trafika.online/proizvod/70087/miki-maus-11-26",
+      "source": "scraper",
+      "status": "upcoming"
+    },
+    {
+      "id": "hr_130298",
+      "issue_code": null,
+      "title": "Miki Maus 6/2026",
+      "country": "hr",
+      "country_name": "Croatia",
+      "country_flag": "🇭🇷",
+      "publisher": "Egmont Hrvatska",
+      "date": null,
+      "formatted_date": null,
+      "price": "4.99 €",
+      "pages": null,
+      "ean": "130298",
+      "cover_url": "https://shop.egmont.hr/wp-content/uploads/2026/11/MM-6-26_page-0001-524x762.jpg",
+      "url": "https://shop.egmont.hr/proizvod/miki-maus-6-2026/",
       "source": "scraper",
       "status": "upcoming"
     },

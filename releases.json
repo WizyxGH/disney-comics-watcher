@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-16T18:44:07.656141+01:00",
-  "total_count": 417,
+  "generated_at": "2026-11-17T02:22:50.539897+01:00",
+  "total_count": 418,
   "countries": [
     {
       "code": "fr",
@@ -90,6 +90,12 @@
       "code": "es",
       "name": "Spain",
       "flag": "🇪🇸",
+      "count": 1
+    },
+    {
+      "code": "fi",
+      "name": "Finland",
+      "flag": "🇫🇮",
       "count": 1
     },
     {
@@ -370,6 +376,24 @@
       "status": "upcoming"
     },
     {
+      "id": "it_342468",
+      "issue_code": null,
+      "title": "Paper Storia 6",
+      "country": "it",
+      "country_name": "Italy",
+      "country_flag": "🇮🇹",
+      "publisher": "Panini Comics",
+      "date": "2026-11-23",
+      "formatted_date": "Monday, November 23, 2026",
+      "price": "4,50 €",
+      "pages": null,
+      "ean": "342468",
+      "cover_url": null,
+      "url": "https://www.panini.it/shp_ita_it/paper-storia-6-1wpsto006-it08.html",
+      "source": "scraper",
+      "status": "upcoming"
+    },
+    {
       "id": "it_342513",
       "issue_code": null,
       "title": "Disney Big 224",
@@ -493,7 +517,7 @@
       "cover_url": "https://www.lustiges-taschenbuch.de/sites/default/files/cover/LTB-617.jpg",
       "url": "https://www.lustiges-taschenbuch.de/ausgaben/alle-ausgaben/ltb-617",
       "source": "scraper",
-      "status": "upcoming"
+      "status": "released"
     },
     {
       "id": "de_LTB_617",
@@ -510,7 +534,24 @@
       "cover_url": "https://raw.githubusercontent.com/WizyxGH/disney-comics-watcher/datas/covers/de_ltb_0617a_001.jpg",
       "url": "https://inducks.org/issue.php?c=de%2FLTB+617",
       "source": "dbi",
-      "status": "upcoming"
+      "status": "released"
+    },
+    {
+      "id": "fi_AA2026-47",
+      "issue_code": "AA2026-47",
+      "title": "Aku Ankka 47/26",
+      "country": "fi",
+      "country_name": "Finland",
+      "country_flag": "🇫🇮",
+      "date": "2026-11-17",
+      "formatted_date": "Tuesday, November 17, 2026",
+      "price": null,
+      "pages": null,
+      "ean": null,
+      "cover_url": "https://raw.githubusercontent.com/WizyxGH/disney-comics-watcher/datas/covers/fi_aa2026_47a_001.jpg",
+      "url": "https://inducks.org/issue.php?c=fi%2FAA2026-47",
+      "source": "dbi",
+      "status": "released"
     },
     {
       "id": "dk_AAC2026-72",
@@ -687,7 +728,7 @@
       "pages": null,
       "ean": "14016_257",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/af/af35e5b41d0bd4be8d89f9c7bd1454f3.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_257;jsessionid=BBC945D093D26113FC8FB54C1553C580",
+      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_257;jsessionid=44C87DFD7355A300EB31C3C6E91D822D",
       "source": "scraper",
       "status": "released"
     },
@@ -1103,24 +1144,6 @@
       "status": "released"
     },
     {
-      "id": "it_340469",
-      "issue_code": null,
-      "title": "Paperino in Team: Paperino, Topolino e le Feste in Compagnia!",
-      "country": "it",
-      "country_name": "Italy",
-      "country_flag": "🇮🇹",
-      "publisher": "Panini Comics",
-      "date": "2026-11-03",
-      "formatted_date": "Tuesday, November 3, 2026",
-      "price": "6,50 €",
-      "pages": null,
-      "ean": "340469",
-      "cover_url": "https://www.panini.it/media/catalog/product/1/w/1wsudi123_0_1.jpeg",
-      "url": "https://www.panini.it/shp_ita_it/paperino-in-team-paperino-topolino-e-le-feste-in-compagnia-1wsudi123-it08.html",
-      "source": "scraper",
-      "status": "released"
-    },
-    {
       "id": "de_weihnachten_band_32",
       "issue_code": null,
       "title": "weihnachten - Nr.\n  32 Frohes Fest in Entenhausen 32",
@@ -1349,9 +1372,9 @@
       "status": "released"
     },
     {
-      "id": "de_LTB_Europareise_Band_7",
+      "id": "de_LTB_Phantomias_Collection_Band_6",
       "issue_code": null,
-      "title": "LTB-Europareise - Nr.\n  7 Osteuropa",
+      "title": "LTB-Phantomias-Collection - Nr.\n  6 LTB Phantomias Collection 6",
       "country": "de",
       "country_name": "Germany",
       "country_flag": "🇩🇪",
@@ -1360,9 +1383,9 @@
       "formatted_date": "Tuesday, October 27, 2026",
       "price": null,
       "pages": null,
-      "ean": "LTB_Europareise_Band_7",
-      "cover_url": "https://www.lustiges-taschenbuch.de/sites/default/files/cover/LTB-Europareise-7.jpg",
-      "url": "https://www.lustiges-taschenbuch.de/ausgaben/nebenreihen/LTB-Europareise/Band-7",
+      "ean": "LTB_Phantomias_Collection_Band_6",
+      "cover_url": "https://www.lustiges-taschenbuch.de/sites/default/files/cover/LTB-Phantomias-Collection-6.jpg",
+      "url": "https://www.lustiges-taschenbuch.de/ausgaben/nebenreihen/LTB-Phantomias-Collection/Band-6",
       "source": "scraper",
       "status": "released"
     },
@@ -1630,7 +1653,7 @@
       "pages": null,
       "ean": "12228_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/ed/ed4704424caf41eb0904db9092da94e9.jpg",
-      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=BBC945D093D26113FC8FB54C1553C580",
+      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=44C87DFD7355A300EB31C3C6E91D822D",
       "source": "scraper",
       "status": "released"
     },
@@ -1702,7 +1725,7 @@
       "pages": null,
       "ean": "13159_597",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/5f/5f662a891434dbec65d59e9bf7898563.jpg",
-      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=BBC945D093D26113FC8FB54C1553C580",
+      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=44C87DFD7355A300EB31C3C6E91D822D",
       "source": "scraper",
       "status": "released"
     },
@@ -2168,7 +2191,7 @@
       "pages": null,
       "ean": "14068_76",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/a9/a944fd8df9bf4edf2ee81c41895ec88f.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=BBC945D093D26113FC8FB54C1553C580",
+      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=44C87DFD7355A300EB31C3C6E91D822D",
       "source": "scraper",
       "status": "released"
     },
@@ -2186,7 +2209,7 @@
       "pages": null,
       "ean": "15420_1",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/f6/f61e2812c435ff4898d656cb6e28ba5d.jpg",
-      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=BBC945D093D26113FC8FB54C1553C580",
+      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=44C87DFD7355A300EB31C3C6E91D822D",
       "source": "scraper",
       "status": "released"
     },
@@ -2508,7 +2531,7 @@
       "pages": null,
       "ean": "18658_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/e1/e1ab93323e556c5618ab556bcf721c01.jpg",
-      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=BBC945D093D26113FC8FB54C1553C580",
+      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=44C87DFD7355A300EB31C3C6E91D822D",
       "source": "scraper",
       "status": "released"
     },
@@ -6190,24 +6213,6 @@
       "status": "released"
     },
     {
-      "id": "tr_0001787710001",
-      "issue_code": null,
-      "title": "Yıldızlararası-Disney En Güzel Maceralar",
-      "country": "tr",
-      "country_name": "Turkey",
-      "country_flag": "🇹🇷",
-      "publisher": "Beta Kids",
-      "date": null,
-      "formatted_date": null,
-      "price": null,
-      "pages": null,
-      "ean": "0001787710001",
-      "cover_url": null,
-      "url": "https://www.dr.com.tr/kitap/yildizlararasi-disney-en-guzel-maceralar/cocuk-ve-genclik/genclik-10-yas/romanoyku/urunno=0001787710001",
-      "source": "scraper",
-      "status": "upcoming"
-    },
-    {
       "id": "tr_0002185492001",
       "issue_code": null,
       "title": "Disney En Güzel Maceralar  Ekoloji",
@@ -6240,6 +6245,24 @@
       "ean": "0002180961001",
       "cover_url": null,
       "url": "https://www.dr.com.tr/kitap/disney-en-guzel-maceralar-korsanlar/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002180961001",
+      "source": "scraper",
+      "status": "upcoming"
+    },
+    {
+      "id": "tr_0001787710001",
+      "issue_code": null,
+      "title": "Yıldızlararası-Disney En Güzel Maceralar",
+      "country": "tr",
+      "country_name": "Turkey",
+      "country_flag": "🇹🇷",
+      "publisher": "Beta Kids",
+      "date": null,
+      "formatted_date": null,
+      "price": null,
+      "pages": null,
+      "ean": "0001787710001",
+      "cover_url": null,
+      "url": "https://www.dr.com.tr/kitap/yildizlararasi-disney-en-guzel-maceralar/cocuk-ve-genclik/genclik-10-yas/romanoyku/urunno=0001787710001",
       "source": "scraper",
       "status": "upcoming"
     },
@@ -6460,24 +6483,6 @@
       "status": "upcoming"
     },
     {
-      "id": "tr_0002088532001",
-      "issue_code": null,
-      "title": "Disney Futbol En Güzel Maceralar Serisi",
-      "country": "tr",
-      "country_name": "Turkey",
-      "country_flag": "🇹🇷",
-      "publisher": "Beta Kids",
-      "date": null,
-      "formatted_date": null,
-      "price": null,
-      "pages": null,
-      "ean": "0002088532001",
-      "cover_url": null,
-      "url": "https://www.dr.com.tr/kitap/disney-futbol-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088532001",
-      "source": "scraper",
-      "status": "upcoming"
-    },
-    {
       "id": "tr_0002088533001",
       "issue_code": null,
       "title": "Disney Mitoloji En Güzel Maceralar Serisi",
@@ -6492,6 +6497,24 @@
       "ean": "0002088533001",
       "cover_url": null,
       "url": "https://www.dr.com.tr/kitap/disney-mitoloji-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088533001",
+      "source": "scraper",
+      "status": "upcoming"
+    },
+    {
+      "id": "tr_0002088532001",
+      "issue_code": null,
+      "title": "Disney Futbol En Güzel Maceralar Serisi",
+      "country": "tr",
+      "country_name": "Turkey",
+      "country_flag": "🇹🇷",
+      "publisher": "Beta Kids",
+      "date": null,
+      "formatted_date": null,
+      "price": null,
+      "pages": null,
+      "ean": "0002088532001",
+      "cover_url": null,
+      "url": "https://www.dr.com.tr/kitap/disney-futbol-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088532001",
       "source": "scraper",
       "status": "upcoming"
     },

@@ -1054,12 +1054,7 @@
   "kathi-gr:564490936": "released",
   "kathi-gr:564490864": "released",
   "panini-it:340073": "released",
-  "_health": {
-    "ES": {
-      "empty_runs": 3,
-      "alerted": false
-    }
-  },
+  "_health": {},
   "es:341708": "announced",
   "es:341705": "announced",
   "es:341714": "announced",
@@ -1563,5 +1558,7 @@
   "lt:press_express_donaldas-ir-kiti": "released",
   "lt:press_express_donaldas-ir-kiti-1993-auksine-donaldo-kolekcija": "released",
   "tr:0002095418001": "released",
-  "hr:130298": "released"
+  "hr:130298": "released",
+  "panini-it:342468": "announced",
+  "fi:fi-aa2026-47": "released"
 }

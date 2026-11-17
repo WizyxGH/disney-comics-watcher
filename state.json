@@ -1054,7 +1054,12 @@
   "kathi-gr:564490936": "released",
   "kathi-gr:564490864": "released",
   "panini-it:340073": "released",
-  "_health": {},
+  "_health": {
+    "ES": {
+      "empty_runs": 1,
+      "alerted": false
+    }
+  },
   "es:341708": "announced",
   "es:341705": "announced",
   "es:341714": "announced",
@@ -1560,5 +1565,6 @@
   "tr:0002095418001": "released",
   "hr:130298": "released",
   "panini-it:342468": "announced",
-  "fi:fi-aa2026-47": "released"
+  "fi:fi-aa2026-47": "released",
+  "ltb-de:ltb_618": "released"
 }

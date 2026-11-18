@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-17T19:57:22.142836+01:00",
+  "generated_at": "2026-11-18T02:28:42.587362+01:00",
   "total_count": 422,
   "countries": [
     {
@@ -522,7 +522,7 @@
       "cover_url": "https://www.panini.it/media/catalog/product/1/w/1wtopo3704_0.jpeg",
       "url": "https://www.panini.it/shp_ita_it/topolino-3704-1wtopo3704-it08.html",
       "source": "scraper",
-      "status": "upcoming"
+      "status": "released"
     },
     {
       "id": "it_344358",
@@ -540,7 +540,7 @@
       "cover_url": "https://www.panini.it/media/catalog/product/1/w/1wtopo3704v_0.jpg",
       "url": "https://www.panini.it/shp_ita_it/topolino-3704-con-calendario-da-tavolo-2027-1wtopo3704v-it08.html",
       "source": "scraper",
-      "status": "upcoming"
+      "status": "released"
     },
     {
       "id": "fr_9782344075135",
@@ -558,7 +558,7 @@
       "cover_url": "https://www.images.hachette-livre.fr/media/imgArticle/GLENAT/2026/9782344075135-001-X.jpeg",
       "url": "https://www.glenat.com/glenat-disney/la-grande-histoire-de-picsou-tome-04-9782344075135",
       "source": "scraper",
-      "status": "upcoming"
+      "status": "released"
     },
     {
       "id": "de_ltb_617",
@@ -787,7 +787,7 @@
       "pages": null,
       "ean": "14016_257",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/af/af35e5b41d0bd4be8d89f9c7bd1454f3.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_257;jsessionid=73DE4EFED7B81957DB753FBB133E8281",
+      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_257;jsessionid=434C13B3450399A9F2AA6FD3904B1A1B",
       "source": "scraper",
       "status": "released"
     },
@@ -1450,6 +1450,24 @@
       "status": "released"
     },
     {
+      "id": "gr_564490858",
+      "issue_code": null,
+      "title": "Μίκυ Μάους #645 ΕΛΕΥΘΕΡΗ ΖΩΝΗ 2",
+      "country": "gr",
+      "country_name": "Greece",
+      "country_flag": "🇬🇷",
+      "publisher": "Kathimerini",
+      "date": "2026-10-23",
+      "formatted_date": "Friday, October 23, 2026",
+      "price": "N/A (Kiosk)",
+      "pages": null,
+      "ean": "564490858",
+      "cover_url": "https://i.prcdn.co/img?cid=464B&page=1&height=1200",
+      "url": "https://www.kathimerini.gr/k/disney/564490858/miky-maoys-645-eleytheri-zoni-2/",
+      "source": "scraper",
+      "status": "released"
+    },
+    {
       "id": "fr_14513_15",
       "issue_code": null,
       "title": "MICKEY JUNIOR HS JEUX - N°15",
@@ -1607,7 +1625,7 @@
       "pages": null,
       "ean": "tidsam_0687_202611",
       "cover_url": "https://www.tidsam.se/covers/hq/cover_0687_202611.jpg",
-      "url": "https://www.tidsam.se/magazines/kalle-ankas-pocket-589-0687-sv/",
+      "url": "https://www.tidsam.se/magazines/kalle-ankas-pocket-586-0687-sv/",
       "source": "scraper",
       "status": "released"
     },
@@ -1646,6 +1664,42 @@
       "status": "released"
     },
     {
+      "id": "gr_564490897",
+      "issue_code": null,
+      "title": "Super MIKY #134 ΕΝΑ ΟΧΙ ΚΑΙ ΤΟΣΟ ΦΙΛΙΚΟ ΤΟΥΡΝΟΥΑ",
+      "country": "gr",
+      "country_name": "Greece",
+      "country_flag": "🇬🇷",
+      "publisher": "Kathimerini",
+      "date": "2026-10-18",
+      "formatted_date": "Sunday, October 18, 2026",
+      "price": "N/A (Kiosk)",
+      "pages": null,
+      "ean": "564490897",
+      "cover_url": "https://i.prcdn.co/img?cid=464B&page=1&height=1200",
+      "url": "https://www.kathimerini.gr/k/disney/564490897/super-miky-134-ena-ochi-kai-toso-filiko-toyrnoya/",
+      "source": "scraper",
+      "status": "released"
+    },
+    {
+      "id": "gr_564490843",
+      "issue_code": null,
+      "title": "Μίκυ Μάους #644 ΕΛΕΥΘΕΡΗ ΖΩΝΗ 1",
+      "country": "gr",
+      "country_name": "Greece",
+      "country_flag": "🇬🇷",
+      "publisher": "Kathimerini",
+      "date": "2026-10-16",
+      "formatted_date": "Friday, October 16, 2026",
+      "price": "N/A (Kiosk)",
+      "pages": null,
+      "ean": "564490843",
+      "cover_url": "https://i.prcdn.co/img?cid=464B&page=1&height=1200",
+      "url": "https://www.kathimerini.gr/k/disney/564490843/miky-maoys-644-eleytheri-zoni-1/",
+      "source": "scraper",
+      "status": "released"
+    },
+    {
       "id": "fr_12228_3",
       "issue_code": null,
       "title": "SUPER PICSOU GÉANT HS DOUBLE DUCK - N°3",
@@ -1659,7 +1713,7 @@
       "pages": null,
       "ean": "12228_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/ed/ed4704424caf41eb0904db9092da94e9.jpg",
-      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=73DE4EFED7B81957DB753FBB133E8281",
+      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=434C13B3450399A9F2AA6FD3904B1A1B",
       "source": "scraper",
       "status": "released"
     },
@@ -1731,7 +1785,7 @@
       "pages": null,
       "ean": "13159_597",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/5f/5f662a891434dbec65d59e9bf7898563.jpg",
-      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=73DE4EFED7B81957DB753FBB133E8281",
+      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=434C13B3450399A9F2AA6FD3904B1A1B",
       "source": "scraper",
       "status": "released"
     },
@@ -2058,6 +2112,24 @@
       "status": "released"
     },
     {
+      "id": "gr_564478549",
+      "issue_code": null,
+      "title": "Μίκυ Μάους #641 Η ΑΓΝΩΣΤΗ ΩΔΗ 1",
+      "country": "gr",
+      "country_name": "Greece",
+      "country_flag": "🇬🇷",
+      "publisher": "Kathimerini",
+      "date": "2026-09-25",
+      "formatted_date": "Friday, September 25, 2026",
+      "price": "N/A (Kiosk)",
+      "pages": null,
+      "ean": "564478549",
+      "cover_url": "https://i.prcdn.co/img?cid=464B&page=1&height=1200",
+      "url": "https://www.kathimerini.gr/k/disney/564478549/miky-maoys-641-i-agnosti-odi-1/",
+      "source": "scraper",
+      "status": "released"
+    },
+    {
       "id": "us_58029",
       "issue_code": null,
       "title": "Gargoyles Quest Trade Paperback",
@@ -2179,7 +2251,7 @@
       "pages": null,
       "ean": "14068_76",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/a9/a944fd8df9bf4edf2ee81c41895ec88f.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=73DE4EFED7B81957DB753FBB133E8281",
+      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=434C13B3450399A9F2AA6FD3904B1A1B",
       "source": "scraper",
       "status": "released"
     },
@@ -2197,7 +2269,7 @@
       "pages": null,
       "ean": "15420_1",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/f6/f61e2812c435ff4898d656cb6e28ba5d.jpg",
-      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=73DE4EFED7B81957DB753FBB133E8281",
+      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=434C13B3450399A9F2AA6FD3904B1A1B",
       "source": "scraper",
       "status": "released"
     },
@@ -2519,7 +2591,7 @@
       "pages": null,
       "ean": "18658_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/e1/e1ab93323e556c5618ab556bcf721c01.jpg",
-      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=73DE4EFED7B81957DB753FBB133E8281",
+      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=434C13B3450399A9F2AA6FD3904B1A1B",
       "source": "scraper",
       "status": "released"
     },
@@ -3693,7 +3765,7 @@
       "price": "14.90 €",
       "pages": null,
       "ean": "9788852247378",
-      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261112_6c5d1f9074eb4842a406d4af370f740d_ccf2b2e4-e73f-4512-9617-56b956d93578.jpg?v=1794462845",
+      "cover_url": "https://cdn.shopify.com/s/files/1/0729/8357/6897/files/20261118_6c5d1f9074eb4842a406d4af370f740d.jpg?v=1794963734",
       "url": "https://www.giunti.it/products/paperpuccini-disney-walt-9788852247378",
       "source": "scraper",
       "status": "released"
@@ -6201,78 +6273,6 @@
       "status": "released"
     },
     {
-      "id": "gr_564490858",
-      "issue_code": null,
-      "title": "Μίκυ Μάους #645 ΕΛΕΥΘΕΡΗ ΖΩΝΗ 2",
-      "country": "gr",
-      "country_name": "Greece",
-      "country_flag": "🇬🇷",
-      "publisher": "Kathimerini",
-      "date": null,
-      "formatted_date": null,
-      "price": "N/A (Kiosk)",
-      "pages": null,
-      "ean": "564490858",
-      "cover_url": "https://i.prcdn.co/img?cid=464B&page=1&height=1200",
-      "url": "https://www.kathimerini.gr/k/disney/564490858/miky-maoys-645-eleytheri-zoni-2/",
-      "source": "scraper",
-      "status": "upcoming"
-    },
-    {
-      "id": "gr_564490897",
-      "issue_code": null,
-      "title": "Super MIKY #134 ΕΝΑ ΟΧΙ ΚΑΙ ΤΟΣΟ ΦΙΛΙΚΟ ΤΟΥΡΝΟΥΑ",
-      "country": "gr",
-      "country_name": "Greece",
-      "country_flag": "🇬🇷",
-      "publisher": "Kathimerini",
-      "date": null,
-      "formatted_date": null,
-      "price": "N/A (Kiosk)",
-      "pages": null,
-      "ean": "564490897",
-      "cover_url": "https://i.prcdn.co/img?cid=464B&page=1&height=1200",
-      "url": "https://www.kathimerini.gr/k/disney/564490897/super-miky-134-ena-ochi-kai-toso-filiko-toyrnoya/",
-      "source": "scraper",
-      "status": "upcoming"
-    },
-    {
-      "id": "gr_564490843",
-      "issue_code": null,
-      "title": "Μίκυ Μάους #644 ΕΛΕΥΘΕΡΗ ΖΩΝΗ 1",
-      "country": "gr",
-      "country_name": "Greece",
-      "country_flag": "🇬🇷",
-      "publisher": "Kathimerini",
-      "date": null,
-      "formatted_date": null,
-      "price": "N/A (Kiosk)",
-      "pages": null,
-      "ean": "564490843",
-      "cover_url": "https://i.prcdn.co/img?cid=464B&page=1&height=1200",
-      "url": "https://www.kathimerini.gr/k/disney/564490843/miky-maoys-644-eleytheri-zoni-1/",
-      "source": "scraper",
-      "status": "upcoming"
-    },
-    {
-      "id": "gr_564478549",
-      "issue_code": null,
-      "title": "Μίκυ Μάους #641 Η ΑΓΝΩΣΤΗ ΩΔΗ 1",
-      "country": "gr",
-      "country_name": "Greece",
-      "country_flag": "🇬🇷",
-      "publisher": "Kathimerini",
-      "date": null,
-      "formatted_date": null,
-      "price": "N/A (Kiosk)",
-      "pages": null,
-      "ean": "564478549",
-      "cover_url": "https://i.prcdn.co/img?cid=464B&page=1&height=1200",
-      "url": "https://www.kathimerini.gr/k/disney/564478549/miky-maoys-641-i-agnosti-odi-1/",
-      "source": "scraper",
-      "status": "upcoming"
-    },
-    {
       "id": "tr_0001787710001",
       "issue_code": null,
       "title": "Yıldızlararası-Disney En Güzel Maceralar",
@@ -6381,24 +6381,6 @@
       "status": "upcoming"
     },
     {
-      "id": "tr_0001787711001",
-      "issue_code": null,
-      "title": "Tarih Öncesi-Disney En Güzel Maceralar",
-      "country": "tr",
-      "country_name": "Turkey",
-      "country_flag": "🇹🇷",
-      "publisher": "Beta Kids",
-      "date": null,
-      "formatted_date": null,
-      "price": null,
-      "pages": null,
-      "ean": "0001787711001",
-      "cover_url": null,
-      "url": "https://www.dr.com.tr/kitap/tarih-oncesi-disney-en-guzel-maceralar/cocuk-ve-genclik/genclik-10-yas/romanoyku/urunno=0001787711001",
-      "source": "scraper",
-      "status": "upcoming"
-    },
-    {
       "id": "tr_0001787708001",
       "issue_code": null,
       "title": "Bilim Kurgu-Disney En Güzel Maceralar",
@@ -6413,6 +6395,24 @@
       "ean": "0001787708001",
       "cover_url": null,
       "url": "https://www.dr.com.tr/kitap/bilim-kurgu-disney-en-guzel-maceralar/cocuk-ve-genclik/okul-cagi-6-10-yas/cocuk-fantastikbilim-kurgu/urunno=0001787708001",
+      "source": "scraper",
+      "status": "upcoming"
+    },
+    {
+      "id": "tr_0001787711001",
+      "issue_code": null,
+      "title": "Tarih Öncesi-Disney En Güzel Maceralar",
+      "country": "tr",
+      "country_name": "Turkey",
+      "country_flag": "🇹🇷",
+      "publisher": "Beta Kids",
+      "date": null,
+      "formatted_date": null,
+      "price": null,
+      "pages": null,
+      "ean": "0001787711001",
+      "cover_url": null,
+      "url": "https://www.dr.com.tr/kitap/tarih-oncesi-disney-en-guzel-maceralar/cocuk-ve-genclik/genclik-10-yas/romanoyku/urunno=0001787711001",
       "source": "scraper",
       "status": "upcoming"
     },
@@ -6993,24 +6993,6 @@
       "status": "upcoming"
     },
     {
-      "id": "mx_222029",
-      "issue_code": null,
-      "title": "THE AMAZING SPIDER-MAN #10 PORTADA VARIANTE DISNEY 100",
-      "country": "mx",
-      "country_name": "Mexico",
-      "country_flag": "🇲🇽",
-      "publisher": "Panini Comics México",
-      "date": null,
-      "formatted_date": null,
-      "price": "$129.00",
-      "pages": null,
-      "ean": "222029",
-      "cover_url": "https://tiendapanini.com.mx/media/catalog/product/q/a/qaspi010v1_1200px.jpg",
-      "url": "https://tiendapanini.com.mx/the-amazing-spider-man-10-portada-variante-disney-100",
-      "source": "scraper",
-      "status": "upcoming"
-    },
-    {
       "id": "mx_213286",
       "issue_code": null,
       "title": "THE AMAZING SPIDER-MAN #9 PORTADA VARIANTE DISNEY",
@@ -7025,6 +7007,24 @@
       "ean": "213286",
       "cover_url": "https://tiendapanini.com.mx/media/catalog/product/q/a/qaspi009v1_cover_1200px.jpg",
       "url": "https://tiendapanini.com.mx/the-amazing-spider-man-9-portada-variante-disney",
+      "source": "scraper",
+      "status": "upcoming"
+    },
+    {
+      "id": "mx_222029",
+      "issue_code": null,
+      "title": "THE AMAZING SPIDER-MAN #10 PORTADA VARIANTE DISNEY 100",
+      "country": "mx",
+      "country_name": "Mexico",
+      "country_flag": "🇲🇽",
+      "publisher": "Panini Comics México",
+      "date": null,
+      "formatted_date": null,
+      "price": "$129.00",
+      "pages": null,
+      "ean": "222029",
+      "cover_url": "https://tiendapanini.com.mx/media/catalog/product/q/a/qaspi010v1_1200px.jpg",
+      "url": "https://tiendapanini.com.mx/the-amazing-spider-man-10-portada-variante-disney-100",
       "source": "scraper",
       "status": "upcoming"
     },
@@ -7065,24 +7065,6 @@
       "status": "upcoming"
     },
     {
-      "id": "mx_404002",
-      "issue_code": null,
-      "title": "Qué Pasaría Si…? El Pato Donald Fuera Thor",
-      "country": "mx",
-      "country_name": "Mexico",
-      "country_flag": "🇲🇽",
-      "publisher": "Panini Comics México",
-      "date": null,
-      "formatted_date": null,
-      "price": "$89.00",
-      "pages": null,
-      "ean": "404002",
-      "cover_url": "https://tiendapanini.com.mx/media/catalog/product/q/w/qwhif003_1200_1.jpg",
-      "url": "https://tiendapanini.com.mx/que-pasaria-si-el-pato-donald-fuera-thor",
-      "source": "scraper",
-      "status": "upcoming"
-    },
-    {
       "id": "mx_418983",
       "issue_code": null,
       "title": "El Pato Donald En La Copa Mundial De La FIFA",
@@ -7097,6 +7079,24 @@
       "ean": "418983",
       "cover_url": "https://tiendapanini.com.mx/media/catalog/product/q/t/qtopo001_1200.jpg",
       "url": "https://tiendapanini.com.mx/el-pato-donald-en-la-copa-mundial-de-la-fifa",
+      "source": "scraper",
+      "status": "upcoming"
+    },
+    {
+      "id": "mx_404002",
+      "issue_code": null,
+      "title": "Qué Pasaría Si…? El Pato Donald Fuera Thor",
+      "country": "mx",
+      "country_name": "Mexico",
+      "country_flag": "🇲🇽",
+      "publisher": "Panini Comics México",
+      "date": null,
+      "formatted_date": null,
+      "price": "$89.00",
+      "pages": null,
+      "ean": "404002",
+      "cover_url": "https://tiendapanini.com.mx/media/catalog/product/q/w/qwhif003_1200_1.jpg",
+      "url": "https://tiendapanini.com.mx/que-pasaria-si-el-pato-donald-fuera-thor",
       "source": "scraper",
       "status": "upcoming"
     },

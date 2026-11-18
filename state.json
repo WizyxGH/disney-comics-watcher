@@ -698,7 +698,7 @@
   "egmont-de:200/03509": "released",
   "panini-it:332689": "announced",
   "panini-it:332698": "announced",
-  "glenat:9782344075135": "announced",
+  "glenat:9782344075135": "released",
   "panini-br:419799": "announced",
   "panini-br:419760": "announced",
   "panini-it:332746": "announced",
@@ -1054,7 +1054,12 @@
   "kathi-gr:564490936": "released",
   "kathi-gr:564490864": "released",
   "panini-it:340073": "released",
-  "_health": {},
+  "_health": {
+    "ES": {
+      "empty_runs": 1,
+      "alerted": false
+    }
+  },
   "es:341708": "announced",
   "es:341705": "announced",
   "es:341714": "announced",
@@ -1458,8 +1463,8 @@
   "se:tidsam_5979_202601": "released",
   "se:tidsam_4810_202611": "released",
   "se:tidsam_4869_202601": "released",
-  "panini-it:344358": "announced",
-  "panini-it:349262": "announced",
+  "panini-it:344358": "released",
+  "panini-it:349262": "released",
   "lt:donaldas-ir-kiti--mitai-ir-legendos-8msi5": "released",
   "lt:donaldas-ir-kiti--vidurnakcio-nuotykis-ir-paslaptinga-knyga-8up4o": "released",
   "lt:donaldas-ir-kiti--kelione-i-atomo-centra-ir-kas-pasaulyje-turtingiausias-8hgx5": "released",

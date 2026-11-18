@@ -288,7 +288,7 @@ def discover_from_scrapers() -> list[dict]:
 
                     results.append({
                         "id": f"{cc}_{ean or title.lower().replace(' ', '_')[:30]}",
-                        "issue_code": b.get("issue_code"),
+                        "issue_code": b.get("issue_code") or b.get("issue_path"),
                         "title": title,
                         "country": cc,
                         "country_name": c_info["name"],

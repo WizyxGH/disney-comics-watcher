@@ -300,9 +300,26 @@ def enrich_gr_metadata(info: dict) -> dict:
     if cid and not info.get("_skip_pressreader_network"):
         manifest = fetch_pressreader_issue_manifest(cid, slug)
         if manifest:
-            info["cover_url"] = manifest["cover_url"]
-            info["summary_page_url"] = manifest["summary_page_url"]
-            info["pages"] = manifest["total_pages"]
+            # Check if PressReader's manifest date matches this issue's release date
+            manifest_date = (manifest.get("issue_date") or "")[:10].replace("-", "")
+            raw_date = info.get("date")
+            info_date = None
+            if raw_date:
+                m = re.search(r'(\d{2})/(\d{2})/(\d{4})', str(raw_date))
+                if m:
+                    info_date = f"{m.group(3)}{m.group(2)}{m.group(1)}"
+                else:
+                    m2 = re.search(r'(\d{4})-(\d{2})-(\d{2})', str(raw_date))
+                    if m2:
+                        info_date = f"{m2.group(1)}{m2.group(2)}{m2.group(3)}"
+
+            # Only overwrite cover_url if PressReader actually has THIS issue
+            # If PressReader is still serving an older issue, preserve the article's specific cover
+            if not info_date or manifest_date == info_date:
+                info["cover_url"] = manifest["cover_url"]
+
+            info["summary_page_url"] = manifest.get("summary_page_url")
+            info["pages"] = manifest.get("total_pages") or info.get("pages")
             info["pressreader_manifest"] = manifest
 
     if not info.get("cover_url"):

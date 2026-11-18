@@ -1056,7 +1056,7 @@
   "panini-it:340073": "released",
   "_health": {
     "ES": {
-      "empty_runs": 2,
+      "empty_runs": 3,
       "alerted": false
     }
   },
@@ -1569,5 +1569,7 @@
   "ltb-de:ltb_618": "released",
   "is:41abffb9-7723-4087-be06-c9d4c0870b1c": "released",
   "nl:11477706277206": "released",
-  "kathi-gr:564562132": "released"
+  "kathi-gr:564562132": "released",
+  "kathi-gr:564562150": "released",
+  "bg:5407": "announced"
 }

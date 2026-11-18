@@ -28,5 +28,6 @@ tests_cache/
 local_tests/
 inducks.db
 .inducks-story-tables/
+.inducks-cache/
 *.db
 *.tmp

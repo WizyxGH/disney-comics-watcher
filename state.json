@@ -972,7 +972,7 @@
   "fi:fi-aa2026-43": "released",
   "ltb-de:ltb_617": "released",
   "panini-it:340067": "announced",
-  "panini-it:340082": "announced",
+  "panini-it:340082": "released",
   "panini-it:340460": "announced",
   "fantagraphics:10369487503606": "released",
   "fantagraphics:10369488552182": "released",
@@ -1056,7 +1056,11 @@
   "panini-it:340073": "released",
   "_health": {
     "ES": {
-      "empty_runs": 3,
+      "empty_runs": 4,
+      "alerted": false
+    },
+    "SE": {
+      "empty_runs": 1,
       "alerted": false
     }
   },
@@ -1125,7 +1129,7 @@
   "dk:udgivelse-aa_20_2026": "released",
   "dk:udgivelse-aa_46_2026": "released",
   "dk:udgivelse-aa_21_2026": "released",
-  "dk:udgivelse-aa_47_2026": "announced",
+  "dk:udgivelse-aa_47_2026": "released",
   "dk:udgivelse-aa_22_2026": "released",
   "dk:udgivelse-aa_48_2026": "announced",
   "dk:udgivelse-aa_23+24_2026": "released",
@@ -1375,7 +1379,7 @@
   "nl:10911388500310": "released",
   "ltb-de:LTB_Kleine_Helden_Band_1": "released",
   "panini-it:347793": "released",
-  "panini-it:340079": "announced",
+  "panini-it:340079": "released",
   "panini-it:342402": "released",
   "panini-it:342411": "released",
   "panini-it:342414": "released",
@@ -1571,5 +1575,9 @@
   "nl:11477706277206": "released",
   "kathi-gr:564562132": "released",
   "kathi-gr:564562150": "released",
-  "bg:5407": "announced"
+  "bg:5407": "announced",
+  "fantagraphics:10434765357302": "released",
+  "fantagraphics:10434765586678": "released",
+  "panini-it:344349": "announced",
+  "panini-it:344352": "announced"
 }

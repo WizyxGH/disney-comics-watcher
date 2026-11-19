@@ -1055,8 +1055,8 @@
   "kathi-gr:564490864": "released",
   "panini-it:340073": "released",
   "_health": {
-    "SE": {
-      "empty_runs": 2,
+    "Panini IT": {
+      "empty_runs": 1,
       "alerted": false
     }
   },
@@ -1575,5 +1575,8 @@
   "fantagraphics:10434765357302": "released",
   "fantagraphics:10434765586678": "released",
   "panini-it:344349": "announced",
-  "panini-it:344352": "announced"
+  "panini-it:344352": "announced",
+  "se:tidsam_0720_202647": "released",
+  "se:tidsam_0687_202612": "released",
+  "se:tidsam_0661_202608": "released"
 }

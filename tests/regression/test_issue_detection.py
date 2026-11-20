@@ -73,6 +73,22 @@ class IssueCodeDetection(unittest.TestCase):
         self.assertEqual(self.resolve("ميكي #1184", "eg"), "eg/MNM1184")
         self.assertEqual(self.resolve("ميكي جيب 79", "eg"), "eg/MMP  79")
 
+    def test_egypt_comic_filtering(self):
+        from src.scrapers.eg import _is_valid_disney_comic_eg
+        # Rejected: preschool, coloring, activities, storybooks
+        self.assertFalse(_is_valid_disney_comic_eg("حكاياتي الأولى: ميكي والديناصور"))
+        self.assertFalse(_is_valid_disney_comic_eg("اروع الحكايات  ميكي وميمي"))
+        self.assertFalse(_is_valid_disney_comic_eg("إبحث عن ميكى و أصدقائه"))
+        self.assertFalse(_is_valid_disney_comic_eg("ديزنى A.B.C"))
+        self.assertFalse(_is_valid_disney_comic_eg("Super Coloring  Mickey"))
+        self.assertFalse(_is_valid_disney_comic_eg("كيف ترسم  أبطال ديزنى"))
+        # Accepted: real comics / magazines / Inducks publications
+        self.assertTrue(_is_valid_disney_comic_eg("مجلة ميكي العدد 1184"))
+        self.assertTrue(_is_valid_disney_comic_eg("مجلد ميكي رقم 108"))
+        self.assertTrue(_is_valid_disney_comic_eg("ميكي جيب عدد 79"))
+        self.assertTrue(_is_valid_disney_comic_eg("ديزني كوميكس - بط جوووول"))
+        self.assertTrue(_is_valid_disney_comic_eg("سوبر بطوط 12"))
+
     def test_year_month_numbering(self):
         self.assertEqual(self.resolve("Макрокомикс 10/2026", "bg"), "bg/MAC 2026-10")
 

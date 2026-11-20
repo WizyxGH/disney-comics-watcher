@@ -4,6 +4,8 @@ eg.py
 Scraper for Egyptian Disney comics published by Nahdet Misr (دار نهضة مصر).
 Extracts releases from the official Nahdet Misr online bookstore
 (nahdetmisrbookstore.com) and resolves product metadata, pricing, and HD covers.
+Strictly filters out preschool, coloring, activity, and non-comic books,
+retaining only genuine Disney comics (BD) that belong to Inducks publications.
 """
 
 import re
@@ -11,29 +13,71 @@ import json
 import urllib.parse
 from bs4 import BeautifulSoup
 from src.utils import get_session
+from src.dbi.isv_search import search_publication_code
 
-DISNEY_KEYWORDS = [
-    "ميكي", "ميكى", "ديزني", "ديزنى", "بطوط", "دهب", "بندق", "أميرات",
-    "disney", "mickey", "donald", "scrooge", "goofy", "minnie"
+# Preschool / activity / coloring / learning books that contain NO comics and are never on Inducks
+NON_COMIC_EXCLUDE = [
+    # Arabic exclusions
+    'تلوين', 'أنشطة', 'انشطة', 'نشاط', 'إبحث عن', 'ابحث عن',
+    'كيف ترسم', 'حجم كبير', 'حكاياتي الأولى', 'حكاياتي الاولى',
+    '365 قصة', '365قصة', 'أجمل الحكايات', 'اجمل الحكايات',
+    'وصفات', 'الجمع و الطرح', 'addition', 'الاعداد', 'أستمع و تعلم',
+    'تعليمية', 'ملصقات', 'مانجا', 'cd', 'اسطوانة', 'ألعاب', 'العاب',
+    'سلسلة ابدأ', 'كلمة وقصة', 'خط عربي', 'الخط العربي', 'درب نفسك',
+    # English exclusions
+    'coloring', 'activity', 'activities', 'learning', 'how to draw', 'first stories',
+    'storybook', 'cookbook', 'recipes', 'flash cards', 'puzzle', 'sound book',
+    'jumbo coloring', 'color and play', 'phonics', 'levels of reading', 'movie night',
+    '5-minutes', '5 minutes'
+]
+
+# Genuine Disney comic / BD magazines and albums published in Egypt (matching Inducks series)
+COMIC_SERIES_KEYWORDS = [
+    'مجلة ميكي', 'مجلة ميكى', 'ميكي جيب', 'ميكى جيب',
+    'مجلد ميكي', 'مجلد ميكى', 'مجلد ميكي جيب', 'مجلد ميكى جيب',
+    'ميكي مكس', 'ميكى مكس', 'سوبر ميكي', 'سوبر ميكى',
+    'ديزني كوميكس', 'ديزنى كوميكس', 'سوبر بطوط', 'مغامرات بطوط', 'مغامرات عم دهب',
+    'بطوط الذهبى', 'بطوط الذهبي', 'ميكى الذهبى', 'ميكي الذهبي',
+    'فرسان المجرة', 'دراكولا', 'فرانكشتاين', 'هاملت', 'بطل من ورق'
 ]
 
 SEARCH_QUERIES = [
-    "ميكي", "ديزني", "بطوط", "دهب", "Disney", "Mickey"
+    "مجلة ميكي", "مجلد ميكي", "ميكي جيب", "سوبر ميكي", "ديزني كوميكس", "ميكي"
 ]
 
 
-def _is_disney_comic(title: str) -> bool:
-    """Checks whether the title is genuinely a Disney release."""
+def _is_valid_disney_comic_eg(title: str) -> bool:
+    """
+    Checks whether the title is genuinely a Disney comic (BD) indexed on Inducks.
+    Rejects coloring, activity, preschool, and non-comic books.
+    """
     if not title:
         return False
     t = title.lower()
-    return any(k in t for k in DISNEY_KEYWORDS)
+
+    # 1. Strictly reject coloring / activity / preschool books
+    if any(exc in t for exc in NON_COMIC_EXCLUDE):
+        return False
+
+    # 2. Check if title matches known Egyptian comic series keywords
+    if any(k in t for k in COMIC_SERIES_KEYWORDS):
+        return True
+
+    # 3. Check if Inducks resolves it to an Egyptian comic publication code
+    try:
+        code = search_publication_code(title, "eg")
+        if code and code.startswith("eg/"):
+            return True
+    except Exception:
+        pass
+
+    return False
 
 
 def discover_nahdet_misr_eg() -> list[dict]:
     """
-    Discovers Disney comics and books published by Nahdet Misr (Egypt).
-    Queries the official Nahdet Misr store for Disney publications.
+    Discovers Disney comics and magazines published by Nahdet Misr (Egypt).
+    Queries the official Nahdet Misr store for Disney comic publications.
     """
     s = get_session()
     result = []
@@ -49,7 +93,7 @@ def discover_nahdet_misr_eg() -> list[dict]:
             soup = BeautifulSoup(r.text, "html.parser")
             for title_el in soup.find_all(class_="product-title"):
                 title = title_el.text.strip()
-                if not _is_disney_comic(title):
+                if not _is_valid_disney_comic_eg(title):
                     continue
 
                 parent = title_el

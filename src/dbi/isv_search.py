@@ -181,6 +181,17 @@ CANONICAL_SERIES: dict[str, dict[str, str]] = {
         "la grande epopee de picsou": "fr/GHP",
         "les grands heros disney": "fr/GHD",
         "creations originales": "fr/DBG",
+    },
+    "eg": {
+        "مجلة ميكي": "eg/MNM",
+        "ميكي": "eg/MNM",
+        "mickey": "eg/MNM",
+        "miki": "eg/MNM",
+        "ميكي جيب": "eg/MMP",
+        "سوبر ميكي": "eg/SM",
+        "مجلد ميكي": "eg/MNV",
+        "أميرات": "eg/PN",
+        "princess": "eg/PN",
     }
 }
 

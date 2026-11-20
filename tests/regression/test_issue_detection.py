@@ -68,6 +68,11 @@ class IssueCodeDetection(unittest.TestCase):
     def test_number_followed_by_a_subtitle(self):
         self.assertEqual(self.resolve("Uncle Scrooge Legacy #464: The McDuck Journals", "us"), "us/US 464")
 
+    def test_egypt_mickey_resolution(self):
+        self.assertEqual(self.resolve("مجلة ميكي 1184", "eg"), "eg/MNM1184")
+        self.assertEqual(self.resolve("ميكي #1184", "eg"), "eg/MNM1184")
+        self.assertEqual(self.resolve("ميكي جيب 79", "eg"), "eg/MMP  79")
+
     def test_year_month_numbering(self):
         self.assertEqual(self.resolve("Макрокомикс 10/2026", "bg"), "bg/MAC 2026-10")
 

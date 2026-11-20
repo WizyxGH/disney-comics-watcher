@@ -48,6 +48,9 @@ PUBLICATIONS = [
     # Germany: "Sonderband" must not be read as "Sonder" + "Band 134".
     ("de/LTB",   "Lustiges Taschenbuch",         [("613", "2026-07-20")], []),
     ("de/LTBSP", "Lustiges Taschenbuch Spezial", [("133", "2026-05-01")], []),
+    # Egypt: Mickey and Mickey Geib (Nahdet Misr).
+    ("eg/MNM",   "ميكي",                         [("1183", "2026-10-01"), ("1184", "2026-10-08", "eg/MNM1184")], []),
+    ("eg/MMP",   "ميكي جيب",                     [("78", "2026-05-01"), ("79", "2026-06-01", "eg/MMP  79")], []),
 ]
 
 STORIES = ["H 2013-227", "I PKA  42-1", "HC DD2025-38"]

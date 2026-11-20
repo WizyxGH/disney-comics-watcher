@@ -1055,12 +1055,8 @@
   "kathi-gr:564490864": "released",
   "panini-it:340073": "released",
   "_health": {
-    "Panini IT": {
-      "empty_runs": 2,
-      "alerted": false
-    },
     "ES": {
-      "empty_runs": 1,
+      "empty_runs": 2,
       "alerted": false
     }
   },
@@ -1527,8 +1523,8 @@
   "tr:0001965081001": "released",
   "es:341711": "announced",
   "es:341717": "announced",
-  "panini-it:342513": "announced",
-  "panini-it:342483": "announced",
+  "panini-it:342513": "released",
+  "panini-it:342483": "released",
   "lt:donaldas-ir-kiti-ramaputros-galva-ir-kelione-i-zemes-centra": "released",
   "lt:neimanoma-misija-marse": "released",
   "giunti-it:giunti_15362831876474": "released",
@@ -1582,5 +1578,6 @@
   "panini-it:344352": "announced",
   "se:tidsam_0720_202647": "released",
   "se:tidsam_0687_202612": "released",
-  "se:tidsam_0661_202608": "released"
+  "se:tidsam_0661_202608": "released",
+  "panini-it:342465": "announced"
 }

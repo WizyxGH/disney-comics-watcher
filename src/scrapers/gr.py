@@ -18,6 +18,14 @@ GREEK_PUB_MAP = {
     "464E": "gr/ECA"
 }
 
+GREEK_PRICES = {
+    "464B": "1,90 €",
+    "464A": "1,90 €",
+    "464D": "3,50 €",
+    "464C": "3,90 €",
+    "464E": "4,50 €",
+}
+
 CID_MAP = {
     "μίκυ μάους": "464B", "miky": "464B",
     "κόμιξ": "464D", "komix": "464D",
@@ -108,13 +116,20 @@ def _process_kathimerini_article(a_tag, s: requests.Session) -> dict | None:
     if not cover_url:
         cover_url = art_img or (f"https://i.prcdn.co/img?cid={cid}&page=1&height=1200" if cid else None)
 
+    # Extract price from article or fallback to standard Greek series price
+    price_val = GREEK_PRICES.get(cid, "1,90 €")
+    if article_html_content:
+        m_pr = re.search(r'(?:€\s*(\d+[,\.]\d{2})|(\d+[,\.]\d{2})\s*€)', article_html_content)
+        if m_pr:
+            price_val = f"{(m_pr.group(1) or m_pr.group(2)).replace('.', ',')} €"
+
     return {
         "id": art_id,
         "title": title_text,
         "url": url,
         "issue_code": canonical_issue_path,
         "issue_path": canonical_issue_path,
-        "price": "N/A (Kiosk)",
+        "price": price_val,
         "cover_url": cover_url,
         "date": date_val,
         "summary": "",

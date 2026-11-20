@@ -176,6 +176,8 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
                     data["date"] = info["date"]
                 if info.get("pages"):
                     data["pages"] = info["pages"]
+                if info.get("price"):
+                    data["price"] = info["price"]
                 if info.get("stories"):
                     # Serials split into their parts, strips per page, invented codes:
                     # only from the Inducks data (src/dbi/story_rules.py).
@@ -196,6 +198,8 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
                     data["date"] = info["date"]
                 if info.get("pages"):
                     data["pages"] = info["pages"]
+                if info.get("price"):
+                    data["price"] = info["price"]
                 if info.get("stories"):
                     from src.dbi.story_rules import apply_story_rules
                     info["stories"] = apply_story_rules(info["stories"])

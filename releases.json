@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-21T19:36:05.673493+01:00",
+  "generated_at": "2026-11-22T00:40:12.548641+01:00",
   "total_count": 431,
   "countries": [
     {
@@ -179,7 +179,7 @@
       "price": "$4.99",
       "pages": null,
       "ean": "61951",
-      "cover_url": "https://cdn11.bigcommerce.com/s-fle6qzf7oq/stencil/original/e/a7415cf0-a8bc-013f-98fe-7a0ab0adebcf/img/ProductDefault.svg",
+      "cover_url": "https://cdn11.bigcommerce.com/s-fle6qzf7oq/images/stencil/original/products/61951/61356/14502_source_1795243680__76143.1795296054.jpg?c=1",
       "url": "https://disney.dynamite.com/products.php?productId=61951",
       "source": "scraper",
       "status": "upcoming"
@@ -251,7 +251,7 @@
       "price": "$4.99",
       "pages": null,
       "ean": "61948",
-      "cover_url": "https://cdn11.bigcommerce.com/s-fle6qzf7oq/stencil/original/e/a7415cf0-a8bc-013f-98fe-7a0ab0adebcf/img/ProductDefault.svg",
+      "cover_url": "https://cdn11.bigcommerce.com/s-fle6qzf7oq/images/stencil/original/products/61948/61353/14490_source_1795243659__26245.1795296050.jpg?c=1",
       "url": "https://disney.dynamite.com/products.php?productId=61948",
       "source": "scraper",
       "status": "upcoming"
@@ -394,7 +394,7 @@
       "price": "$4.99",
       "pages": null,
       "ean": "61950",
-      "cover_url": "https://cdn11.bigcommerce.com/s-fle6qzf7oq/stencil/original/e/a7415cf0-a8bc-013f-98fe-7a0ab0adebcf/img/ProductDefault.svg",
+      "cover_url": "https://cdn11.bigcommerce.com/s-fle6qzf7oq/images/stencil/original/products/61950/61355/14498_source_1795243674__47491.1795296053.jpg?c=1",
       "url": "https://disney.dynamite.com/products.php?productId=61950",
       "source": "scraper",
       "status": "upcoming"
@@ -1053,7 +1053,7 @@
       "pages": null,
       "ean": "14016_257",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/af/af35e5b41d0bd4be8d89f9c7bd1454f3.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_257;jsessionid=3D655EB13C0532B9AC07874DF5077713",
+      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_257;jsessionid=6D905064DB7220788CDD645AA7CD3A5C",
       "source": "scraper",
       "status": "released"
     },
@@ -1888,7 +1888,7 @@
       "pages": null,
       "ean": "12228_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/ed/ed4704424caf41eb0904db9092da94e9.jpg",
-      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=3D655EB13C0532B9AC07874DF5077713",
+      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=6D905064DB7220788CDD645AA7CD3A5C",
       "source": "scraper",
       "status": "released"
     },
@@ -1960,7 +1960,7 @@
       "pages": null,
       "ean": "13159_597",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/5f/5f662a891434dbec65d59e9bf7898563.jpg",
-      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=3D655EB13C0532B9AC07874DF5077713",
+      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=6D905064DB7220788CDD645AA7CD3A5C",
       "source": "scraper",
       "status": "released"
     },
@@ -2372,7 +2372,7 @@
       "pages": null,
       "ean": "14068_76",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/a9/a944fd8df9bf4edf2ee81c41895ec88f.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=3D655EB13C0532B9AC07874DF5077713",
+      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=6D905064DB7220788CDD645AA7CD3A5C",
       "source": "scraper",
       "status": "released"
     },
@@ -2390,7 +2390,7 @@
       "pages": null,
       "ean": "15420_1",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/f6/f61e2812c435ff4898d656cb6e28ba5d.jpg",
-      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=3D655EB13C0532B9AC07874DF5077713",
+      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=6D905064DB7220788CDD645AA7CD3A5C",
       "source": "scraper",
       "status": "released"
     },
@@ -2712,7 +2712,7 @@
       "pages": null,
       "ean": "18658_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/e1/e1ab93323e556c5618ab556bcf721c01.jpg",
-      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=3D655EB13C0532B9AC07874DF5077713",
+      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=6D905064DB7220788CDD645AA7CD3A5C",
       "source": "scraper",
       "status": "released"
     },
@@ -6699,24 +6699,6 @@
       "status": "upcoming"
     },
     {
-      "id": "tr_0002088532001",
-      "issue_code": null,
-      "title": "Disney Futbol En Güzel Maceralar Serisi",
-      "country": "tr",
-      "country_name": "Turkey",
-      "country_flag": "🇹🇷",
-      "publisher": "Beta Kids",
-      "date": null,
-      "formatted_date": null,
-      "price": null,
-      "pages": null,
-      "ean": "0002088532001",
-      "cover_url": null,
-      "url": "https://www.dr.com.tr/kitap/disney-futbol-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088532001",
-      "source": "scraper",
-      "status": "upcoming"
-    },
-    {
       "id": "tr_0002088530001",
       "issue_code": null,
       "title": "Disney Canavarlar En Güzel Maceralar Serisi",
@@ -6731,6 +6713,24 @@
       "ean": "0002088530001",
       "cover_url": null,
       "url": "https://www.dr.com.tr/kitap/disney-canavarlar-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088530001",
+      "source": "scraper",
+      "status": "upcoming"
+    },
+    {
+      "id": "tr_0002088532001",
+      "issue_code": null,
+      "title": "Disney Futbol En Güzel Maceralar Serisi",
+      "country": "tr",
+      "country_name": "Turkey",
+      "country_flag": "🇹🇷",
+      "publisher": "Beta Kids",
+      "date": null,
+      "formatted_date": null,
+      "price": null,
+      "pages": null,
+      "ean": "0002088532001",
+      "cover_url": null,
+      "url": "https://www.dr.com.tr/kitap/disney-futbol-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088532001",
       "source": "scraper",
       "status": "upcoming"
     },
@@ -7005,24 +7005,6 @@
       "status": "upcoming"
     },
     {
-      "id": "tr_0002217315001",
-      "issue_code": null,
-      "title": "Disney Stiç - Bahar Coşkusu - Disney Okuma Adım...",
-      "country": "tr",
-      "country_name": "Turkey",
-      "country_flag": "🇹🇷",
-      "publisher": "Beta Kids",
-      "date": null,
-      "formatted_date": null,
-      "price": null,
-      "pages": null,
-      "ean": "0002217315001",
-      "cover_url": null,
-      "url": "https://www.dr.com.tr/kitap/disney-stic-bahar-coskusu-disney-okuma-adimlarim-2/virginia-murphy/cocuk-ve-genclik/okul-cagi-6-10-yas/cocuk-kitaplari/urunno=0002217315001",
-      "source": "scraper",
-      "status": "upcoming"
-    },
-    {
       "id": "tr_0002192864001",
       "issue_code": null,
       "title": "Disney Pixar Arabalar",
@@ -7037,6 +7019,24 @@
       "ean": "0002192864001",
       "cover_url": null,
       "url": "https://www.dr.com.tr/kitap/disney-pixar-arabalar/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002192864001",
+      "source": "scraper",
+      "status": "upcoming"
+    },
+    {
+      "id": "tr_0002217315001",
+      "issue_code": null,
+      "title": "Disney Stiç - Bahar Coşkusu - Disney Okuma Adım...",
+      "country": "tr",
+      "country_name": "Turkey",
+      "country_flag": "🇹🇷",
+      "publisher": "Beta Kids",
+      "date": null,
+      "formatted_date": null,
+      "price": null,
+      "pages": null,
+      "ean": "0002217315001",
+      "cover_url": null,
+      "url": "https://www.dr.com.tr/kitap/disney-stic-bahar-coskusu-disney-okuma-adimlarim-2/virginia-murphy/cocuk-ve-genclik/okul-cagi-6-10-yas/cocuk-kitaplari/urunno=0002217315001",
       "source": "scraper",
       "status": "upcoming"
     },

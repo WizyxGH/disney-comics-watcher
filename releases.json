@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-21T12:57:27.326566+01:00",
+  "generated_at": "2026-11-21T19:36:05.673493+01:00",
   "total_count": 431,
   "countries": [
     {
@@ -1053,7 +1053,7 @@
       "pages": null,
       "ean": "14016_257",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/af/af35e5b41d0bd4be8d89f9c7bd1454f3.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_257;jsessionid=9900307A096E4F57D393E6BDA27E5B56",
+      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_257;jsessionid=3D655EB13C0532B9AC07874DF5077713",
       "source": "scraper",
       "status": "released"
     },
@@ -1184,6 +1184,42 @@
       "status": "released"
     },
     {
+      "id": "fr_14067_3882-3883",
+      "issue_code": null,
+      "title": "Journal de Mickey - N°3882-3883",
+      "country": "fr",
+      "country_name": "France",
+      "country_flag": "🇫🇷",
+      "publisher": "Kiosque Presse",
+      "date": "2026-11-10",
+      "formatted_date": "Tuesday, November 10, 2026",
+      "price": null,
+      "pages": null,
+      "ean": "14067_3882-3883",
+      "cover_url": "https://cdn.direct-editeurs.fr/parutions/a4/a4107727eaeae869baa936ca3489c876.jpg",
+      "url": "https://direct-editeurs.fr/magazine/14067_le-journal-de-mickey_3882-3883",
+      "source": "scraper",
+      "status": "released"
+    },
+    {
+      "id": "fr_15190_40",
+      "issue_code": null,
+      "title": "Les Chroniques de Fantomiald - N°40",
+      "country": "fr",
+      "country_name": "France",
+      "country_flag": "🇫🇷",
+      "publisher": "Kiosque Presse",
+      "date": "2026-11-10",
+      "formatted_date": "Tuesday, November 10, 2026",
+      "price": null,
+      "pages": null,
+      "ean": "15190_40",
+      "cover_url": "https://cdn.direct-editeurs.fr/parutions/62/625ff385f56e76ff4fcb4ab1ed220254.jpg",
+      "url": "https://direct-editeurs.fr/magazine/15190_les-chroniques-de-fantomiald_40",
+      "source": "scraper",
+      "status": "released"
+    },
+    {
       "id": "se_tidsam_5979_202601",
       "issue_code": "se/KA",
       "title": "Kalle Anka Jul i Ankeborg",
@@ -1234,42 +1270,6 @@
       "ean": "tidsam_4869_202601",
       "cover_url": "https://www.tidsam.se/covers/hq/cover_4869_202601.jpg",
       "url": "https://www.tidsam.se/magazines/kalle-anka-onskar-god-jul-4869-sv/",
-      "source": "scraper",
-      "status": "released"
-    },
-    {
-      "id": "fr_14067_3882-3883",
-      "issue_code": null,
-      "title": "Journal de Mickey - N°3882-3883",
-      "country": "fr",
-      "country_name": "France",
-      "country_flag": "🇫🇷",
-      "publisher": "Kiosque Presse",
-      "date": "2026-11-10",
-      "formatted_date": "Tuesday, November 10, 2026",
-      "price": null,
-      "pages": null,
-      "ean": "14067_3882-3883",
-      "cover_url": "https://cdn.direct-editeurs.fr/parutions/a4/a4107727eaeae869baa936ca3489c876.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14067_le-journal-de-mickey_3882-3883",
-      "source": "scraper",
-      "status": "released"
-    },
-    {
-      "id": "fr_15190_40",
-      "issue_code": null,
-      "title": "Les Chroniques de Fantomiald - N°40",
-      "country": "fr",
-      "country_name": "France",
-      "country_flag": "🇫🇷",
-      "publisher": "Kiosque Presse",
-      "date": "2026-11-10",
-      "formatted_date": "Tuesday, November 10, 2026",
-      "price": null,
-      "pages": null,
-      "ean": "15190_40",
-      "cover_url": "https://cdn.direct-editeurs.fr/parutions/62/625ff385f56e76ff4fcb4ab1ed220254.jpg",
-      "url": "https://direct-editeurs.fr/magazine/15190_les-chroniques-de-fantomiald_40",
       "source": "scraper",
       "status": "released"
     },
@@ -1888,7 +1888,7 @@
       "pages": null,
       "ean": "12228_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/ed/ed4704424caf41eb0904db9092da94e9.jpg",
-      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=9900307A096E4F57D393E6BDA27E5B56",
+      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=3D655EB13C0532B9AC07874DF5077713",
       "source": "scraper",
       "status": "released"
     },
@@ -1960,7 +1960,7 @@
       "pages": null,
       "ean": "13159_597",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/5f/5f662a891434dbec65d59e9bf7898563.jpg",
-      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=9900307A096E4F57D393E6BDA27E5B56",
+      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=3D655EB13C0532B9AC07874DF5077713",
       "source": "scraper",
       "status": "released"
     },
@@ -2372,7 +2372,7 @@
       "pages": null,
       "ean": "14068_76",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/a9/a944fd8df9bf4edf2ee81c41895ec88f.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=9900307A096E4F57D393E6BDA27E5B56",
+      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=3D655EB13C0532B9AC07874DF5077713",
       "source": "scraper",
       "status": "released"
     },
@@ -2390,7 +2390,7 @@
       "pages": null,
       "ean": "15420_1",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/f6/f61e2812c435ff4898d656cb6e28ba5d.jpg",
-      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=9900307A096E4F57D393E6BDA27E5B56",
+      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=3D655EB13C0532B9AC07874DF5077713",
       "source": "scraper",
       "status": "released"
     },
@@ -2712,7 +2712,7 @@
       "pages": null,
       "ean": "18658_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/e1/e1ab93323e556c5618ab556bcf721c01.jpg",
-      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=9900307A096E4F57D393E6BDA27E5B56",
+      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=3D655EB13C0532B9AC07874DF5077713",
       "source": "scraper",
       "status": "released"
     },

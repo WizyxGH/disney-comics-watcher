@@ -102,9 +102,9 @@ def main():
     # A caption in the exact HTML shape notify_magazine() produces.
     CAPTION = (
         "<b>Picsou Magazine 580</b>\n\n"
-        "\U0001f4b6 Price: 6,50 €\n"
-        "\U0001f4c5 Published: 10/06/2026\n"
-        "\U0001f4c5 On newsstands until: 15/07/2026\n\n"
+        "Price: 6,50 €\n"
+        "Released: 10/06/2026\n"
+        "On newsstands until: 15/07/2026\n\n"
         "<i>A cover summary with an &amp; ampersand and \"quotes\" to check unescaping.</i>"
     )
     BUTTONS = [

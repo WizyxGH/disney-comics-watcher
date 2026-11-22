@@ -501,9 +501,9 @@ def notify_magazine(info: dict, releve_date: str | None = None):
 
     title_line = f"<b>{html_lib.escape(name)} {num}</b>"
     lines = [title_line, ""]
-    if prix: lines.append(f"💶 Price: {html_lib.escape(prix)}")
-    if date: lines.append(f"📅 Published: {date}")
-    if releve_date: lines.append(f"📅 On newsstands until: {releve_date}")
+    if prix: lines.append(f"Price: {html_lib.escape(prix)}")
+    if date: lines.append(f"Released: {date}")
+    if releve_date: lines.append(f"On newsstands until: {releve_date}")
     
     # The Inducks button is filled in by _dispatch_notification.
     buttons = [[{"text": "View Source", "url": url}], [{"text": "Search on Inducks", "url": ""}]]
@@ -549,9 +549,9 @@ def notify_glenat_announce(album: dict, state: dict | None = None):
     raw_title = album.get("title", "Album Disney")
 
     lines = [f"<b>Announcement — {title}</b>", ""]
-    if album.get("date"): lines.append(f"🗓 Expected release: {album['date']}")
+    if album.get("date"): lines.append(f"Expected release: {album['date']}")
     prix = format_price_fr(album.get("price"))
-    if prix: lines.append(f"💶 Price: {html_lib.escape(prix)}")
+    if prix: lines.append(f"Price: {html_lib.escape(prix)}")
 
     _dispatch_notification(
         info=album,
@@ -570,9 +570,9 @@ def notify_glenat_release(album: dict, state: dict | None = None):
     raw_title = album.get("title", "Album Disney")
 
     lines = [f"<b>{title}</b>", ""]
-    if album.get("date"): lines.append(f"🗓 Released: {album['date']}")
+    if album.get("date"): lines.append(f"Released: {album['date']}")
     prix = format_price_fr(album.get("price"))
-    if prix: lines.append(f"💶 Price: {html_lib.escape(prix)}")
+    if prix: lines.append(f"Price: {html_lib.escape(prix)}")
 
     _dispatch_notification(
         info=album,
@@ -585,17 +585,12 @@ def notify_glenat_release(album: dict, state: dict | None = None):
     )
 
 def notify_international_comic(album: dict, state: dict | None = None, country: str = "us", event_type: str = "announce"):
-    """Generic notification function for international releases (US, DE, GR)."""
+    """Generic notification function for international releases (US, DE, GR, etc.)."""
     title = html_lib.escape(album.get("title", f"{country.upper()} Disney Comic"))
     raw_title = album.get("title", f"{country.upper()} Disney Comic")
 
-    # Only the price symbol varies per country; everything else is shared.
-    PRICE_PREFIX = {
-        "us": "💵 Price:", "br": "💵 Price:", "eg": "EGP Price:",
-        "de": "💶 Price:", "gr": "💶 Price:", "it": "💶 Price:",
-    }
-    date_prefix  = "🗓 Expected release:" if event_type == "announce" else "🗓 Released:"
-    price_prefix = PRICE_PREFIX.get(country, "Price:")
+    date_prefix  = "Expected release:" if event_type == "announce" else "Released:"
+    price_prefix = "Price:"
 
     lines = [f"<b>Announcement — {title}</b>" if event_type == "announce" else f"<b>{title}</b>", ""]
     if album.get("date"): lines.append(f"{date_prefix} {album['date']}")

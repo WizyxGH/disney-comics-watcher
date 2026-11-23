@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-22T21:09:36.517575+01:00",
+  "generated_at": "2026-11-23T02:18:32.076013+01:00",
   "total_count": 431,
   "countries": [
     {
@@ -540,7 +540,7 @@
       "cover_url": "https://www.panini.it/media/catalog/product/1/w/1wpsto006_0.jpeg",
       "url": "https://www.panini.it/shp_ita_it/paper-storia-6-1wpsto006-it08.html",
       "source": "scraper",
-      "status": "upcoming"
+      "status": "released"
     },
     {
       "id": "it_342513",
@@ -805,7 +805,7 @@
       "pages": null,
       "ean": "tidsam_0687_202612",
       "cover_url": "https://www.tidsam.se/covers/hq/cover_0687_202612.jpg",
-      "url": "https://www.tidsam.se/magazines/kalle-ankas-pocket-590-0687-sv/",
+      "url": "https://www.tidsam.se/magazines/kalle-ankas-pocket-584-0687-sv/",
       "source": "scraper",
       "status": "released"
     },
@@ -1053,7 +1053,7 @@
       "pages": null,
       "ean": "14016_257",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/af/af35e5b41d0bd4be8d89f9c7bd1454f3.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_257;jsessionid=09395E25F7BBEAD79612ABB3D91EA903",
+      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_257;jsessionid=94CD1373D66346FAC0736B62D32D99DC",
       "source": "scraper",
       "status": "released"
     },
@@ -1416,24 +1416,6 @@
       "status": "released"
     },
     {
-      "id": "de_spezial_band_133",
-      "issue_code": null,
-      "title": "spezial - Nr.\n  133 Guten Appetit!",
-      "country": "de",
-      "country_name": "Germany",
-      "country_flag": "🇩🇪",
-      "publisher": "Egmont LTB",
-      "date": "2026-11-03",
-      "formatted_date": "Tuesday, November 3, 2026",
-      "price": null,
-      "pages": null,
-      "ean": "spezial_band_133",
-      "cover_url": "https://www.lustiges-taschenbuch.de/sites/default/files/cover/LTB-Spezial-133.jpg",
-      "url": "https://www.lustiges-taschenbuch.de/ausgaben/nebenreihen/spezial/band-133",
-      "source": "scraper",
-      "status": "released"
-    },
-    {
       "id": "de_weihnachten_band_32",
       "issue_code": null,
       "title": "weihnachten - Nr.\n  32 Frohes Fest in Entenhausen 32",
@@ -1448,6 +1430,24 @@
       "ean": "weihnachten_band_32",
       "cover_url": "https://www.lustiges-taschenbuch.de/sites/default/files/cover/LTB-Weihnachten-32.jpg",
       "url": "https://www.lustiges-taschenbuch.de/ausgaben/nebenreihen/weihnachten/band-32",
+      "source": "scraper",
+      "status": "released"
+    },
+    {
+      "id": "de_spezial_band_133",
+      "issue_code": null,
+      "title": "spezial - Nr.\n  133 Guten Appetit!",
+      "country": "de",
+      "country_name": "Germany",
+      "country_flag": "🇩🇪",
+      "publisher": "Egmont LTB",
+      "date": "2026-11-03",
+      "formatted_date": "Tuesday, November 3, 2026",
+      "price": null,
+      "pages": null,
+      "ean": "spezial_band_133",
+      "cover_url": "https://www.lustiges-taschenbuch.de/sites/default/files/cover/LTB-Spezial-133.jpg",
+      "url": "https://www.lustiges-taschenbuch.de/ausgaben/nebenreihen/spezial/band-133",
       "source": "scraper",
       "status": "released"
     },
@@ -1643,9 +1643,9 @@
       "status": "released"
     },
     {
-      "id": "de_LTB_Phantomias_Collection_Band_6",
+      "id": "de_LTB_Europareise_Band_7",
       "issue_code": null,
-      "title": "LTB-Phantomias-Collection - Nr.\n  6 LTB Phantomias Collection 6",
+      "title": "LTB-Europareise - Nr.\n  7 Osteuropa",
       "country": "de",
       "country_name": "Germany",
       "country_flag": "🇩🇪",
@@ -1654,9 +1654,9 @@
       "formatted_date": "Tuesday, October 27, 2026",
       "price": null,
       "pages": null,
-      "ean": "LTB_Phantomias_Collection_Band_6",
-      "cover_url": "https://www.lustiges-taschenbuch.de/sites/default/files/cover/LTB-Phantomias-Collection-6.jpg",
-      "url": "https://www.lustiges-taschenbuch.de/ausgaben/nebenreihen/LTB-Phantomias-Collection/Band-6",
+      "ean": "LTB_Europareise_Band_7",
+      "cover_url": "https://www.lustiges-taschenbuch.de/sites/default/files/cover/LTB-Europareise-7.jpg",
+      "url": "https://www.lustiges-taschenbuch.de/ausgaben/nebenreihen/LTB-Europareise/Band-7",
       "source": "scraper",
       "status": "released"
     },
@@ -1888,7 +1888,7 @@
       "pages": null,
       "ean": "12228_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/ed/ed4704424caf41eb0904db9092da94e9.jpg",
-      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=09395E25F7BBEAD79612ABB3D91EA903",
+      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=94CD1373D66346FAC0736B62D32D99DC",
       "source": "scraper",
       "status": "released"
     },
@@ -1960,7 +1960,7 @@
       "pages": null,
       "ean": "13159_597",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/5f/5f662a891434dbec65d59e9bf7898563.jpg",
-      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=09395E25F7BBEAD79612ABB3D91EA903",
+      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=94CD1373D66346FAC0736B62D32D99DC",
       "source": "scraper",
       "status": "released"
     },
@@ -2372,7 +2372,7 @@
       "pages": null,
       "ean": "14068_76",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/a9/a944fd8df9bf4edf2ee81c41895ec88f.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=09395E25F7BBEAD79612ABB3D91EA903",
+      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=94CD1373D66346FAC0736B62D32D99DC",
       "source": "scraper",
       "status": "released"
     },
@@ -2390,7 +2390,7 @@
       "pages": null,
       "ean": "15420_1",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/f6/f61e2812c435ff4898d656cb6e28ba5d.jpg",
-      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=09395E25F7BBEAD79612ABB3D91EA903",
+      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=94CD1373D66346FAC0736B62D32D99DC",
       "source": "scraper",
       "status": "released"
     },
@@ -2712,7 +2712,7 @@
       "pages": null,
       "ean": "18658_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/e1/e1ab93323e556c5618ab556bcf721c01.jpg",
-      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=09395E25F7BBEAD79612ABB3D91EA903",
+      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=94CD1373D66346FAC0736B62D32D99DC",
       "source": "scraper",
       "status": "released"
     },
@@ -6663,42 +6663,6 @@
       "status": "upcoming"
     },
     {
-      "id": "tr_0002088534001",
-      "issue_code": null,
-      "title": "Disney Müzik En Güzel Maceralar Serisi",
-      "country": "tr",
-      "country_name": "Turkey",
-      "country_flag": "🇹🇷",
-      "publisher": "Beta Kids",
-      "date": null,
-      "formatted_date": null,
-      "price": null,
-      "pages": null,
-      "ean": "0002088534001",
-      "cover_url": null,
-      "url": "https://www.dr.com.tr/kitap/disney-muzik-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088534001",
-      "source": "scraper",
-      "status": "upcoming"
-    },
-    {
-      "id": "tr_0002088535001",
-      "issue_code": null,
-      "title": "Disney Sanat En Güzel Maceralar Serisi",
-      "country": "tr",
-      "country_name": "Turkey",
-      "country_flag": "🇹🇷",
-      "publisher": "Beta Kids",
-      "date": null,
-      "formatted_date": null,
-      "price": null,
-      "pages": null,
-      "ean": "0002088535001",
-      "cover_url": null,
-      "url": "https://www.dr.com.tr/kitap/disney-sanat-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088535001",
-      "source": "scraper",
-      "status": "upcoming"
-    },
-    {
       "id": "tr_0002088533001",
       "issue_code": null,
       "title": "Disney Mitoloji En Güzel Maceralar Serisi",
@@ -6717,6 +6681,24 @@
       "status": "upcoming"
     },
     {
+      "id": "tr_0002088534001",
+      "issue_code": null,
+      "title": "Disney Müzik En Güzel Maceralar Serisi",
+      "country": "tr",
+      "country_name": "Turkey",
+      "country_flag": "🇹🇷",
+      "publisher": "Beta Kids",
+      "date": null,
+      "formatted_date": null,
+      "price": null,
+      "pages": null,
+      "ean": "0002088534001",
+      "cover_url": null,
+      "url": "https://www.dr.com.tr/kitap/disney-muzik-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088534001",
+      "source": "scraper",
+      "status": "upcoming"
+    },
+    {
       "id": "tr_0002088530001",
       "issue_code": null,
       "title": "Disney Canavarlar En Güzel Maceralar Serisi",
@@ -6731,6 +6713,24 @@
       "ean": "0002088530001",
       "cover_url": null,
       "url": "https://www.dr.com.tr/kitap/disney-canavarlar-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088530001",
+      "source": "scraper",
+      "status": "upcoming"
+    },
+    {
+      "id": "tr_0002088535001",
+      "issue_code": null,
+      "title": "Disney Sanat En Güzel Maceralar Serisi",
+      "country": "tr",
+      "country_name": "Turkey",
+      "country_flag": "🇹🇷",
+      "publisher": "Beta Kids",
+      "date": null,
+      "formatted_date": null,
+      "price": null,
+      "pages": null,
+      "ean": "0002088535001",
+      "cover_url": null,
+      "url": "https://www.dr.com.tr/kitap/disney-sanat-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088535001",
       "source": "scraper",
       "status": "upcoming"
     },

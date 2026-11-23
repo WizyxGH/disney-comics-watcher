@@ -1056,11 +1056,11 @@
   "panini-it:340073": "released",
   "_health": {
     "Nahdet Misr EG": {
-      "empty_runs": 8,
+      "empty_runs": 9,
       "alerted": true
     },
     "ES": {
-      "empty_runs": 1,
+      "empty_runs": 2,
       "alerted": false
     }
   },
@@ -1568,7 +1568,7 @@
   "lt:press_express_donaldas-ir-kiti-1993-auksine-donaldo-kolekcija": "released",
   "tr:0002095418001": "released",
   "hr:130298": "released",
-  "panini-it:342468": "announced",
+  "panini-it:342468": "released",
   "fi:fi-aa2026-47": "released",
   "ltb-de:ltb_618": "released",
   "is:41abffb9-7723-4087-be06-c9d4c0870b1c": "released",

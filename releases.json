@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-23T11:04:24.866031+01:00",
-  "total_count": 430,
+  "generated_at": "2026-11-23T23:21:28.787685+01:00",
+  "total_count": 431,
   "countries": [
     {
       "code": "fr",
@@ -9,15 +9,15 @@
       "count": 154
     },
     {
-      "code": "us",
-      "name": "United States",
-      "flag": "🇺🇸",
-      "count": 62
-    },
-    {
       "code": "it",
       "name": "Italy",
       "flag": "🇮🇹",
+      "count": 63
+    },
+    {
+      "code": "us",
+      "name": "United States",
+      "flag": "🇺🇸",
       "count": 62
     },
     {
@@ -489,24 +489,6 @@
       "status": "upcoming"
     },
     {
-      "id": "it_344352",
-      "issue_code": null,
-      "title": "Topolino 3705 con le Luci di Natale Led",
-      "country": "it",
-      "country_name": "Italy",
-      "country_flag": "🇮🇹",
-      "publisher": "Panini Comics",
-      "date": "2026-11-25",
-      "formatted_date": "Wednesday, November 25, 2026",
-      "price": "14,90 €",
-      "pages": null,
-      "ean": "344352",
-      "cover_url": null,
-      "url": "https://www.panini.it/shp_ita_it/topolino-3705-con-le-luci-di-natale-led-1wtopo3705v-it08.html",
-      "source": "scraper",
-      "status": "upcoming"
-    },
-    {
       "id": "us_60700",
       "issue_code": null,
       "title": "Aladdin #5",
@@ -522,6 +504,23 @@
       "cover_url": "https://cdn11.bigcommerce.com/s-fle6qzf7oq/images/stencil/original/products/60700/60147/TNAladdin05ABUSTOS__19380.1787950233.jpg?c=1",
       "url": "https://disney.dynamite.com/products.php?productId=60700",
       "source": "scraper",
+      "status": "upcoming"
+    },
+    {
+      "id": "it_TL_3705B",
+      "issue_code": "TL 3705B",
+      "title": "Topolino 3705 con le Luci di Natale Led",
+      "country": "it",
+      "country_name": "Italy",
+      "country_flag": "🇮🇹",
+      "date": "2026-11-25",
+      "formatted_date": "Wednesday, November 25, 2026",
+      "price": "14.90 EUR",
+      "pages": null,
+      "ean": null,
+      "cover_url": "https://raw.githubusercontent.com/WizyxGH/disney-comics-watcher/datas/covers/it_tl_3705ba_001.jpg",
+      "url": "https://inducks.org/issue.php?c=it%2FTL+3705B",
+      "source": "dbi",
       "status": "upcoming"
     },
     {
@@ -805,7 +804,7 @@
       "pages": null,
       "ean": "tidsam_0687_202612",
       "cover_url": "https://www.tidsam.se/covers/hq/cover_0687_202612.jpg",
-      "url": "https://www.tidsam.se/magazines/kalle-ankas-pocket-584-0687-sv/",
+      "url": "https://www.tidsam.se/magazines/kalle-ankas-pocket-586-0687-sv/",
       "source": "scraper",
       "status": "released"
     },
@@ -1053,7 +1052,7 @@
       "pages": null,
       "ean": "14016_257",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/af/af35e5b41d0bd4be8d89f9c7bd1454f3.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_257;jsessionid=E0DF65BA53F0A39493CC0FDDEDD449F5",
+      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_257;jsessionid=1CF11A40ACBCC20094F7AF35883E5374",
       "source": "scraper",
       "status": "released"
     },
@@ -1412,6 +1411,24 @@
       "ean": "340073",
       "cover_url": "https://www.panini.it/media/catalog/product/1/w/1wtopo3702_0.jpeg",
       "url": "https://www.panini.it/shp_ita_it/topolino-3702-1wtopo3702-it08.html",
+      "source": "scraper",
+      "status": "released"
+    },
+    {
+      "id": "it_343935",
+      "issue_code": null,
+      "title": "Topolino 3702 con Pencil Tin Calciatori 2026-2027",
+      "country": "it",
+      "country_name": "Italy",
+      "country_flag": "🇮🇹",
+      "publisher": "Panini Comics",
+      "date": "2026-11-04",
+      "formatted_date": "Wednesday, November 4, 2026",
+      "price": "16,90 €",
+      "pages": null,
+      "ean": "343935",
+      "cover_url": "https://www.panini.it/media/catalog/product/1/w/1wtopo3702v_0_1_1.jpg",
+      "url": "https://www.panini.it/shp_ita_it/topolino-3702-con-pencil-tin-calciatori-2026-2027-1wtopo3702v-it08.html",
       "source": "scraper",
       "status": "released"
     },
@@ -1888,7 +1905,7 @@
       "pages": null,
       "ean": "12228_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/ed/ed4704424caf41eb0904db9092da94e9.jpg",
-      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=E0DF65BA53F0A39493CC0FDDEDD449F5",
+      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=1CF11A40ACBCC20094F7AF35883E5374",
       "source": "scraper",
       "status": "released"
     },
@@ -1960,7 +1977,7 @@
       "pages": null,
       "ean": "13159_597",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/5f/5f662a891434dbec65d59e9bf7898563.jpg",
-      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=E0DF65BA53F0A39493CC0FDDEDD449F5",
+      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=1CF11A40ACBCC20094F7AF35883E5374",
       "source": "scraper",
       "status": "released"
     },
@@ -2372,7 +2389,7 @@
       "pages": null,
       "ean": "14068_76",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/a9/a944fd8df9bf4edf2ee81c41895ec88f.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=E0DF65BA53F0A39493CC0FDDEDD449F5",
+      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=1CF11A40ACBCC20094F7AF35883E5374",
       "source": "scraper",
       "status": "released"
     },
@@ -2390,7 +2407,7 @@
       "pages": null,
       "ean": "15420_1",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/f6/f61e2812c435ff4898d656cb6e28ba5d.jpg",
-      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=E0DF65BA53F0A39493CC0FDDEDD449F5",
+      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=1CF11A40ACBCC20094F7AF35883E5374",
       "source": "scraper",
       "status": "released"
     },
@@ -2712,7 +2729,7 @@
       "pages": null,
       "ean": "18658_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/e1/e1ab93323e556c5618ab556bcf721c01.jpg",
-      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=E0DF65BA53F0A39493CC0FDDEDD449F5",
+      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=1CF11A40ACBCC20094F7AF35883E5374",
       "source": "scraper",
       "status": "released"
     },
@@ -6141,24 +6158,6 @@
       "status": "released"
     },
     {
-      "id": "fr_9782723483223",
-      "issue_code": null,
-      "title": "Mickey - Le Cycle des magiciens - Tome 02",
-      "country": "fr",
-      "country_name": "France",
-      "country_flag": "🇫🇷",
-      "publisher": "Glénat",
-      "date": "2011-08-24",
-      "formatted_date": "Wednesday, August 24, 2011",
-      "price": null,
-      "pages": null,
-      "ean": "9782723483223",
-      "cover_url": "https://www.images.hachette-livre.fr/media/imgArticle/GLENAT/2011/9782723483223-T.jpg",
-      "url": "https://www.glenat.com/glenat-disney/mickey-le-cycle-des-magiciens-tome-02-9782723483223",
-      "source": "scraper",
-      "status": "released"
-    },
-    {
       "id": "fr_9782723483216",
       "issue_code": null,
       "title": "Donald - DoubleDuck - Tome 02",
@@ -6173,6 +6172,24 @@
       "ean": "9782723483216",
       "cover_url": "https://www.images.hachette-livre.fr/media/imgArticle/GLENAT/2011/9782723483216-T.jpg",
       "url": "https://www.glenat.com/glenat-disney/donald-doubleduck-tome-02-9782723483216",
+      "source": "scraper",
+      "status": "released"
+    },
+    {
+      "id": "fr_9782723483223",
+      "issue_code": null,
+      "title": "Mickey - Le Cycle des magiciens - Tome 02",
+      "country": "fr",
+      "country_name": "France",
+      "country_flag": "🇫🇷",
+      "publisher": "Glénat",
+      "date": "2011-08-24",
+      "formatted_date": "Wednesday, August 24, 2011",
+      "price": null,
+      "pages": null,
+      "ean": "9782723483223",
+      "cover_url": "https://www.images.hachette-livre.fr/media/imgArticle/GLENAT/2011/9782723483223-T.jpg",
+      "url": "https://www.glenat.com/glenat-disney/mickey-le-cycle-des-magiciens-tome-02-9782723483223",
       "source": "scraper",
       "status": "released"
     },
@@ -6537,24 +6554,6 @@
       "status": "upcoming"
     },
     {
-      "id": "tr_0001787708001",
-      "issue_code": null,
-      "title": "Bilim Kurgu-Disney En Güzel Maceralar",
-      "country": "tr",
-      "country_name": "Turkey",
-      "country_flag": "🇹🇷",
-      "publisher": "Beta Kids",
-      "date": null,
-      "formatted_date": null,
-      "price": null,
-      "pages": null,
-      "ean": "0001787708001",
-      "cover_url": null,
-      "url": "https://www.dr.com.tr/kitap/bilim-kurgu-disney-en-guzel-maceralar/cocuk-ve-genclik/okul-cagi-6-10-yas/cocuk-fantastikbilim-kurgu/urunno=0001787708001",
-      "source": "scraper",
-      "status": "upcoming"
-    },
-    {
       "id": "tr_0002185494001",
       "issue_code": null,
       "title": "Disney En Güzel Maceralar - Orta Çağ",
@@ -6569,6 +6568,24 @@
       "ean": "0002185494001",
       "cover_url": null,
       "url": "https://www.dr.com.tr/kitap/disney-en-guzel-maceralar-orta-cag/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002185494001",
+      "source": "scraper",
+      "status": "upcoming"
+    },
+    {
+      "id": "tr_0001787708001",
+      "issue_code": null,
+      "title": "Bilim Kurgu-Disney En Güzel Maceralar",
+      "country": "tr",
+      "country_name": "Turkey",
+      "country_flag": "🇹🇷",
+      "publisher": "Beta Kids",
+      "date": null,
+      "formatted_date": null,
+      "price": null,
+      "pages": null,
+      "ean": "0001787708001",
+      "cover_url": null,
+      "url": "https://www.dr.com.tr/kitap/bilim-kurgu-disney-en-guzel-maceralar/cocuk-ve-genclik/okul-cagi-6-10-yas/cocuk-fantastikbilim-kurgu/urunno=0001787708001",
       "source": "scraper",
       "status": "upcoming"
     },
@@ -6717,6 +6734,24 @@
       "status": "upcoming"
     },
     {
+      "id": "tr_0002088531001",
+      "issue_code": null,
+      "title": "Disney Dedektif En Güzel Maceralar Serisi",
+      "country": "tr",
+      "country_name": "Turkey",
+      "country_flag": "🇹🇷",
+      "publisher": "Beta Kids",
+      "date": null,
+      "formatted_date": null,
+      "price": null,
+      "pages": null,
+      "ean": "0002088531001",
+      "cover_url": null,
+      "url": "https://www.dr.com.tr/kitap/disney-dedektif-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088531001",
+      "source": "scraper",
+      "status": "upcoming"
+    },
+    {
       "id": "tr_0002088530001",
       "issue_code": null,
       "title": "Disney Canavarlar En Güzel Maceralar Serisi",
@@ -6767,24 +6802,6 @@
       "ean": "0002088540001",
       "cover_url": null,
       "url": "https://www.dr.com.tr/kitap/disney-yaris-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088540001",
-      "source": "scraper",
-      "status": "upcoming"
-    },
-    {
-      "id": "tr_0002088531001",
-      "issue_code": null,
-      "title": "Disney Dedektif En Güzel Maceralar Serisi",
-      "country": "tr",
-      "country_name": "Turkey",
-      "country_flag": "🇹🇷",
-      "publisher": "Beta Kids",
-      "date": null,
-      "formatted_date": null,
-      "price": null,
-      "pages": null,
-      "ean": "0002088531001",
-      "cover_url": null,
-      "url": "https://www.dr.com.tr/kitap/disney-dedektif-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088531001",
       "source": "scraper",
       "status": "upcoming"
     },
@@ -7059,6 +7076,24 @@
       "status": "upcoming"
     },
     {
+      "id": "tr_0002095418001",
+      "issue_code": null,
+      "title": "Disney Twisted-Wonderland Vol. 2 (Disney Twiste...",
+      "country": "tr",
+      "country_name": "Turkey",
+      "country_flag": "🇹🇷",
+      "publisher": "Beta Kids",
+      "date": null,
+      "formatted_date": null,
+      "price": null,
+      "pages": null,
+      "ean": "0002095418001",
+      "cover_url": null,
+      "url": "https://www.dr.com.tr/kitap/disney-twisted-wonderland-vol-2-disney-twisted-wonderland-/wakana-hazuki/foreign-languages/graphic-novel/graphic-novel/urunno=0002095418001",
+      "source": "scraper",
+      "status": "upcoming"
+    },
+    {
       "id": "tr_0002096059001",
       "issue_code": null,
       "title": "Disney Witch - Kayboluş",
@@ -7073,24 +7108,6 @@
       "ean": "0002096059001",
       "cover_url": null,
       "url": "https://www.dr.com.tr/kitap/disney-witch-kaybolus/kolektif/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002096059001",
-      "source": "scraper",
-      "status": "upcoming"
-    },
-    {
-      "id": "tr_0002244011001",
-      "issue_code": null,
-      "title": "Disney Stiç - Stiç'in Sevgi Günü! Disney Okuma ...",
-      "country": "tr",
-      "country_name": "Turkey",
-      "country_flag": "🇹🇷",
-      "publisher": "Beta Kids",
-      "date": null,
-      "formatted_date": null,
-      "price": null,
-      "pages": null,
-      "ean": "0002244011001",
-      "cover_url": null,
-      "url": "https://www.dr.com.tr/kitap/disney-stic-sticin-sevgi-gunu-disney-okuma-adimlarim-2/tim-mccanna/cocuk-ve-genclik/okul-cagi-6-10-yas/cocuk-oyku-hikaye/urunno=0002244011001",
       "source": "scraper",
       "status": "upcoming"
     },

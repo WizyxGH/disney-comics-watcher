@@ -1056,12 +1056,8 @@
   "panini-it:340073": "released",
   "_health": {
     "Nahdet Misr EG": {
-      "empty_runs": 12,
+      "empty_runs": 13,
       "alerted": true
-    },
-    "ES": {
-      "empty_runs": 1,
-      "alerted": false
     }
   },
   "es:341708": "announced",
@@ -1637,5 +1633,7 @@
   "dynamite:61948": "announced",
   "ltb-de:LTB_Mystery_Band_6": "released",
   "panini-it:342516": "announced",
-  "fi:fi-aa2026-48": "released"
+  "fi:fi-aa2026-48": "released",
+  "nl:11501817004374": "released",
+  "tr:0002244011001": "released"
 }

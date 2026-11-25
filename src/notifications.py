@@ -11,7 +11,7 @@ from src.config import (
 )
 from src import db as _db
 from src.discord import send_discord, role_mention, build_link_line, html_to_markdown
-from src.utils import format_price_fr, get_session, truncate_summary, is_fully_indexed_in_inducks, does_issue_exist_in_inducks, cover_filename
+from src.utils import format_price_fr, get_session, fetch_image_bytes, truncate_summary, is_fully_indexed_in_inducks, does_issue_exist_in_inducks, cover_filename
 from src.dbi.generator import generate_dbi_skeleton
 from src.dbi.mappers import resolve_magazine_metadata, resolve_glenat_metadata, resolve_comic_metadata
 from src.dbi.isv_search import _extract_base_and_number
@@ -45,10 +45,11 @@ def download_cover(url: str | None, filename: str):
         return
         
     try:
-        r = get_session().get(url, timeout=15)
-        r.raise_for_status()
+        fetched = fetch_image_bytes(url, timeout=15)
+        if not fetched:
+            raise RuntimeError("empty or non-image response")
         with open(filepath, "wb") as f:
-            f.write(r.content)
+            f.write(fetched[0])
         print(f"  [info] Cover saved: {filepath}")
     except Exception as e:
         print(f"  [warn] Failed to download cover {url}: {e}")

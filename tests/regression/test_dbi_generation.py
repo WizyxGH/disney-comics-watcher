@@ -165,6 +165,8 @@ class GreekEnricherTests(unittest.TestCase):
         mock_session.get.return_value = mock_resp
 
         import os, tempfile
+        from src.utils import fetch_image_bytes
+        fetch_image_bytes.cache_clear()
         with FakeInducks(), tempfile.TemporaryDirectory() as tmpdir:
             old_cwd = os.getcwd()
             os.chdir(tmpdir)

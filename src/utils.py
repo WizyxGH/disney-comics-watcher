@@ -160,3 +160,20 @@ def does_issue_exist_in_inducks(issue_code: str) -> bool:
         print(f"  [warn] Failed to query issue existence from DB for {issue_code}: {e}")
         
     return False
+
+
+@lru_cache(maxsize=256)
+def fetch_image_bytes(url: str, timeout: int = 15) -> tuple[bytes, str] | None:
+    """Downloads an image once per process and caches (bytes, content_type)."""
+    if not url:
+        return None
+    try:
+        r = get_session().get(url, timeout=timeout)
+        if not r.ok:
+            return None
+        ct = r.headers.get("content-type", "")
+        if ct and not ct.startswith("image/"):
+            return None
+        return r.content, ct or "image/jpeg"
+    except Exception:
+        return None

@@ -82,15 +82,11 @@ def analyze_cover_with_gemini(cover_url: str, api_key: str) -> dict:
     if not cover_url or not api_key:
         return fallback_res
     try:
-        # Download the image
-        resp = requests.get(cover_url, timeout=15)
-        resp.raise_for_status()
-        img_bytes = resp.content
-        
-        # Determine MIME type
-        mime_type = resp.headers.get("Content-Type", "image/jpeg")
-        if not mime_type or not mime_type.startswith("image/"):
-            mime_type = "image/jpeg"
+        from src.utils import fetch_image_bytes
+        fetched = fetch_image_bytes(cover_url, timeout=15)
+        if not fetched:
+            return fallback_res
+        img_bytes, mime_type = fetched
             
         img_b64 = base64.b64encode(img_bytes).decode("utf-8")
         

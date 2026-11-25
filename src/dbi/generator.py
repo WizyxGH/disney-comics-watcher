@@ -251,10 +251,10 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         if (not info.get("cover_code") or info.get("cover_code") == "?") and not info.get("characters") and info.get("cover_url") and not info.get("_skip_vision"):
             try:
                 from inducks_dbi.vision import detect_cover_characters
-                from src.utils import get_session
-                r_cov = get_session().get(info["cover_url"], timeout=10)
-                if r_cov.status_code == 200 and r_cov.content:
-                    detected = detect_cover_characters(r_cov.content)
+                from src.utils import fetch_image_bytes
+                fetched = fetch_image_bytes(info["cover_url"], timeout=10)
+                if fetched and fetched[0]:
+                    detected = detect_cover_characters(fetched[0])
                     if detected:
                         info["characters"] = [{"code": c} for c in detected]
             except Exception as e:

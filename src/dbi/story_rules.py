@@ -55,12 +55,9 @@ def apply_story_rules(stories: list[dict], log=print) -> list[dict]:
 
 
 def _fetch(url: str) -> bytes | None:
-    from src.utils import get_session
-    try:
-        r = get_session().get(url, timeout=60)
-        return r.content if r.ok and r.headers.get("content-type", "").startswith("image/") else None
-    except Exception:
-        return None
+    from src.utils import fetch_image_bytes
+    fetched = fetch_image_bytes(url, timeout=60)
+    return fetched[0] if fetched else None
 
 
 def find_story_codes(stories: list[dict], issue_path: str = "", log=print) -> None:

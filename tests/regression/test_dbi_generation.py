@@ -177,10 +177,12 @@ class GreekEnricherTests(unittest.TestCase):
                     "price": "3,50 €",
                     "cover_url": "https://example.com/cov.jpg",
                 }
+                fake_vision = MagicMock()
+                fake_vision.detect_cover_characters.return_value = ["MM", "GO"]
                 with patch("src.utils.get_session", return_value=mock_session), \
-                     patch("inducks_dbi.vision.detect_cover_characters", return_value=["MM", "GO"]) as mock_vision:
+                     patch.dict("sys.modules", {"inducks_dbi.vision": fake_vision}):
                     block = generate_dbi_skeleton(info_inedit, publication_type="it")
-                    mock_vision.assert_called_once_with(b"fake-jpeg")
+                    fake_vision.detect_cover_characters.assert_called_once_with(b"fake-jpeg")
                     self.assertIn("IC TL 3701", block)
                     self.assertIn("[xapp:MM,GO]", block)
 

@@ -167,6 +167,118 @@ def _inedit_cover_code(issue_path: str, dbi_issue_code: str) -> str:
     return f"{prefix} {dbi_issue_code}"
 
 
+def _format_cover_line(info: dict, issue_path: str, dbi_issue_code: str, isslet_val: str) -> str:
+    """Formats the Bolderbast cover entry line ('a') with cover code, credits, and [xapp:...] if inédit."""
+    cover_ec = dbi_issue_code + "a"
+    is_inedit_cover = not info.get("cover_code") or info.get("cover_code") == "?"
+    storycode = _inedit_cover_code(issue_path, dbi_issue_code) if is_inedit_cover else info["cover_code"]
+
+    storycode_field, pages_field, cover_overflow = _code_and_pages(storycode, "1")
+    brokpg = " "
+    pagel = "c"
+
+    plot_val, writ_val, art_val, ink_val, hero_val = "", "", "", "", ""
+    if info.get("cover_hero"):
+        hero_val = info["cover_hero"]
+    else:
+        for c in info.get("characters", []):
+            if c.get("code"):
+                hero_val = c["code"]
+                break
+
+    if dbi_issue_code.startswith("JM "):
+        writ_val, art_val = "FPt", "FPt"
+
+    credits_field = f"  {plot_val[:4].ljust(4)}{writ_val[:4].ljust(4)}{art_val[:4].ljust(4)}{ink_val[:4].ljust(4)}{hero_val[:2].ljust(2)}  "
+    if len(cover_ec) <= 12:
+        prefix = f"{cover_ec.ljust(12)}{storycode_field}{pages_field}{brokpg}{pagel}{credits_field}"
+    else:
+        prefix = f"->          {storycode_field}{pages_field}{brokpg}{pagel}{credits_field}"
+
+    cover_title = info.get("cover_title") or ("CV" if cover_ec.endswith("a") else "")
+    suffixes = []
+    if cover_title:
+        suffixes.append(cover_title)
+    suffixes += cover_overflow
+    if len(cover_ec) > 12:
+        suffixes.append(f"[entrycode:{cover_ec}]")
+
+    # Only emit [xapp:...] on unpublished (inédit) covers
+    characters = info.get("characters", [])
+    if is_inedit_cover and characters:
+        xapp_codes = [c["code"] for c in characters if c.get("code")]
+        if xapp_codes:
+            suffixes.append(f"[xapp:{','.join(xapp_codes)}]")
+
+    if isslet_val:
+        suffixes.append(f"[isslet:{isslet_val}]")
+
+    return f"{prefix}{' '.join(suffixes)}".rstrip() + "\n"
+
+
+def _format_story_lines(stories: list[dict], dbi_issue_code: str, pages_val, positions_known: bool) -> list[str]:
+    """Formats the Bolderbast story entry lines for an issue."""
+    total_pages = 0
+    if pages_val:
+        try:
+            total_pages = int(str(pages_val).strip())
+        except Exception:
+            pass
+
+    current_page = 5 if "LTB" in dbi_issue_code else 1
+    lines = []
+    for i, story in enumerate(stories, start=1):
+        start_p = story.get("start_page")
+        if start_p is not None:
+            current_page = int(start_p)
+
+        page_len_str = str(story.get("pages", "")).strip()
+        if positions_known and (page_len_str.isdigit() or start_p is not None):
+            pad = 3 if (total_pages >= 100 or current_page >= 100) else 2
+            story_ec = f"{dbi_issue_code}p{str(current_page).zfill(pad)}"
+            if page_len_str.isdigit():
+                current_page += int(page_len_str)
+        else:
+            story_ec = f"{dbi_issue_code}{chr(97 + i)}"
+
+        story_code = (story.get("story_code", "") or story.get("code", "")).strip() or "?"
+        pages_str = str(story.get("pages", "")).strip()
+        code_field, pages_field, overflow = _code_and_pages(story_code, pages_str)
+        pagel = str(story.get("pagel") or " ")[:1]
+
+        c_hero = ""
+        for c in story.get("characters") or []:
+            if c.get("code"):
+                c_hero = c["code"]
+                break
+        c_hero = (story.get("hero") or c_hero)[:2].ljust(2)
+        st_credits = (
+            f"  {str(story.get('plot', ''))[:4].ljust(4)}"
+            f"{str(story.get('writ', ''))[:4].ljust(4)}"
+            f"{str(story.get('art', ''))[:4].ljust(4)}"
+            f"{str(story.get('ink', ''))[:4].ljust(4)}"
+            f"{c_hero}  "
+        )
+        if len(story_ec) <= 12:
+            st_prefix = f"{story_ec.ljust(12)}{code_field}{pages_field} {pagel}{st_credits}"
+        else:
+            st_prefix = f"->          {code_field}{pages_field} {pagel}{st_credits}"
+
+        st_title = _sanitize_bolderbast(story.get("title", "").strip())
+        st_suffixes = list(overflow)
+        if story.get("part"):
+            st_suffixes.append(f"[part:{story['part']}]")
+        if len(story_ec) > 12:
+            st_suffixes.append(f"[entrycode:{story_ec}]")
+        if story.get("characters"):
+            c_codes = [c["code"] for c in story["characters"] if c.get("code")]
+            if c_codes:
+                st_suffixes.append(f"[xapp:{','.join(c_codes)}]")
+
+        lines.append(f"{st_prefix}{st_title} {' '.join(st_suffixes)}".rstrip() + "\n")
+    return lines
+
+
 def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | None = None) -> str | None:
     overrides = overrides or {}
     try:
@@ -344,129 +456,17 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
 
         # Bolderbast DBI spec: 'h' must be exactly on position 14
         h3_line = f"{issue_code_field} h3 {title_part}\n"
+        cover_line = _format_cover_line(info, issue_path, dbi_issue_code, isslet_val)
 
-        cover_ec = dbi_issue_code + "a"
-        is_inedit_cover = not info.get("cover_code") or info.get("cover_code") == "?"
-        storycode = _inedit_cover_code(issue_path, dbi_issue_code) if is_inedit_cover else info["cover_code"]
-        
-        storycode_field, pages_field, cover_overflow = _code_and_pages(storycode, "1")
-        brokpg          = " "
-        pagel           = "c"
-        
-        plot_val, writ_val, art_val, ink_val, hero_val = "", "", "", "", ""
-
-        if info.get("cover_hero"):
-            hero_val = info["cover_hero"]
-        else:
-            for c in info.get("characters", []):
-                if c.get("code"):
-                    hero_val = c["code"]
-                    break
-
-        if dbi_issue_code.startswith("JM "):
-            writ_val, art_val = "FPt", "FPt"
-
-        c_plot = plot_val[:4].ljust(4)
-        c_writ = writ_val[:4].ljust(4)
-        c_art  = art_val[:4].ljust(4)
-        c_ink  = ink_val[:4].ljust(4)
-        c_hero = hero_val[:2].ljust(2)
-        credits_field = f"  {c_plot}{c_writ}{c_art}{c_ink}{c_hero}  "
-
-        if len(cover_ec) <= 12:
-            prefix = f"{cover_ec.ljust(12)}{storycode_field}{pages_field}{brokpg}{pagel}{credits_field}"
-        else:
-            prefix = f"->          {storycode_field}{pages_field}{brokpg}{pagel}{credits_field}"
-
-        cover_title = info.get("cover_title") or ("CV" if cover_ec.endswith("a") else "")
-        suffixes = []
-        if cover_title: suffixes.append(cover_title)
-        suffixes += cover_overflow
-        if len(cover_ec) > 12: suffixes.append(f"[entrycode:{cover_ec}]")
-        
-        # Only emit [xapp:...] on unpublished (inédit) covers
-        characters = info.get("characters", [])
-        if is_inedit_cover and characters:
-            xapp_codes = [c["code"] for c in characters if c.get("code")]
-            if xapp_codes:
-                suffixes.append(f"[xapp:{','.join(xapp_codes)}]")
-                
-        if isslet_val: suffixes.append(f"[isslet:{isslet_val}]")
-
-        suffix_str = " ".join(suffixes)
-        # No extra spaces between prefix and suffix_str
-        cover_line = f"{prefix}{suffix_str}".rstrip() + "\n"
-        
-        body_parts = []
-        body_parts.append(h3_line)
-        body_parts.append(cover_line)
-
+        body_parts = [h3_line, cover_line]
         stories = info.get("stories", [])
         if stories:
-            total_pages = 0
-            if pages_val:
-                try: total_pages = int(str(pages_val).strip())
-                except: pass
-
-            current_page = 5 if "LTB" in dbi_issue_code else 1
-            # A source that knows story lengths but not where they sit in the
-            # printed issue (a digital edition drops pages) gets letter codes:
-            # positions summed from page 1 would be invented.
-            positions_known = not info.get("page_positions_unknown")
-
-            for i, story in enumerate(stories, start=1):
-                start_p = story.get("start_page")
-                if start_p is not None:
-                    current_page = int(start_p)
-
-                page_len_str = str(story.get("pages", "")).strip()
-                if positions_known and (page_len_str.isdigit() or start_p is not None):
-                    if total_pages >= 100 or current_page >= 100:
-                        story_ec = f"{dbi_issue_code}p{str(current_page).zfill(3)}"
-                    else:
-                        story_ec = f"{dbi_issue_code}p{str(current_page).zfill(2)}"
-                    if page_len_str.isdigit():
-                        current_page += int(page_len_str)
-                else:
-                    story_ec = f"{dbi_issue_code}{chr(97 + i)}"
-                
-                story_code = (story.get("story_code", "") or story.get("code", "")).strip() or "?"
-                pages_str = str(story.get("pages", "")).strip()
-                code_field, pages_field, overflow = _code_and_pages(story_code, pages_str)
-                brokpg = " "
-                pagel = str(story.get("pagel") or " ")[:1]
-                
-                c_hero = ""
-                if story.get("characters"):
-                    for c in story["characters"]:
-                        if c.get("code"):
-                            c_hero = c["code"]
-                            break
-                c_hero = (story.get("hero") or c_hero)[:2].ljust(2)
-                c_plot = str(story.get("plot", ""))[:4].ljust(4)
-                c_writ = str(story.get("writ", ""))[:4].ljust(4)
-                c_art  = str(story.get("art", ""))[:4].ljust(4)
-                c_ink  = str(story.get("ink", ""))[:4].ljust(4)
-                st_credits = f"  {c_plot}{c_writ}{c_art}{c_ink}{c_hero}  "
-                
-                if len(story_ec) <= 12:
-                    st_prefix = f"{story_ec.ljust(12)}{code_field}{pages_field}{brokpg}{pagel}{st_credits}"
-                else:
-                    st_prefix = f"->          {code_field}{pages_field}{brokpg}{pagel}{st_credits}"
-
-                st_title = _sanitize_bolderbast(story.get("title", "").strip())
-                st_suffixes = list(overflow)
-                if story.get("part"):
-                    st_suffixes.append(f"[part:{story['part']}]")
-                if len(story_ec) > 12: st_suffixes.append(f"[entrycode:{story_ec}]")
-                if story.get("characters"):
-                    c_codes = [c["code"] for c in story["characters"] if c.get("code")]
-                    if c_codes: st_suffixes.append(f"[xapp:{','.join(c_codes)}]")
-
-                st_suffix_str = " ".join(st_suffixes)
-                # No extra spaces between st_prefix and st_title
-                st_line = f"{st_prefix}{st_title} {st_suffix_str}".rstrip() + "\n"
-                body_parts.append(st_line)
+            body_parts.extend(_format_story_lines(
+                stories,
+                dbi_issue_code,
+                pages_val,
+                positions_known=not info.get("page_positions_unknown"),
+            ))
 
         content = "".join(body_parts)
         with open(dbi_path, "a", encoding="utf-8") as f:

@@ -3,7 +3,7 @@ import re
 import html as html_lib
 import time
 import requests
-from urllib.parse import quote_plus, urlencode
+from urllib.parse import quote, quote_plus, urlencode
 from src.config import (
     TELEGRAM_API, TELEGRAM_CHAT_ID, TELEGRAM_THREADS,
     DISCORD_ADMIN_WEBHOOK_URL, NOTIFY_BACKENDS,
@@ -234,6 +234,15 @@ def _is_placeholder_cover(url: str | None) -> bool:
         'coverabbildung-nicht-verfugbar',
     ))
 
+def build_cvsedit_url(issue_path: str) -> str:
+    """Builds the Inducks cvsedit.php URL using issuecode and createifneeded=1."""
+    encoded_issue = quote(issue_path, safe="/")
+    return (
+        f"https://inducks.org/cvsedit.php"
+        f"?storycode=&issuecode={encoded_issue}&publicationcode=&createifneeded=1&fast=&coazilla="
+    )
+
+
 def _get_inputfilename_for_issue(issue_path: str) -> tuple[str, str | None]:
     from src.db import query_db
     import re
@@ -447,18 +456,7 @@ def _dispatch_notification(
                 u_part = f"{i_part}a"
                 upload_url = f"https://inducks.org/sendscan.php?c={quote_plus(country_part)}&s={s_part}&i={i_part}&u={u_part}"
                 
-                if does_issue_exist_in_inducks(issue_path):
-                    edit_url = f"https://inducks.org/cvsedit.php?issuecode={quote_plus(issue_path)}"
-                else:
-                    input_file, input_code = _get_inputfilename_for_issue(issue_path)
-                    params = {
-                        "inputfilename": input_file,
-                        "induckscode": issue_part,
-                        "new": "1",
-                    }
-                    if input_code:
-                        params["inputfilecode"] = input_code
-                    edit_url = f"https://inducks.org/cvsedit.php?{urlencode(params)}"
+                edit_url = build_cvsedit_url(issue_path)
                 
                 dm_buttons = [
                     [

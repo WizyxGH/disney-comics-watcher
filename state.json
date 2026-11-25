@@ -1056,11 +1056,11 @@
   "panini-it:340073": "released",
   "_health": {
     "Nahdet Misr EG": {
-      "empty_runs": 14,
+      "empty_runs": 15,
       "alerted": true
     },
     "ES": {
-      "empty_runs": 1,
+      "empty_runs": 2,
       "alerted": false
     }
   },
@@ -1579,7 +1579,7 @@
   "fantagraphics:10434765357302": "released",
   "fantagraphics:10434765586678": "released",
   "panini-it:344349": "released",
-  "panini-it:344352": "announced",
+  "panini-it:344352": "released",
   "se:tidsam_0720_202647": "released",
   "se:tidsam_0687_202612": "released",
   "se:tidsam_0661_202608": "released",
@@ -1639,5 +1639,11 @@
   "panini-it:342516": "announced",
   "fi:fi-aa2026-48": "released",
   "nl:11501817004374": "released",
-  "tr:0002244011001": "released"
+  "tr:0002244011001": "released",
+  "fr_kiosk:13459_9": "released",
+  "fr_kiosk:13159_598": "released",
+  "fr_kiosk:15528_495": "released",
+  "fr_kiosk:14067_3884-3885": "released",
+  "kathi-gr:564562165": "released",
+  "kathi-gr:564562156": "released"
 }

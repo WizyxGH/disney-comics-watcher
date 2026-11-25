@@ -156,7 +156,8 @@ def inducks_button(issue_path: str | None, raw_title: str, country: str, info: d
         if _db.query_db("SELECT 1 FROM inducks_publication WHERE publicationcode = ?", (publication,)):
             return {"text": "View Publication", "url": f"https://inducks.org/publication.php?c={quote_plus(publication)}"}
 
-    params = {"country": country}
+    search_country = "fr" if country in ("fr_kiosk", "magazine", "glenat") else country
+    params = {"country": search_country}
     if known:
         # 'it/PM  557' -> publication 'PM' (the search reads entry codes), number '557'.
         pub, _, number = issue_path.split("/", 1)[1].rpartition(" ")
@@ -164,15 +165,28 @@ def inducks_button(issue_path: str | None, raw_title: str, country: str, info: d
             pub, number = re.match(r"^([A-Za-z]+)(.*)$", issue_path.split("/", 1)[1]).groups()
         params["title1"], params["entrycodeh3"] = pub.strip(), number.strip()
     else:
-        base, number = _extract_base_and_number(raw_title or "")
-        params["title1"] = base or raw_title or ""
+        clean_raw = re.sub(r"\s+(?:con|mit|avec)\s+.*$", "", raw_title or "", flags=re.IGNORECASE)
+        clean_raw = re.sub(r"\s*[-–:]\s*(?:Tome|Vol\.?|Volume|N°|Nr\.?|#)\s*", " ", clean_raw, flags=re.IGNORECASE)
+        base, number = _extract_base_and_number(clean_raw)
+        title_q = (base or clean_raw or "").strip(" -–:")
+        # compmag.php ANDs every word of title1; trim overly long subtitles (> 5 words)
+        words = title_q.split()
+        if len(words) > 5:
+            title_q = " ".join(words[:5])
+        params["title1"] = title_q
         if number:
-            params["entrycodeh3"] = number
+            num_clean = number.lstrip("0") or number
+            # Avoid exact-match misses on 4-digit hyphenated ranges like 3884-3885 vs 3884-85
+            if not re.match(r"^\d{4}-\d{4}$", num_clean):
+                params["entrycodeh3"] = num_clean
     year = re.search(r"\b(19|20)\d{2}\b", str(info.get("date") or info.get("date_mise_en_vente") or ""))
     if year:
         # "equal to or after": a new release keeps old homonyms out.
         params["date2"] = year.group(0)
-    params["publisher"] = info.get("publisher") or info.get("editeur") or info.get("editor")
+    pub_name = info.get("publisher") or info.get("editeur") or info.get("editor")
+    # Skip internal/distributor labels that don't match Inducks' inducks_publisher names
+    if pub_name and pub_name not in ("Direct Éditeurs", "Disney Magazines", "Egmont DE", "Lustiges Taschenbuch DE", "Beta Kids TR"):
+        params["publisher"] = pub_name
     return {"text": "Search on Inducks", "url": "https://inducks.org/compmag.php?" + urlencode({k: v for k, v in params.items() if v})}
 
 

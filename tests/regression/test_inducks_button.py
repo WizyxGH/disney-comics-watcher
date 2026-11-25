@@ -56,6 +56,13 @@ class InducksButton(unittest.TestCase):
         button = inducks_button("fi/AA2026-44", "Aku Ankka 44/2026", "fi")
         self.assertEqual(self.query(button), {"country": "fi", "title1": "AA", "entrycodeh3": "2026-44"})
 
+    def test_search_normalizes_country_strips_noise_and_skips_distributor_publisher(self):
+        button = inducks_button(None, "MICKEY JUNIOR - N°495", "fr_kiosk", {"publisher": "Direct Éditeurs"})
+        self.assertEqual(self.query(button), {"country": "fr", "title1": "MICKEY JUNIOR", "entrycodeh3": "495"})
+
+        button2 = inducks_button(None, "Les Âges d'or de Donald - Tome 04", "glenat", {"publisher": "Glénat"})
+        self.assertEqual(self.query(button2), {"country": "fr", "title1": "Les Âges d'or de Donald", "entrycodeh3": "4", "publisher": "Glénat"})
+
     def test_cvsedit_url_uses_issuecode_and_createifneeded(self):
         from src.notifications import build_cvsedit_url
 

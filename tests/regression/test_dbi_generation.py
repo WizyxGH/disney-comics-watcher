@@ -109,7 +109,9 @@ class GreekEnricherTests(unittest.TestCase):
         stories = parse_kathimerini_stories(sample_html)
         self.assertEqual(len(stories), 3)
         self.assertEqual(stories[0]["start_page"], 7)
+        self.assertEqual(stories[0]["title"], "Η ΜΠΑΛΑΝΤΑ ΤΟΥ ΤΖΩΝ ΡΟΜΠΑΞ")
         self.assertEqual(stories[1]["start_page"], 47)
+        self.assertEqual(stories[1]["title"], "ΤΟ ΑΡΧΙΠΕΛΑΓΟΣ ΤΩΝ ΧΕΛΩΝΩΝ Α")
         self.assertEqual(stories[2]["start_page"], 73)
 
     def test_fetch_pressreader_manifest_fast_mocked(self):

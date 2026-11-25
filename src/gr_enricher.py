@@ -154,6 +154,60 @@ def fetch_pressreader_issue_manifest(cid: str, slug: str = "miky-maous", session
         return None
 
 
+# Ordered longest-first so compound hero names match before single names.
+GREEK_HERO_PREFIXES = (
+    "ΧΙΟΥΗ ΛΙΟΥΗ & ΝΤΙΟΥΗ",
+    "ΜΙΚΥ & ΦΑΝΤΟΜ",
+    "ΜΙΚΥ & ΓΚΟΥΦΥ",
+    "ΜΙΚΥ & ΜΙΝΝΙ",
+    "ΝΤΟΝΑΛΝΤ & ΦΕΘΡΥ",
+    "ΛΟΥΝΤΒΙΧ & ΝΙΟΥΤΟΝ",
+    "ΜΙΚΡΟΙ ΕΞΕΡΕΥΝΗΤΕΣ",
+    "ΣΚΡΟΥΤΖ ΜΑΚ ΝΤΑΚ",
+    "ΜΑΤΖΙΚΑ ΝΤΕ ΣΠΕΛ",
+    "ΝΥΧΤΕΡΙΔΑΣ ΝΤΑΚ",
+    "ΚΥΡΟΣ ΓΡΑΝΑΖΗΣ",
+    "ΠΡΑΚΤΟΡΑΣ ΝΤΑΚ",
+    "ΣΟΥΠΕΡ ΓΚΟΥΦΥ",
+    "ΝΤΟΝΑΛΝΤ ΝΤΑΚ",
+    "ΘΕΙΟΣ ΣΚΡΟΥΤΖ",
+    "ΙΟΥΝΙΟΡ ΝΤΑΚ",
+    "ΦΑΝΤΟΜ ΝΤΑΚ",
+    "ΜΙΚΥ ΜΑΟΥΣ",
+    "ΜΙΝΝΙ ΜΑΟΥΣ",
+    "ΝΤΑΙΖΥ ΝΤΑΚ",
+    "ΤΖΩΝ ΡΟΜΠΑΞ",
+    "ΜΑΥΡΟΣ ΠΗΤ",
+    "ΜΟΥΡΓΟΛΥΚΟΙ",
+    "ΝΤΟΝΑΛΝΤ",
+    "ΓΚΑΣΤΟΝΕ",
+    "ΜΟΡΤΙΜΕΡ",
+    "ΣΚΡΟΥΤΖ",
+    "ΓΚΟΥΦΥ",
+    "ΦΑΝΤΟΜ",
+    "ΠΛΟΥΤΟ",
+    "ΝΤΑΙΖΥ",
+    "ΜΠΑΜΠΗΣ",
+    "ΦΕΘΡΥ",
+    "ΚΥΡΟΣ",
+    "ΜΙΝΝΙ",
+    "ΟΛΑΦ",
+    "ΜΙΚΥ",
+)
+
+
+def _strip_greek_hero_prefix(text: str) -> str:
+    """Strips a leading Greek hero name from Kathimerini's 'HERO TITLE' announcement lines."""
+    cleaned = text.strip()
+    upper = cleaned.upper()
+    for hero in GREEK_HERO_PREFIXES:
+        if upper.startswith(hero + " "):
+            candidate = cleaned[len(hero):].strip(" :-–—")
+            if len(candidate) >= 3:
+                return candidate
+    return cleaned
+
+
 def parse_kathimerini_stories(html_or_soup) -> list[dict]:
     """
     Parses story items from a Kathimerini Disney announcement article.
@@ -169,7 +223,7 @@ def parse_kathimerini_stories(html_or_soup) -> list[dict]:
     stories = []
     paragraphs = []
     for p in soup.find_all("p"):
-        text = unicodedata.normalize("NFKD", p.get_text()).strip()
+        text = unicodedata.normalize("NFC", p.get_text()).strip()
         text = re.sub(r"\s+", " ", text).strip()
         if text:
             paragraphs.append(text)
@@ -199,8 +253,8 @@ def parse_kathimerini_stories(html_or_soup) -> list[dict]:
         m_num = re.search(r"^(\d{2,3})\s+([Α-Ωα-ωΆ-Ώά-ώ0-9\s&'’\-]+)", text)
         if m_num:
             page_str = m_num.group(1).strip()
-            rest = m_num.group(2).strip()
-            
+            rest = _strip_greek_hero_prefix(m_num.group(2).strip())
+
             stories.append({
                 "start_page": int(page_str),
                 "title": rest,

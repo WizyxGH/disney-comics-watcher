@@ -1056,11 +1056,11 @@
   "panini-it:340073": "released",
   "_health": {
     "Nahdet Misr EG": {
-      "empty_runs": 15,
+      "empty_runs": 16,
       "alerted": true
     },
     "ES": {
-      "empty_runs": 2,
+      "empty_runs": 3,
       "alerted": false
     }
   },

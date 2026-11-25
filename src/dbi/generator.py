@@ -131,6 +131,42 @@ def _sanitize_bolderbast(text: str) -> str:
     return text
 
 
+def _inedit_cover_code(issue_path: str, dbi_issue_code: str) -> str:
+    """Builds the standard Inducks cover storycode for an unpublished (inédit) cover
+    (e.g. 'FC PM  598', 'IC TL 3701', 'GC MMB 650')."""
+    if not issue_path or "/" not in issue_path:
+        return "?"
+    country, rest = issue_path.split("/", 1)
+    short = rest.split()[0] if rest else ""
+    full_pub = f"{country}/{short}" if short else ""
+
+    prefix = None
+    if full_pub:
+        try:
+            rows = query_db(
+                "SELECT DISTINCT substr(sv.storycode, 1, 2) "
+                "FROM inducks_entry e "
+                "JOIN inducks_storyversion sv ON e.storyversioncode = sv.storyversioncode "
+                "JOIN inducks_issue i ON e.issuecode = i.issuecode "
+                "WHERE i.publicationcode = ? AND e.position = 'a' "
+                "AND length(sv.storycode) >= 3 AND substr(sv.storycode, 2, 2) = 'C '",
+                (full_pub,),
+            ) or []
+            prefixes = [r[0] for r in rows if r and r[0]]
+            if len(prefixes) == 1:
+                prefix = prefixes[0]
+        except Exception:
+            pass
+
+    if not prefix:
+        prefix = {
+            "fr": "FC", "it": "IC", "nl": "HC", "de": "DC",
+            "br": "BC", "es": "EC", "gr": "GC", "pl": "PC", "tr": "TC",
+        }.get(country.lower(), f"{country[0].upper()}C" if country else "IC")
+
+    return f"{prefix} {dbi_issue_code}"
+
+
 def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | None = None) -> str | None:
     overrides = overrides or {}
     try:
@@ -310,7 +346,8 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         h3_line = f"{issue_code_field} h3 {title_part}\n"
 
         cover_ec = dbi_issue_code + "a"
-        storycode = info.get("cover_code") or "?"
+        is_inedit_cover = not info.get("cover_code") or info.get("cover_code") == "?"
+        storycode = _inedit_cover_code(issue_path, dbi_issue_code) if is_inedit_cover else info["cover_code"]
         
         storycode_field, pages_field, cover_overflow = _code_and_pages(storycode, "1")
         brokpg          = " "
@@ -349,7 +386,7 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         
         # Only emit [xapp:...] on unpublished (inédit) covers
         characters = info.get("characters", [])
-        if storycode == "?" and characters:
+        if is_inedit_cover and characters:
             xapp_codes = [c["code"] for c in characters if c.get("code")]
             if xapp_codes:
                 suffixes.append(f"[xapp:{','.join(xapp_codes)}]")

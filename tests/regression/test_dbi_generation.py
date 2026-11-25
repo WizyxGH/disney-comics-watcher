@@ -179,6 +179,7 @@ class GreekEnricherTests(unittest.TestCase):
                      patch("inducks_dbi.vision.detect_cover_characters", return_value=["MM", "GO"]) as mock_vision:
                     block = generate_dbi_skeleton(info_inedit, publication_type="it")
                     mock_vision.assert_called_once_with(b"fake-jpeg")
+                    self.assertIn("IC TL 3701", block)
                     self.assertIn("[xapp:MM,GO]", block)
 
                 info_reprint = {

@@ -799,7 +799,7 @@
   "panini-it:338155": "released",
   "panini-it:338158": "released",
   "kathi-gr:564450379": "released",
-  "dynamite:60700": "announced",
+  "dynamite:60700": "released",
   "dynamite:60699": "released",
   "dynamite:60697": "released",
   "dynamite:60686": "released",
@@ -1056,8 +1056,12 @@
   "panini-it:340073": "released",
   "_health": {
     "Nahdet Misr EG": {
-      "empty_runs": 13,
+      "empty_runs": 14,
       "alerted": true
+    },
+    "ES": {
+      "empty_runs": 1,
+      "alerted": false
     }
   },
   "es:341708": "announced",
@@ -1574,7 +1578,7 @@
   "bg:5407": "announced",
   "fantagraphics:10434765357302": "released",
   "fantagraphics:10434765586678": "released",
-  "panini-it:344349": "announced",
+  "panini-it:344349": "released",
   "panini-it:344352": "announced",
   "se:tidsam_0720_202647": "released",
   "se:tidsam_0687_202612": "released",

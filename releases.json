@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-24T19:32:01.260565+01:00",
+  "generated_at": "2026-11-25T03:53:49.148946+01:00",
   "total_count": 434,
   "countries": [
     {
@@ -522,7 +522,7 @@
       "cover_url": "https://www.panini.it/media/catalog/product/1/w/1wtopo3705_0.jpeg",
       "url": "https://www.panini.it/shp_ita_it/topolino-3705-1wtopo3705-it08.html",
       "source": "scraper",
-      "status": "upcoming"
+      "status": "released"
     },
     {
       "id": "us_60700",
@@ -540,7 +540,7 @@
       "cover_url": "https://cdn11.bigcommerce.com/s-fle6qzf7oq/images/stencil/original/products/60700/60147/TNAladdin05ABUSTOS__19380.1787950233.jpg?c=1",
       "url": "https://disney.dynamite.com/products.php?productId=60700",
       "source": "scraper",
-      "status": "upcoming"
+      "status": "released"
     },
     {
       "id": "it_TL_3705B",
@@ -557,7 +557,7 @@
       "cover_url": "https://raw.githubusercontent.com/WizyxGH/disney-comics-watcher/datas/covers/it_tl_3705ba_001.jpg",
       "url": "https://inducks.org/issue.php?c=it%2FTL+3705B",
       "source": "dbi",
-      "status": "upcoming"
+      "status": "released"
     },
     {
       "id": "de_LTB_Mystery_Band_6",
@@ -1140,7 +1140,7 @@
       "pages": null,
       "ean": "14016_257",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/af/af35e5b41d0bd4be8d89f9c7bd1454f3.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_257;jsessionid=316DC3B2E5A409D777715718117356B5",
+      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_257;jsessionid=3581419EB31888561D0F3F7265CFCB23",
       "source": "scraper",
       "status": "released"
     },
@@ -1271,42 +1271,6 @@
       "status": "released"
     },
     {
-      "id": "fr_14067_3882-3883",
-      "issue_code": null,
-      "title": "Journal de Mickey - N°3882-3883",
-      "country": "fr",
-      "country_name": "France",
-      "country_flag": "🇫🇷",
-      "publisher": "Kiosque Presse",
-      "date": "2026-11-10",
-      "formatted_date": "Tuesday, November 10, 2026",
-      "price": null,
-      "pages": null,
-      "ean": "14067_3882-3883",
-      "cover_url": "https://cdn.direct-editeurs.fr/parutions/a4/a4107727eaeae869baa936ca3489c876.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14067_le-journal-de-mickey_3882-3883",
-      "source": "scraper",
-      "status": "released"
-    },
-    {
-      "id": "fr_15190_40",
-      "issue_code": null,
-      "title": "Les Chroniques de Fantomiald - N°40",
-      "country": "fr",
-      "country_name": "France",
-      "country_flag": "🇫🇷",
-      "publisher": "Kiosque Presse",
-      "date": "2026-11-10",
-      "formatted_date": "Tuesday, November 10, 2026",
-      "price": null,
-      "pages": null,
-      "ean": "15190_40",
-      "cover_url": "https://cdn.direct-editeurs.fr/parutions/62/625ff385f56e76ff4fcb4ab1ed220254.jpg",
-      "url": "https://direct-editeurs.fr/magazine/15190_les-chroniques-de-fantomiald_40",
-      "source": "scraper",
-      "status": "released"
-    },
-    {
       "id": "se_tidsam_5979_202601",
       "issue_code": "se/KA",
       "title": "Kalle Anka Jul i Ankeborg",
@@ -1357,6 +1321,42 @@
       "ean": "tidsam_4869_202601",
       "cover_url": "https://www.tidsam.se/covers/hq/cover_4869_202601.jpg",
       "url": "https://www.tidsam.se/magazines/kalle-anka-onskar-god-jul-4869-sv/",
+      "source": "scraper",
+      "status": "released"
+    },
+    {
+      "id": "fr_14067_3882-3883",
+      "issue_code": null,
+      "title": "Journal de Mickey - N°3882-3883",
+      "country": "fr",
+      "country_name": "France",
+      "country_flag": "🇫🇷",
+      "publisher": "Kiosque Presse",
+      "date": "2026-11-10",
+      "formatted_date": "Tuesday, November 10, 2026",
+      "price": null,
+      "pages": null,
+      "ean": "14067_3882-3883",
+      "cover_url": "https://cdn.direct-editeurs.fr/parutions/a4/a4107727eaeae869baa936ca3489c876.jpg",
+      "url": "https://direct-editeurs.fr/magazine/14067_le-journal-de-mickey_3882-3883",
+      "source": "scraper",
+      "status": "released"
+    },
+    {
+      "id": "fr_15190_40",
+      "issue_code": null,
+      "title": "Les Chroniques de Fantomiald - N°40",
+      "country": "fr",
+      "country_name": "France",
+      "country_flag": "🇫🇷",
+      "publisher": "Kiosque Presse",
+      "date": "2026-11-10",
+      "formatted_date": "Tuesday, November 10, 2026",
+      "price": null,
+      "pages": null,
+      "ean": "15190_40",
+      "cover_url": "https://cdn.direct-editeurs.fr/parutions/62/625ff385f56e76ff4fcb4ab1ed220254.jpg",
+      "url": "https://direct-editeurs.fr/magazine/15190_les-chroniques-de-fantomiald_40",
       "source": "scraper",
       "status": "released"
     },
@@ -1503,24 +1503,6 @@
       "status": "released"
     },
     {
-      "id": "de_weihnachten_band_32",
-      "issue_code": null,
-      "title": "weihnachten - Nr.\n  32 Frohes Fest in Entenhausen 32",
-      "country": "de",
-      "country_name": "Germany",
-      "country_flag": "🇩🇪",
-      "publisher": "Egmont LTB",
-      "date": "2026-11-03",
-      "formatted_date": "Tuesday, November 3, 2026",
-      "price": null,
-      "pages": null,
-      "ean": "weihnachten_band_32",
-      "cover_url": "https://www.lustiges-taschenbuch.de/sites/default/files/cover/LTB-Weihnachten-32.jpg",
-      "url": "https://www.lustiges-taschenbuch.de/ausgaben/nebenreihen/weihnachten/band-32",
-      "source": "scraper",
-      "status": "released"
-    },
-    {
       "id": "de_spezial_band_133",
       "issue_code": null,
       "title": "spezial - Nr.\n  133 Guten Appetit!",
@@ -1535,6 +1517,24 @@
       "ean": "spezial_band_133",
       "cover_url": "https://www.lustiges-taschenbuch.de/sites/default/files/cover/LTB-Spezial-133.jpg",
       "url": "https://www.lustiges-taschenbuch.de/ausgaben/nebenreihen/spezial/band-133",
+      "source": "scraper",
+      "status": "released"
+    },
+    {
+      "id": "de_weihnachten_band_32",
+      "issue_code": null,
+      "title": "weihnachten - Nr.\n  32 Frohes Fest in Entenhausen 32",
+      "country": "de",
+      "country_name": "Germany",
+      "country_flag": "🇩🇪",
+      "publisher": "Egmont LTB",
+      "date": "2026-11-03",
+      "formatted_date": "Tuesday, November 3, 2026",
+      "price": null,
+      "pages": null,
+      "ean": "weihnachten_band_32",
+      "cover_url": "https://www.lustiges-taschenbuch.de/sites/default/files/cover/LTB-Weihnachten-32.jpg",
+      "url": "https://www.lustiges-taschenbuch.de/ausgaben/nebenreihen/weihnachten/band-32",
       "source": "scraper",
       "status": "released"
     },
@@ -1638,24 +1638,6 @@
       "ean": "564490936",
       "cover_url": "https://i.prcdn.co/img?file=464d2026103000000000001001&page=1&height=1200",
       "url": "https://www.kathimerini.gr/k/disney/564490936/komix-148-i-methodos-toy-kaloy-ntetektiv/",
-      "source": "scraper",
-      "status": "released"
-    },
-    {
-      "id": "gr_564490864",
-      "issue_code": "gr/MMB 646",
-      "title": "Μίκυ Μάους #646 ΚΑΤΙ ΚΡΥΒΕΤΑΙ ΣΤΗΝ ΟΜΙΧΛΗ",
-      "country": "gr",
-      "country_name": "Greece",
-      "country_flag": "🇬🇷",
-      "publisher": "Kathimerini",
-      "date": "2026-10-30",
-      "formatted_date": "Friday, October 30, 2026",
-      "price": "0,16 €",
-      "pages": null,
-      "ean": "564490864",
-      "cover_url": "https://i.prcdn.co/img?file=464b2026103000000000001001&page=1&height=1200",
-      "url": "https://www.kathimerini.gr/k/disney/564490864/miky-maoys-646-kati-kryvetai-stin-omichli/",
       "source": "scraper",
       "status": "released"
     },
@@ -1939,7 +1921,7 @@
       "pages": null,
       "ean": "12228_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/ed/ed4704424caf41eb0904db9092da94e9.jpg",
-      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=316DC3B2E5A409D777715718117356B5",
+      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=3581419EB31888561D0F3F7265CFCB23",
       "source": "scraper",
       "status": "released"
     },
@@ -2011,7 +1993,7 @@
       "pages": null,
       "ean": "13159_597",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/5f/5f662a891434dbec65d59e9bf7898563.jpg",
-      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=316DC3B2E5A409D777715718117356B5",
+      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_597;jsessionid=3581419EB31888561D0F3F7265CFCB23",
       "source": "scraper",
       "status": "released"
     },
@@ -2423,7 +2405,7 @@
       "pages": null,
       "ean": "14068_76",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/a9/a944fd8df9bf4edf2ee81c41895ec88f.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=316DC3B2E5A409D777715718117356B5",
+      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=3581419EB31888561D0F3F7265CFCB23",
       "source": "scraper",
       "status": "released"
     },
@@ -2441,7 +2423,7 @@
       "pages": null,
       "ean": "15420_1",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/f6/f61e2812c435ff4898d656cb6e28ba5d.jpg",
-      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=316DC3B2E5A409D777715718117356B5",
+      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=3581419EB31888561D0F3F7265CFCB23",
       "source": "scraper",
       "status": "released"
     },
@@ -2763,7 +2745,7 @@
       "pages": null,
       "ean": "18658_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/e1/e1ab93323e556c5618ab556bcf721c01.jpg",
-      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=316DC3B2E5A409D777715718117356B5",
+      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=3581419EB31888561D0F3F7265CFCB23",
       "source": "scraper",
       "status": "released"
     },
@@ -6462,6 +6444,24 @@
       "status": "released"
     },
     {
+      "id": "gr_564490864",
+      "issue_code": "gr/MMB 646",
+      "title": "Μίκυ Μάους #646 ΚΑΤΙ ΚΡΥΒΕΤΑΙ ΣΤΗΝ ΟΜΙΧΛΗ",
+      "country": "gr",
+      "country_name": "Greece",
+      "country_flag": "🇬🇷",
+      "publisher": "Kathimerini",
+      "date": null,
+      "formatted_date": null,
+      "price": "1,90 €",
+      "pages": null,
+      "ean": "564490864",
+      "cover_url": "https://i.prcdn.co/img?cid=464B&page=1&height=1200",
+      "url": "https://www.kathimerini.gr/k/disney/564490864/miky-maoys-646-kati-kryvetai-stin-omichli/",
+      "source": "scraper",
+      "status": "upcoming"
+    },
+    {
       "id": "tr_0001787710001",
       "issue_code": null,
       "title": "Yıldızlararası-Disney En Güzel Maceralar",
@@ -6858,24 +6858,6 @@
       "status": "upcoming"
     },
     {
-      "id": "tr_0002088537001",
-      "issue_code": null,
-      "title": "Disney Süper Kahraman En Güzel Maceralar Serisi",
-      "country": "tr",
-      "country_name": "Turkey",
-      "country_flag": "🇹🇷",
-      "publisher": "Beta Kids",
-      "date": null,
-      "formatted_date": null,
-      "price": null,
-      "pages": null,
-      "ean": "0002088537001",
-      "cover_url": null,
-      "url": "https://www.dr.com.tr/kitap/disney-super-kahraman-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088537001",
-      "source": "scraper",
-      "status": "upcoming"
-    },
-    {
       "id": "tr_0002088529001",
       "issue_code": null,
       "title": "Disney Antik Mısır En Güzel Maceralar Serisi",
@@ -6890,6 +6872,24 @@
       "ean": "0002088529001",
       "cover_url": null,
       "url": "https://www.dr.com.tr/kitap/disney-antik-misir-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088529001",
+      "source": "scraper",
+      "status": "upcoming"
+    },
+    {
+      "id": "tr_0002088537001",
+      "issue_code": null,
+      "title": "Disney Süper Kahraman En Güzel Maceralar Serisi",
+      "country": "tr",
+      "country_name": "Turkey",
+      "country_flag": "🇹🇷",
+      "publisher": "Beta Kids",
+      "date": null,
+      "formatted_date": null,
+      "price": null,
+      "pages": null,
+      "ean": "0002088537001",
+      "cover_url": null,
+      "url": "https://www.dr.com.tr/kitap/disney-super-kahraman-en-guzel-maceralar-serisi/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002088537001",
       "source": "scraper",
       "status": "upcoming"
     },
@@ -7128,9 +7128,9 @@
       "status": "upcoming"
     },
     {
-      "id": "tr_0002244011001",
+      "id": "tr_0001965081001",
       "issue_code": null,
-      "title": "Disney Stiç - Stiç'in Sevgi Günü! Disney Okuma ...",
+      "title": "Disney Kötüler Şehri",
       "country": "tr",
       "country_name": "Turkey",
       "country_flag": "🇹🇷",
@@ -7139,16 +7139,16 @@
       "formatted_date": null,
       "price": null,
       "pages": null,
-      "ean": "0002244011001",
+      "ean": "0001965081001",
       "cover_url": null,
-      "url": "https://www.dr.com.tr/kitap/disney-stic-sticin-sevgi-gunu-disney-okuma-adimlarim-2/tim-mccanna/cocuk-ve-genclik/okul-cagi-6-10-yas/cocuk-oyku-hikaye/urunno=0002244011001",
+      "url": "https://www.dr.com.tr/kitap/disney-kotuler-sehri/cocuk-ve-genclik/genclik-10-yas/fantastik-bilim-kurgu/urunno=0001965081001",
       "source": "scraper",
       "status": "upcoming"
     },
     {
-      "id": "tr_0002217301001",
+      "id": "tr_0002095418001",
       "issue_code": null,
-      "title": "Disney Karlar Ükesi - Merhaba Olaf! Disney Okum...",
+      "title": "Disney Twisted-Wonderland Vol. 2 (Disney Twiste...",
       "country": "tr",
       "country_name": "Turkey",
       "country_flag": "🇹🇷",
@@ -7157,9 +7157,9 @@
       "formatted_date": null,
       "price": null,
       "pages": null,
-      "ean": "0002217301001",
+      "ean": "0002095418001",
       "cover_url": null,
-      "url": "https://www.dr.com.tr/kitap/disney-karlar-ukesi-merhaba-olaf-disney-okuma-adimlarim-1/andrea-posner-sanchez/cocuk-ve-genclik/okul-cagi-6-10-yas/cocuk-kitaplari/urunno=0002217301001",
+      "url": "https://www.dr.com.tr/kitap/disney-twisted-wonderland-vol-2-disney-twisted-wonderland-/wakana-hazuki/foreign-languages/graphic-novel/graphic-novel/urunno=0002095418001",
       "source": "scraper",
       "status": "upcoming"
     },

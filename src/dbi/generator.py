@@ -211,6 +211,19 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
             # the image among the covers of the issues printing the same stories.
             from src.dbi.story_rules import find_cover_code
             info["cover_code"] = find_cover_code(info["cover_url"], info["stories"], issue_path)
+
+        # If the cover is still unpublished (inédit), detect xapp characters via inducks-dbi vision
+        if (not info.get("cover_code") or info.get("cover_code") == "?") and not info.get("characters") and info.get("cover_url") and not info.get("_skip_vision"):
+            try:
+                from inducks_dbi.vision import detect_cover_characters
+                from src.utils import get_session
+                r_cov = get_session().get(info["cover_url"], timeout=10)
+                if r_cov.status_code == 200 and r_cov.content:
+                    detected = detect_cover_characters(r_cov.content)
+                    if detected:
+                        info["characters"] = [{"code": c} for c in detected]
+            except Exception as e:
+                print(f"  [warn] Cover vision xapp failed: {e}")
                 
         if preindexed:
             if preindexed.get("title"):
@@ -335,8 +348,9 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
         suffixes += cover_overflow
         if len(cover_ec) > 12: suffixes.append(f"[entrycode:{cover_ec}]")
         
+        # Only emit [xapp:...] on unpublished (inédit) covers
         characters = info.get("characters", [])
-        if characters:
+        if storycode == "?" and characters:
             xapp_codes = [c["code"] for c in characters if c.get("code")]
             if xapp_codes:
                 suffixes.append(f"[xapp:{','.join(xapp_codes)}]")

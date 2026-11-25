@@ -153,6 +153,46 @@ class GreekEnricherTests(unittest.TestCase):
         self.assertIn("key3", manifest["summary_page_url"])
         self.assertEqual(len(manifest["pages"]), 100)
 
+    def test_cover_xapp_only_for_inedit_covers_via_vision(self):
+        from unittest.mock import patch, MagicMock
+        from src.dbi.generator import generate_dbi_skeleton
+        from fake_inducks import FakeInducks
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.content = b"fake-jpeg"
+        mock_session = MagicMock()
+        mock_session.get.return_value = mock_resp
+
+        import os, tempfile
+        with FakeInducks(), tempfile.TemporaryDirectory() as tmpdir:
+            old_cwd = os.getcwd()
+            os.chdir(tmpdir)
+            try:
+                info_inedit = {
+                    "title": "Topolino 3701",
+                    "date": "2026-11-18",
+                    "price": "3,50 €",
+                    "cover_url": "https://example.com/cov.jpg",
+                }
+                with patch("src.utils.get_session", return_value=mock_session), \
+                     patch("inducks_dbi.vision.detect_cover_characters", return_value=["MM", "GO"]) as mock_vision:
+                    block = generate_dbi_skeleton(info_inedit, publication_type="it")
+                    mock_vision.assert_called_once_with(b"fake-jpeg")
+                    self.assertIn("[xapp:MM,GO]", block)
+
+                info_reprint = {
+                    "title": "Topolino 3701",
+                    "date": "2026-11-18",
+                    "price": "3,50 €",
+                    "cover_code": "IC TL 3700",
+                    "characters": [{"code": "MM"}],
+                }
+                block2 = generate_dbi_skeleton(info_reprint, publication_type="it")
+                self.assertNotIn("[xapp:", block2)
+            finally:
+                os.chdir(old_cwd)
+
 
 if __name__ == "__main__":
     unittest.main()

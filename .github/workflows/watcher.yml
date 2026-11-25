@@ -147,7 +147,7 @@ jobs:
 
           # Restore files
           cp /tmp/state_updated.json state.json
-          rm -rf issues covers
+          rm -rf issues covers web
           mkdir -p issues covers
           cp -r /tmp/issues_updated/* issues/ 2>/dev/null || true
           cp -r /tmp/covers_updated/* covers/ 2>/dev/null || true
@@ -156,11 +156,12 @@ jobs:
           fi
           
           # Write state and cache, and commit if there are changes
-          # Use -A so deleted files in issues/ and covers/ are tracked and committed
+          # Use -A so deleted files in issues/ and covers/ (and removed web/) are tracked and committed
           git add -A state.json
           if [ -f "releases.json" ]; then git add releases.json; fi
           if [ -d "issues" ]; then git add -A issues/; fi
           if [ -d "covers" ]; then git add -A covers/; fi
+          git add -A web/ 2>/dev/null || true
           
           if git diff --cached --quiet; then
             echo "No changes in state, issues, covers, or releases — nothing to commit."

@@ -27,10 +27,10 @@ GREEK_PRICES = {
 }
 
 CID_MAP = {
+    "super miky": "464C", "σούπερ μίκυ": "464C",
     "μίκυ μάους": "464B", "miky": "464B",
     "κόμιξ": "464D", "komix": "464D",
     "ντόναλντ": "464A", "donald": "464A",
-    "super miky": "464C", "σούπερ μίκυ": "464C",
     "editor": "464E", "επιλογή": "464E",
 }
 
@@ -116,10 +116,12 @@ def _process_kathimerini_article(a_tag, s: requests.Session) -> dict | None:
     if not cover_url:
         cover_url = art_img or (f"https://i.prcdn.co/img?cid={cid}&page=1&height=1200" if cid else None)
 
-    # Extract price from article or fallback to standard Greek series price
+    # Extract price from article body only (avoiding site-wide subscription banners like "0,16€/μέρα")
     price_val = GREEK_PRICES.get(cid, "1,90 €")
     if article_html_content:
-        m_pr = re.search(r'(?:€\s*(\d+[,\.]\d{2})|(\d+[,\.]\d{2})\s*€)', article_html_content)
+        body_soup = art_soup.find(class_=re.compile(r"entry-content|article-content|post-content"))
+        body_str = body_soup.get_text(" ", strip=True) if body_soup else ""
+        m_pr = re.search(r'(?:€\s*(\d+[,\.]\d{2})|(\d+[,\.]\d{2})\s*€)(?!\s*/)', body_str)
         if m_pr:
             price_val = f"{(m_pr.group(1) or m_pr.group(2)).replace('.', ',')} €"
 

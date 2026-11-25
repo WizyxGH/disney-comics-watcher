@@ -194,7 +194,7 @@ def main():
         ("Dynamite", DYNAMITE_KEY_PREFIX, discover_dynamite, "us", "announced", fetch_dynamite_details, False),
         ("Egmont DE", EGMONT_DE_KEY_PREFIX, discover_egmont_de, "de", "released", fetch_egmont_de_details, False),
         ("LTB DE", LTB_DE_KEY_PREFIX, discover_lustiges_taschenbuch_de, "de", "released", fetch_lustiges_taschenbuch_de_details, False),
-        ("Kathimerini GR", KATHIMERINI_KEY_PREFIX, discover_kathimerini, "gr", "released", None, False),
+        ("Kathimerini GR", KATHIMERINI_KEY_PREFIX, discover_kathimerini, "gr", "announced", None, False),
         ("Panini IT", PANINI_IT_KEY_PREFIX, discover_panini_it, "it", "announced", fetch_panini_it_details, False),
         ("Giunti IT", GIUNTI_IT_KEY_PREFIX, discover_giunti_it, "it", "released", fetch_giunti_it_details, False),
         ("Panini BR", PANINI_BR_KEY_PREFIX, discover_panini_br, "br", "announced", fetch_panini_br_details, False),

@@ -206,11 +206,10 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
             except Exception as e:
                 print(f"  [warn] Failed to enrich Greek comic: {e}")
 
-        if not info.get("cover_code") and info.get("cover_url") and info.get("stories"):
-            # A reprinted cover (LTB 610a = D 28817, the Nordic pocket books' cover): found from
-            # the image among the covers of the issues printing the same stories.
+        if not info.get("cover_code") and info.get("cover_url"):
+            # Check shared-story covers (dHash) and global cover embedding index (if built).
             from src.dbi.story_rules import find_cover_code
-            info["cover_code"] = find_cover_code(info["cover_url"], info["stories"], issue_path)
+            info["cover_code"] = find_cover_code(info["cover_url"], info.get("stories") or [], issue_path)
 
         # If the cover is still unpublished (inédit), detect xapp characters via inducks-dbi vision
         if (not info.get("cover_code") or info.get("cover_code") == "?") and not info.get("characters") and info.get("cover_url") and not info.get("_skip_vision"):

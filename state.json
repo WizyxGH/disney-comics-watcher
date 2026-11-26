@@ -1056,18 +1056,18 @@
   "panini-it:340073": "released",
   "_health": {
     "Nahdet Misr EG": {
-      "empty_runs": 17,
+      "empty_runs": 18,
       "alerted": true
     },
-    "ES": {
-      "empty_runs": 4,
+    "Panini IT": {
+      "empty_runs": 1,
       "alerted": false
     }
   },
-  "es:341708": "announced",
-  "es:341705": "announced",
-  "es:341714": "announced",
-  "es:341699": "announced",
+  "es:341708": "released",
+  "es:341705": "released",
+  "es:341714": "released",
+  "es:341699": "released",
   "panini-it:340613": "released",
   "panini-it:340631": "released",
   "is:d1f7893f-fc43-4aa6-bf03-888543b0e19d": "released",
@@ -1131,7 +1131,7 @@
   "dk:udgivelse-aa_21_2026": "released",
   "dk:udgivelse-aa_47_2026": "released",
   "dk:udgivelse-aa_22_2026": "released",
-  "dk:udgivelse-aa_48_2026": "announced",
+  "dk:udgivelse-aa_48_2026": "released",
   "dk:udgivelse-aa_23+24_2026": "released",
   "dk:udgivelse-aa_49_2026": "announced",
   "dk:udgivelse-aa_25_2026": "released",
@@ -1525,8 +1525,8 @@
   "tr:0002036551001": "released",
   "tr:0002096059001": "released",
   "tr:0001965081001": "released",
-  "es:341711": "announced",
-  "es:341717": "announced",
+  "es:341711": "released",
+  "es:341717": "released",
   "panini-it:342513": "released",
   "panini-it:342483": "released",
   "lt:donaldas-ir-kiti-ramaputros-galva-ir-kelione-i-zemes-centra": "released",
@@ -1645,5 +1645,7 @@
   "fr_kiosk:15528_495": "released",
   "fr_kiosk:14067_3884-3885": "released",
   "kathi-gr:564562165": "announced",
-  "kathi-gr:564562156": "announced"
+  "kathi-gr:564562156": "announced",
+  "se:tidsam_0778_202606": "released",
+  "se:tidsam_0723_202606": "released"
 }

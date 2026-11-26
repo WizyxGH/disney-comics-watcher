@@ -1,3 +1,6 @@
+ERL  1       h3 Disney Villanos: El rey León 1 [issdate:2026-11-26] [price:13.95 EUR] [inx:-]
+ERL  1a     EC ERL  1      1 c                      CV
+
 STP  1       h3 Disney Villanos: Stitch 1 [issdate:2026-11-26] [price:13.95 EUR] [inx:-]
-STP  1a     ?              1 c                      CV
+STP  1a     EC STP  1      1 c                      CV
 

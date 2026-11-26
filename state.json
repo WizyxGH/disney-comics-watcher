@@ -1056,12 +1056,8 @@
   "panini-it:340073": "released",
   "_health": {
     "Nahdet Misr EG": {
-      "empty_runs": 18,
+      "empty_runs": 19,
       "alerted": true
-    },
-    "Panini IT": {
-      "empty_runs": 1,
-      "alerted": false
     }
   },
   "es:341708": "released",
@@ -1583,7 +1579,7 @@
   "se:tidsam_0720_202647": "released",
   "se:tidsam_0687_202612": "released",
   "se:tidsam_0661_202608": "released",
-  "panini-it:342465": "announced",
+  "panini-it:342465": "released",
   "nahdet_misr_eg:c040926211172p": "released",
   "nahdet_misr_eg:mickey-and-minnie-stories": "released",
   "nahdet_misr_eg:c04080820034p": "released",
@@ -1647,5 +1643,8 @@
   "kathi-gr:564562165": "announced",
   "kathi-gr:564562156": "announced",
   "se:tidsam_0778_202606": "released",
-  "se:tidsam_0723_202606": "released"
+  "se:tidsam_0723_202606": "released",
+  "is:7f7a6dcd-e7b3-4e1b-8e2e-2180da932880": "released",
+  "no:269629": "announced",
+  "tr:0002217301001": "released"
 }

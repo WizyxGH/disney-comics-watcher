@@ -5,7 +5,8 @@ Temabog, Anders And Classic, and Anders And Junior via the WordPress REST API.
 """
 
 import re
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
+from email.utils import parsedate_to_datetime
 from bs4 import BeautifulSoup
 from src.config import ANDEBY_DK_API_BASE
 from src.utils import get_session
@@ -46,6 +47,29 @@ def _build_issue_path(pubcode: str, num_str: str, year: int) -> str | None:
     return None
 
 
+def _cover_last_modified(s, url: str) -> date | None:
+    """Returns the Last-Modified date of an Egmont CDN cover, or None if unavailable."""
+    try:
+        r = s.head(url, timeout=5)
+        lm = r.headers.get("Last-Modified")
+        if lm:
+            return parsedate_to_datetime(lm).date()
+    except Exception:
+        pass
+    return None
+
+
+def _cover_for_issue(base_cover: str, cover_lm: date | None, pub_date: date) -> str | None:
+    """Egmont CDN reuses a single static URL (e.g. AND__b600m.jpg) and only updates it
+    sporadically. Only attach it when its Last-Modified date matches this issue's release
+    window, with a date query param so Telegram never serves a cached older cover."""
+    if not base_cover or not cover_lm:
+        return None
+    if pub_date - timedelta(days=10) <= cover_lm <= pub_date + timedelta(days=7):
+        return f"{base_cover}?d={cover_lm.strftime('%Y%m%d')}"
+    return None
+
+
 def discover_dk() -> list[dict]:
     """Discovers Danish Disney comic books from andeby.dk official release plans."""
     s = get_session()
@@ -64,12 +88,13 @@ def discover_dk() -> list[dict]:
             soup = BeautifulSoup(content_html, "html.parser")
 
             # Check if there is an updated cover image in the page content
-            cover_url = default_cover
+            base_cover = default_cover
             for img in soup.find_all("img"):
                 src = img.get("src", "")
                 if src and any(ext in src.lower() for ext in (".jpg", ".jpeg", ".png")):
-                    cover_url = src
+                    base_cover = src
                     break
+            cover_lm = _cover_last_modified(s, base_cover)
 
             for tr in soup.find_all("tr"):
                 tds = [td.get_text(strip=True) for td in tr.find_all("td")]
@@ -108,7 +133,7 @@ def discover_dk() -> list[dict]:
                         "date": date_str_fr,
                         "pub_date": pub_date,
                         "issue_path": path,
-                        "cover_url": cover_url,
+                        "cover_url": _cover_for_issue(base_cover, cover_lm, pub_date),
                         "price": None,
                     })
 

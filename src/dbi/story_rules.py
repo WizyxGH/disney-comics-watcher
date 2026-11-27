@@ -123,7 +123,7 @@ def resolve_stories_by_title(stories: list[dict], log=print) -> None:
     for s in stories:
         if s.get("story_code"):
             continue
-        title = (s.get("title") or "").strip()
+        title = (s.get("orig_title") or s.get("title") or "").strip()
         if not title:
             continue
         rows = _query(

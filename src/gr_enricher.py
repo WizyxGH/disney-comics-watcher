@@ -201,7 +201,7 @@ def parse_kathimerini_stories(html_or_soup) -> list[dict]:
 
     # 1. Try Komix format: "ΕΝΑ ΜΩΡΟ ΓΙΑ ΔΥΟ Two Men and a Baby: Μια ιστορία του David Gerstein, από το πενάκι του Vicar"
     for text in paragraphs:
-        m_k = re.search(r"^([Α-ΩΆ-Ώ0-9\s'’]+?)\s+([A-Za-z0-9\s,'’\-?!]+?):\s*(.*)", text)
+        m_k = re.search(r"^([Α-ΩΆ-Ώ0-9\s,'’\-?!.…«»]+?)\s+([A-Za-z0-9\s,'’\-?!.…]+?):\s*(.*)", text)
         if m_k:
             greek_title = m_k.group(1).strip()
             english_title = m_k.group(2).strip()
@@ -210,8 +210,8 @@ def parse_kathimerini_stories(html_or_soup) -> list[dict]:
             # Avoid matching site navigational paragraphs
             if len(english_title) >= 3 and not english_title.startswith("http"):
                 stories.append({
-                    "greek_title": greek_title,
-                    "title": english_title,
+                    "title": greek_title,
+                    "orig_title": english_title,
                     "credits_text": credits_text,
                     "format": "komix"
                 })

@@ -20,6 +20,7 @@ STORY_TABLES = {
     "inducks_entry": ("entrycode", "issuecode", "storyversioncode", "position", "part"),
     "inducks_entryurl": ("entrycode", "sitecode", "pagenumber", "url", "storycode"),
     "inducks_charactername": ("charactercode", "languagecode", "charactername"),
+    "inducks_appearance": ("storyversioncode", "charactercode"),
 }
 # Rows kept: the scans Inducks serves (site "webusers") of a known story, for the cover lookup.
 STORY_TABLE_ROWS = {"inducks_entryurl": lambda row: row[1] == "webusers" and row[4] != ""}
@@ -89,6 +90,7 @@ def _story_table_file(table: str, cache_dir: str) -> str:
 
 
 def _load_story_tables(cur, cache_dir: str) -> None:
+    cover_sv_set: set[str] = set()
     for table, columns in STORY_TABLES.items():
         path = _story_table_file(table, cache_dir)
         cur.execute(f"DROP TABLE IF EXISTS {table}")
@@ -101,6 +103,15 @@ def _load_story_tables(cur, cache_dir: str) -> None:
             keep = STORY_TABLE_ROWS.get(table)
             if keep:
                 rows = (row for row in rows if keep(row))
+            if table == "inducks_entry":
+                def _track_covers(iter_rows):
+                    for row in iter_rows:
+                        if row[3] == "a" and row[2]:
+                            cover_sv_set.add(row[2])
+                        yield row
+                rows = _track_covers(rows)
+            elif table == "inducks_appearance" and cover_sv_set:
+                rows = (row for row in rows if row[0] in cover_sv_set)
             cur.executemany(f"INSERT INTO {table} VALUES ({', '.join('?' * len(columns))})", rows)
         print(f"  -> {table} imported.")
     cur.execute("CREATE INDEX idx_story_code ON inducks_story(storycode)")
@@ -113,6 +124,8 @@ def _load_story_tables(cur, cache_dir: str) -> None:
     cur.execute("CREATE INDEX idx_entryurl_story ON inducks_entryurl(storycode)")
     cur.execute("CREATE INDEX idx_entryurl_entry ON inducks_entryurl(entrycode)")
     cur.execute("CREATE INDEX idx_charname_lang ON inducks_charactername(languagecode)")
+    cur.execute("CREATE INDEX idx_app_sv ON inducks_appearance(storyversioncode)")
+    cur.execute("CREATE INDEX idx_app_char ON inducks_appearance(charactercode)")
 
 
 def build():

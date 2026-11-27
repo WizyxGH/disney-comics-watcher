@@ -182,7 +182,8 @@ def find_story_codes(stories: list[dict], issue_path: str = "", log=print) -> No
         log(f"  [page] lookup skipped: {e}")
 
 
-def find_cover_code(cover_url: str, stories: list[dict], issue_path: str = "", log=print) -> str | None:
+def find_cover_code(cover_url: str, stories: list[dict], issue_path: str = "",
+                    cover_chars: list[str] | None = None, log=print) -> str | None:
     """Story code of the reprinted cover, or None (new cover, no clear match, or the tables or
     Pillow missing: the cover keeps "?")."""
     try:
@@ -191,8 +192,12 @@ def find_cover_code(cover_url: str, stories: list[dict], issue_path: str = "", l
         cover = _fetch(cover_url)
         if not cover:
             return None
-        return _find_cover_code(_query, cover, [s.get("story_code") for s in stories],
-                                _fetch, own_issue=issue_path or "", log=log)
+        try:
+            return _find_cover_code(_query, cover, [s.get("story_code") for s in stories],
+                                    _fetch, own_issue=issue_path or "", cover_chars=cover_chars, log=log)
+        except TypeError:
+            return _find_cover_code(_query, cover, [s.get("story_code") for s in stories],
+                                    _fetch, own_issue=issue_path or "", log=log)
     except Exception as e:
         log(f"  [cover] lookup skipped: {e}")
         return None

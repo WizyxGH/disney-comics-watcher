@@ -358,23 +358,38 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
             except Exception as e:
                 print(f"  [warn] Story rules failed: {e}")
 
+        detected_cover_chars: list[str] | None = None
         if not info.get("cover_code") and info.get("cover_url"):
-            # Check shared-story covers (dHash) and global cover embedding index (if built).
+            # Detect cover characters once when vision is enabled so cover lookup can use them
+            # to disambiguate candidates, and reuse them for xapp if the cover remains inédit.
+            if not info.get("characters") and not info.get("_skip_vision"):
+                try:
+                    from inducks_dbi.vision import detect_cover_characters
+                    from src.utils import fetch_image_bytes
+                    fetched = fetch_image_bytes(info["cover_url"], timeout=10)
+                    if fetched and fetched[0]:
+                        detected_cover_chars = detect_cover_characters(fetched[0]) or []
+                except Exception as e:
+                    print(f"  [warn] Cover vision xapp failed: {e}")
+            # Check shared-story covers (dHash + character filter) and global cover embedding index.
             from src.dbi.story_rules import find_cover_code
-            info["cover_code"] = find_cover_code(info["cover_url"], info.get("stories") or [], issue_path)
+            info["cover_code"] = find_cover_code(
+                info["cover_url"], info.get("stories") or [], issue_path, cover_chars=detected_cover_chars
+            )
 
-        # If the cover is still unpublished (inédit), detect xapp characters via inducks-dbi vision
+        # If the cover is still unpublished (inédit), attach xapp characters detected via vision
         if (not info.get("cover_code") or info.get("cover_code") == "?") and not info.get("characters") and info.get("cover_url") and not info.get("_skip_vision"):
-            try:
-                from inducks_dbi.vision import detect_cover_characters
-                from src.utils import fetch_image_bytes
-                fetched = fetch_image_bytes(info["cover_url"], timeout=10)
-                if fetched and fetched[0]:
-                    detected = detect_cover_characters(fetched[0])
-                    if detected:
-                        info["characters"] = [{"code": c} for c in detected]
-            except Exception as e:
-                print(f"  [warn] Cover vision xapp failed: {e}")
+            if detected_cover_chars is None:
+                try:
+                    from inducks_dbi.vision import detect_cover_characters
+                    from src.utils import fetch_image_bytes
+                    fetched = fetch_image_bytes(info["cover_url"], timeout=10)
+                    if fetched and fetched[0]:
+                        detected_cover_chars = detect_cover_characters(fetched[0])
+                except Exception as e:
+                    print(f"  [warn] Cover vision xapp failed: {e}")
+            if detected_cover_chars:
+                info["characters"] = [{"code": c} for c in detected_cover_chars]
                 
         if preindexed:
             if preindexed.get("title"):

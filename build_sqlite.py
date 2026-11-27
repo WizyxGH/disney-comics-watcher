@@ -15,6 +15,7 @@ USER_AGENT = (
 # columns used. ~490 MB to download, so they are loaded only when INDUCKS_STORY_TABLES_DIR names
 # a folder where the files are kept (the watcher workflow caches it for a week).
 STORY_TABLES = {
+    "inducks_story": ("storycode", "title"),
     "inducks_storyversion": ("storyversioncode", "storycode", "entirepages", "rowsperpage"),
     "inducks_entry": ("entrycode", "issuecode", "storyversioncode", "position", "part"),
     "inducks_entryurl": ("entrycode", "sitecode", "pagenumber", "url", "storycode"),
@@ -89,6 +90,7 @@ def _story_table_file(table: str, cache_dir: str) -> str:
 def _load_story_tables(cur, cache_dir: str) -> None:
     for table, columns in STORY_TABLES.items():
         path = _story_table_file(table, cache_dir)
+        cur.execute(f"DROP TABLE IF EXISTS {table}")
         cur.execute(f"CREATE TABLE {table} ({', '.join(c + ' TEXT' for c in columns)})")
         with open(path, encoding="utf-8", errors="replace") as f:
             header = f.readline().rstrip("\r\n").split("^")
@@ -100,6 +102,8 @@ def _load_story_tables(cur, cache_dir: str) -> None:
                 rows = (row for row in rows if keep(row))
             cur.executemany(f"INSERT INTO {table} VALUES ({', '.join('?' * len(columns))})", rows)
         print(f"  -> {table} imported.")
+    cur.execute("CREATE INDEX idx_story_code ON inducks_story(storycode)")
+    cur.execute("CREATE INDEX idx_story_title ON inducks_story(LOWER(title))")
     cur.execute("CREATE INDEX idx_sv_storycode ON inducks_storyversion(storycode)")
     cur.execute("CREATE INDEX idx_sv_code ON inducks_storyversion(storyversioncode)")
     cur.execute("CREATE INDEX idx_entry_sv ON inducks_entry(storyversioncode)")

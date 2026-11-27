@@ -265,18 +265,26 @@ def parse_kathimerini_stories(html_or_soup) -> list[dict]:
 
 
 def match_komix_story(story_entry: dict) -> dict:
-    """Resolves Inducks storycode, pages, and creators for an Egmont/Komix story by English title."""
-    title = story_entry.get("title", "")
+    """Resolves Inducks storycode and page count for an Egmont/Komix story by English title."""
+    title = (story_entry.get("title") or "").strip()
     if not title:
         return story_entry
 
+    has_title_col = any(
+        r[1] == "title"
+        for r in (query_db("PRAGMA table_info(inducks_story)") or [])
+    )
+    if not has_title_col:
+        return story_entry
+
     rows = query_db("""
-        SELECT sv.storycode, sv.entirepages, sv.writsummary, sv.artsummary
-        FROM inducks_storyversion sv
-        WHERE sv.storycode IN (SELECT storycode FROM inducks_story WHERE title = ?)
-           OR sv.storyversioncode IN (SELECT storyversioncode FROM inducks_entry WHERE title = ?)
+        SELECT s.storycode, sv.entirepages
+        FROM inducks_story s
+        LEFT JOIN inducks_storyversion sv ON sv.storycode = s.storycode
+        WHERE LOWER(s.title) = LOWER(?)
+        ORDER BY CASE WHEN sv.entirepages IS NOT NULL AND sv.entirepages <> '' THEN 0 ELSE 1 END
         LIMIT 1
-    """, (title, title))
+    """, (title,))
 
     if rows and rows[0]:
         r = rows[0]
@@ -285,8 +293,6 @@ def match_komix_story(story_entry: dict) -> dict:
             story_entry["pages"] = int(r[1]) if r[1] else None
         except Exception:
             pass
-        story_entry["writ"] = (r[2] or "").strip(",")
-        story_entry["art"] = (r[3] or "").strip(",")
 
     return story_entry
 
@@ -393,6 +399,7 @@ def enrich_gr_metadata(info: dict) -> dict:
         for s in parsed_stories:
             match_komix_story(s)
         info["stories"] = parsed_stories
+        info["page_positions_unknown"] = True
         if not info.get("pages"):
             info["pages"] = 100
         return info

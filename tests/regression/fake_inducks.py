@@ -53,7 +53,12 @@ PUBLICATIONS = [
     ("eg/MMP",   "ميكي جيب",                     [("78", "2026-05-01"), ("79", "2026-06-01", "eg/MMP  79")], []),
 ]
 
-STORIES = ["H 2013-227", "I PKA  42-1", "HC DD2025-38"]
+STORIES = [
+    ("H 2013-227", ""),
+    ("I PKA  42-1", ""),
+    ("HC DD2025-38", ""),
+    ("D 2010-069", "Duck of Thunder"),
+]
 
 # Story versions (storyversioncode, storycode, entirepages, rowsperpage) and their
 # printings (entrycode, issuecode, storyversioncode, position, part): a serial in two
@@ -67,6 +72,7 @@ STORY_VERSIONS = [
     ("pl/GP 269p179", "I TL 3681-1P", 20, 3), ("pl/GP 269p231", "I TL 3681-1P", 24, 3),
     ("I PKA  42-1", "I PKA  42-1", 20, 3), ("I TL 3017-3", "I TL 3017-3", 24, 3),
     ("I TL 3622-1", "I TL 3622-1", 30, 3),
+    ("D 2010-069", "D 2010-069", 21, 3),
 ]
 ENTRIES = [
     ("it/TL 3583p009", "it/TL 3583", "it/TL 3583p009", "p009", "1"),
@@ -90,7 +96,7 @@ def _build() -> sqlite3.Connection:
         CREATE TABLE inducks_issue (issuecode TEXT, publicationcode TEXT, issuenumber TEXT,
                                     filledoldestdate TEXT, fullyindexed TEXT, inputfilecode TEXT);
         CREATE TABLE inducks_inputfile (inputfilecode TEXT, path TEXT, filename TEXT);
-        CREATE TABLE inducks_story (storycode TEXT);
+        CREATE TABLE inducks_story (storycode TEXT, title TEXT);
         CREATE TABLE inducks_storyversion (storyversioncode TEXT, storycode TEXT, entirepages TEXT,
                                            rowsperpage TEXT);
         CREATE TABLE inducks_entry (entrycode TEXT, issuecode TEXT, storyversioncode TEXT,
@@ -104,7 +110,7 @@ def _build() -> sqlite3.Connection:
             conn.execute("INSERT INTO inducks_issue VALUES (?,?,?,?,?,?)",
                          (issuecode[0] if issuecode else f"{code} {number}", code, number, date, "N", "1914" if code == "it/TL" else "1"))
     conn.execute("INSERT INTO inducks_inputfile VALUES (?,?,?)", ("1914", "issues/it", "tl2000.dbi"))
-    conn.executemany("INSERT INTO inducks_story VALUES (?)", [(s,) for s in STORIES])
+    conn.executemany("INSERT INTO inducks_story VALUES (?,?)", STORIES)
     conn.executemany("INSERT INTO inducks_storyversion VALUES (?,?,?,?)", STORY_VERSIONS)
     conn.executemany("INSERT INTO inducks_entry VALUES (?,?,?,?,?)", ENTRIES)
     return conn
@@ -114,10 +120,12 @@ class FakeInducks:
     """Context manager routing every query_db call to the in-memory database."""
 
     def __enter__(self):
+        from src import gr_enricher
         from src.dbi import isv_search, story_rules
         self.conn = _build()
         query = lambda sql, params=(): self.conn.execute(sql, params).fetchall()
         self.patches = [mock.patch("src.db.query_db", query),
+                        mock.patch.object(gr_enricher, "query_db", query),
                         mock.patch.object(isv_search, "query_db", query),
                         mock.patch.object(story_rules, "query_db", query)]
         for p in self.patches:

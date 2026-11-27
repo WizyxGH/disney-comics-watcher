@@ -198,6 +198,14 @@ class GreekEnricherTests(unittest.TestCase):
             finally:
                 os.chdir(old_cwd)
 
+    def test_match_komix_story_resolves_english_title_and_pages(self):
+        from src.gr_enricher import match_komix_story
+        from tests.regression.fake_inducks import FakeInducks
+        with FakeInducks():
+            match = match_komix_story({"title": "Duck of Thunder"})
+        self.assertEqual(match["story_code"], "D 2010-069")
+        self.assertEqual(match["pages"], 21)
+
 
 if __name__ == "__main__":
     unittest.main()

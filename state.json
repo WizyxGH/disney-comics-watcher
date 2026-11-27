@@ -1056,15 +1056,11 @@
   "panini-it:340073": "released",
   "_health": {
     "Nahdet Misr EG": {
-      "empty_runs": 21,
+      "empty_runs": 22,
       "alerted": true
     },
-    "Panini IT": {
-      "empty_runs": 2,
-      "alerted": false
-    },
     "ES": {
-      "empty_runs": 1,
+      "empty_runs": 2,
       "alerted": false
     }
   },
@@ -1654,5 +1650,6 @@
   "se:tidsam_0723_202606": "released",
   "is:7f7a6dcd-e7b3-4e1b-8e2e-2180da932880": "released",
   "no:269629": "announced",
-  "tr:0002217301001": "released"
+  "tr:0002217301001": "released",
+  "egmont-de:200/03411": "released"
 }

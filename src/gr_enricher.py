@@ -328,7 +328,7 @@ def enrich_gr_metadata(info: dict) -> dict:
         if next_p and current.get("start_page"):
             current["pages"] = next_p - current["start_page"]
         sp = current.get("start_page")
-        if sp and sp in manifest_pages and manifest_pages[sp].get("url"):
+        if sp and sp in manifest_pages and manifest_pages[sp].get("is_hd") and manifest_pages[sp].get("url"):
             current["preview_url"] = manifest_pages[sp]["url"]
 
     info["stories"] = parsed_stories

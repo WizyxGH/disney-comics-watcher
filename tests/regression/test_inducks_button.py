@@ -85,6 +85,7 @@ class CoverFilename(unittest.TestCase):
             self.assertEqual(cover_filename(code, "it"), "it_dbig_0223a_001")
         self.assertEqual(cover_filename("DSE  62B", "it"), "it_dse_062ba_001")
         self.assertEqual(cover_filename("MM2026-02", "bg"), "bg_mm2026_02a_001")
+        self.assertEqual(cover_filename("gr/MMB 650", "gr"), "gr_mmb_0650a_001")
 
 
 if __name__ == "__main__":

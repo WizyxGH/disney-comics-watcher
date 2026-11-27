@@ -128,6 +128,10 @@ def cover_filename(issue_code: str, country: str) -> str:
     """Name of an issue's cover in covers/, without extension: 'it_pm_0557a_001'.
     Spacing does not matter ('PM 557', 'PM  557' and 'DBIG223' / 'DBIG 223'
     name the same file), so a code respaced as Inducks spaces it keeps its cover."""
+    if "/" in issue_code:
+        prefix, rest = issue_code.split("/", 1)
+        if prefix.strip().lower() == country.strip().lower():
+            issue_code = rest
     m = re.match(r'^([a-zA-Z]+)(?:[\s_]+(.*)|(\d+[A-Za-z]?))$', issue_code)
     if m:
         pub_code = m.group(1).lower()

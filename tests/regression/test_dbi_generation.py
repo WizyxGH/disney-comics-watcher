@@ -206,6 +206,17 @@ class GreekEnricherTests(unittest.TestCase):
         self.assertEqual(match["story_code"], "D 2010-069")
         self.assertEqual(match["pages"], 21)
 
+    def test_strip_hero_prefix_uses_inducks_charactername(self):
+        from src.dbi.story_rules import strip_hero_prefix
+        from tests.regression.fake_inducks import FakeInducks
+        with FakeInducks():
+            title_el, code_el = strip_hero_prefix("ΦΑΝΤΟΜ ΝΤΑΚ Ο ΗΡΩΑΣ ΚΑΙ Ο ΝΤΕΤΕΚΤΙΒ", language_code="el")
+            title_it, code_it = strip_hero_prefix("TOPOLINO E IL MISTERO", language_code="it")
+        self.assertEqual(title_el, "Ο ΗΡΩΑΣ ΚΑΙ Ο ΝΤΕΤΕΚΤΙΒ")
+        self.assertEqual(code_el, "PK")
+        self.assertEqual(title_it, "E IL MISTERO")
+        self.assertEqual(code_it, "MM")
+
 
 if __name__ == "__main__":
     unittest.main()

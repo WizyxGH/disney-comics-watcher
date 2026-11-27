@@ -327,13 +327,8 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
                 if info.get("price"):
                     data["price"] = info["price"]
                 if info.get("stories"):
-                    # Serials split into their parts, strips per page, invented codes:
-                    # only from the Inducks data (src/dbi/story_rules.py).
                     from src.dbi.story_rules import apply_story_rules
                     info["stories"] = apply_story_rules(info["stories"])
-                    # Stories still without a code: from the image of their first page.
-                    from src.dbi.story_rules import find_story_codes
-                    find_story_codes(info["stories"], issue_path)
             except Exception as e:
                 print(f"  [warn] Failed to enrich LTB: {e}")
 
@@ -353,6 +348,15 @@ def generate_dbi_skeleton(info: dict, publication_type: str, overrides: dict | N
                     info["stories"] = apply_story_rules(info["stories"])
             except Exception as e:
                 print(f"  [warn] Failed to enrich Greek comic: {e}")
+
+        if info.get("stories"):
+            # Global story resolution across all countries: original-title match and first-page dHash.
+            try:
+                from src.dbi.story_rules import find_story_codes, resolve_stories_by_title
+                resolve_stories_by_title(info["stories"])
+                find_story_codes(info["stories"], issue_path)
+            except Exception as e:
+                print(f"  [warn] Story rules failed: {e}")
 
         if not info.get("cover_code") and info.get("cover_url"):
             # Check shared-story covers (dHash) and global cover embedding index (if built).

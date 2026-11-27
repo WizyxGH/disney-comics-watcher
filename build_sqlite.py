@@ -19,6 +19,7 @@ STORY_TABLES = {
     "inducks_storyversion": ("storyversioncode", "storycode", "entirepages", "rowsperpage"),
     "inducks_entry": ("entrycode", "issuecode", "storyversioncode", "position", "part"),
     "inducks_entryurl": ("entrycode", "sitecode", "pagenumber", "url", "storycode"),
+    "inducks_charactername": ("charactercode", "languagecode", "charactername"),
 }
 # Rows kept: the scans Inducks serves (site "webusers") of a known story, for the cover lookup.
 STORY_TABLE_ROWS = {"inducks_entryurl": lambda row: row[1] == "webusers" and row[4] != ""}
@@ -106,10 +107,12 @@ def _load_story_tables(cur, cache_dir: str) -> None:
     cur.execute("CREATE INDEX idx_story_title ON inducks_story(LOWER(title))")
     cur.execute("CREATE INDEX idx_sv_storycode ON inducks_storyversion(storycode)")
     cur.execute("CREATE INDEX idx_sv_code ON inducks_storyversion(storyversioncode)")
+    cur.execute("CREATE INDEX idx_sv_pages ON inducks_storyversion(entirepages)")
     cur.execute("CREATE INDEX idx_entry_sv ON inducks_entry(storyversioncode)")
     cur.execute("CREATE INDEX idx_entry_issue ON inducks_entry(issuecode)")
     cur.execute("CREATE INDEX idx_entryurl_story ON inducks_entryurl(storycode)")
     cur.execute("CREATE INDEX idx_entryurl_entry ON inducks_entryurl(entrycode)")
+    cur.execute("CREATE INDEX idx_charname_lang ON inducks_charactername(languagecode)")
 
 
 def build():

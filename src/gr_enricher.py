@@ -154,7 +154,7 @@ def fetch_pressreader_issue_manifest(cid: str, slug: str = "miky-maous", session
         return None
 
 
-# Ordered longest-first so compound hero names match before single names.
+# Compound/shorthand Greek hero prefixes not present verbatim in inducks_charactername.
 GREEK_HERO_PREFIXES = (
     "ΧΙΟΥΗ ΛΙΟΥΗ & ΝΤΙΟΥΗ",
     "ΜΙΚΥ & ΦΑΝΤΟΜ",
@@ -163,49 +163,20 @@ GREEK_HERO_PREFIXES = (
     "ΝΤΟΝΑΛΝΤ & ΦΕΘΡΥ",
     "ΛΟΥΝΤΒΙΧ & ΝΙΟΥΤΟΝ",
     "ΜΙΚΡΟΙ ΕΞΕΡΕΥΝΗΤΕΣ",
-    "ΣΚΡΟΥΤΖ ΜΑΚ ΝΤΑΚ",
-    "ΜΑΤΖΙΚΑ ΝΤΕ ΣΠΕΛ",
-    "ΝΥΧΤΕΡΙΔΑΣ ΝΤΑΚ",
-    "ΚΥΡΟΣ ΓΡΑΝΑΖΗΣ",
-    "ΠΡΑΚΤΟΡΑΣ ΝΤΑΚ",
-    "ΣΟΥΠΕΡ ΓΚΟΥΦΥ",
-    "ΝΤΟΝΑΛΝΤ ΝΤΑΚ",
-    "ΘΕΙΟΣ ΣΚΡΟΥΤΖ",
-    "ΙΟΥΝΙΟΡ ΝΤΑΚ",
-    "ΦΑΝΤΟΜ ΝΤΑΚ",
-    "ΜΙΚΥ ΜΑΟΥΣ",
-    "ΜΙΝΝΙ ΜΑΟΥΣ",
-    "ΝΤΑΙΖΥ ΝΤΑΚ",
     "ΤΖΩΝ ΡΟΜΠΑΞ",
-    "ΜΑΥΡΟΣ ΠΗΤ",
-    "ΜΟΥΡΓΟΛΥΚΟΙ",
-    "ΝΤΟΝΑΛΝΤ",
-    "ΓΚΑΣΤΟΝΕ",
-    "ΜΟΡΤΙΜΕΡ",
     "ΣΚΡΟΥΤΖ",
     "ΓΚΟΥΦΥ",
     "ΦΑΝΤΟΜ",
-    "ΠΛΟΥΤΟ",
-    "ΝΤΑΙΖΥ",
-    "ΜΠΑΜΠΗΣ",
-    "ΦΕΘΡΥ",
-    "ΚΥΡΟΣ",
-    "ΜΙΝΝΙ",
-    "ΟΛΑΦ",
     "ΜΙΚΥ",
+    "ΝΤΟΝΑΛΝΤ",
 )
 
 
 def _strip_greek_hero_prefix(text: str) -> str:
-    """Strips a leading Greek hero name from Kathimerini's 'HERO TITLE' announcement lines."""
-    cleaned = text.strip()
-    upper = cleaned.upper()
-    for hero in GREEK_HERO_PREFIXES:
-        if upper.startswith(hero + " "):
-            candidate = cleaned[len(hero):].strip(" :-–—")
-            if len(candidate) >= 3:
-                return candidate
-    return cleaned
+    """Strips a leading Greek hero name using global Inducks character names + compound fallbacks."""
+    from src.dbi.story_rules import strip_hero_prefix
+    stripped, _ = strip_hero_prefix(text, language_code="el", extra_prefixes=GREEK_HERO_PREFIXES)
+    return stripped
 
 
 def parse_kathimerini_stories(html_or_soup) -> list[dict]:
@@ -265,63 +236,10 @@ def parse_kathimerini_stories(html_or_soup) -> list[dict]:
 
 
 def match_komix_story(story_entry: dict) -> dict:
-    """Resolves Inducks storycode and page count for an Egmont/Komix story by English title."""
-    title = (story_entry.get("title") or "").strip()
-    if not title:
-        return story_entry
-
-    has_title_col = any(
-        r[1] == "title"
-        for r in (query_db("PRAGMA table_info(inducks_story)") or [])
-    )
-    if not has_title_col:
-        return story_entry
-
-    rows = query_db("""
-        SELECT s.storycode, sv.entirepages
-        FROM inducks_story s
-        LEFT JOIN inducks_storyversion sv ON sv.storycode = s.storycode
-        WHERE LOWER(s.title) = LOWER(?)
-        ORDER BY CASE WHEN sv.entirepages IS NOT NULL AND sv.entirepages <> '' THEN 0 ELSE 1 END
-        LIMIT 1
-    """, (title,))
-
-    if rows and rows[0]:
-        r = rows[0]
-        story_entry["story_code"] = r[0]
-        try:
-            story_entry["pages"] = int(r[1]) if r[1] else None
-        except Exception:
-            pass
-
+    """Delegates to the global Inducks title resolver."""
+    from src.dbi.story_rules import resolve_stories_by_title
+    resolve_stories_by_title([story_entry])
     return story_entry
-
-
-def match_italian_source_issue(stories: list[dict], pub_code: str) -> str | None:
-    """
-    Attempts to identify which Italian Topolino / Paperino issue is being translated
-    by finding candidate Italian stories matching the titles or characters.
-    """
-    candidates = []
-    for s in stories:
-        title = s.get("title", "")
-        for word in title.split():
-            if len(word) > 4:
-                rows = query_db("""
-                    SELECT issuecode FROM inducks_entry
-                    WHERE issuecode LIKE 'it/TL 3%' AND title LIKE ?
-                    LIMIT 3
-                """, (f"%{word}%",))
-                for r in (rows or []):
-                    candidates.append(r[0])
-
-    if candidates:
-        from collections import Counter
-        most_common = Counter(candidates).most_common(1)
-        if most_common:
-            return most_common[0][0]
-
-    return None
 
 
 def enrich_gr_metadata(info: dict) -> dict:
@@ -394,10 +312,8 @@ def enrich_gr_metadata(info: dict) -> dict:
     if not parsed_stories:
         return info
 
-    # 1. Komix layout
+    # 1. Komix layout (resolved globally by title in generator/story_rules)
     if parsed_stories[0].get("format") == "komix":
-        for s in parsed_stories:
-            match_komix_story(s)
         info["stories"] = parsed_stories
         info["page_positions_unknown"] = True
         if not info.get("pages"):
@@ -405,26 +321,15 @@ def enrich_gr_metadata(info: dict) -> dict:
         return info
 
     # 2. Numbered layout (Miky Maous, Donald, Super Miky)
+    manifest_pages = (manifest or {}).get("pages") or {}
     for i in range(len(parsed_stories)):
         current = parsed_stories[i]
         next_p = parsed_stories[i + 1]["start_page"] if i + 1 < len(parsed_stories) else None
         if next_p and current.get("start_page"):
             current["pages"] = next_p - current["start_page"]
-
-    # Try matching Italian source issue if it's Miky Maous
-    if "MM" in pub_code:
-        source_issue = match_italian_source_issue(parsed_stories, pub_code)
-        if source_issue:
-            source_rows = query_db("""
-                SELECT e.position, e.title, sv.storycode, sv.entirepages, sv.writsummary, sv.artsummary
-                FROM inducks_entry e
-                LEFT JOIN inducks_storyversion sv ON e.storyversioncode = sv.storyversioncode
-                WHERE e.issuecode = ? AND sv.storycode NOT LIKE 'Q%'
-            """, (source_issue,))
-            if source_rows:
-                cover_row = next((r for r in source_rows if r[0] == 'a'), None)
-                if cover_row and cover_row[2]:
-                    info["cover_code"] = cover_row[2]
+        sp = current.get("start_page")
+        if sp and sp in manifest_pages and manifest_pages[sp].get("url"):
+            current["preview_url"] = manifest_pages[sp]["url"]
 
     info["stories"] = parsed_stories
     if not info.get("pages"):

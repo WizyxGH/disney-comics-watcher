@@ -24,7 +24,7 @@ It combines real-time notification dispatch (Telegram, Discord), automated Induc
 - **Interactive Web Agenda** — Clean, responsive web app with monthly calendar and chronological list views, instant search, country filtering, cover previews, and dark/light themes.
 - **New Magazine Issues & Announcements** — Extracts cover art, issue numbers, retail prices, barcodes (EAN), and precise publication dates.
 - **Multi-Platform Notifications** — Real-time alerts dispatched to Telegram channels/topics and Discord servers with country-role pings.
-- **Inducks Pre-Indexing** — Automatically generates and maintains `.dbi` skeleton files for seamless integration into the [Inducks database](https://inducks.org/), with automatic cleanup when issues get indexed.
+- **Inducks Pre-Indexing** — Automatically generates and maintains `.dbi` skeleton files for seamless integration into the [Inducks database](https://inducks.org/), with global story/cover resolution (`inducks_story.title`, `inducks_charactername` hero-prefix stripping, and `inducks-dbi` first-page/cover dHash & length matching) and automatic cleanup when issues get indexed.
 - **Gemini AI Integration** — Analyzes magazine covers to extract character appearances and featured story titles.
 - **Local & Remote Cover Archive** — Automatically downloads and archives high-quality cover images.
 

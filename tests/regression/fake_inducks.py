@@ -101,6 +101,7 @@ def _build() -> sqlite3.Connection:
                                            rowsperpage TEXT);
         CREATE TABLE inducks_entry (entrycode TEXT, issuecode TEXT, storyversioncode TEXT,
                                     position TEXT, part TEXT);
+        CREATE TABLE inducks_charactername (charactercode TEXT, languagecode TEXT, charactername TEXT);
     """)
     for code, title, issues, alts in PUBLICATIONS:
         conn.execute("INSERT INTO inducks_publication VALUES (?,?,?)", (code, code.split("/")[0], title))
@@ -113,6 +114,12 @@ def _build() -> sqlite3.Connection:
     conn.executemany("INSERT INTO inducks_story VALUES (?,?)", STORIES)
     conn.executemany("INSERT INTO inducks_storyversion VALUES (?,?,?,?)", STORY_VERSIONS)
     conn.executemany("INSERT INTO inducks_entry VALUES (?,?,?,?,?)", ENTRIES)
+    conn.executemany("INSERT INTO inducks_charactername VALUES (?,?,?)", [
+        ("MM", "el", "Μίκυ Μάους"),
+        ("DD", "el", "Ντόναλντ Ντακ"),
+        ("PK", "el", "Φάντομ Ντακ"),
+        ("MM", "it", "Topolino"),
+    ])
     return conn
 
 
@@ -134,6 +141,8 @@ class FakeInducks:
         for name in ("_PUB_CACHE", "_CACHE_LOADED", "_STATS_CACHE", "_MAX_ISSUE_CACHE", "_NEWEST_CACHE", "_CODES_CACHE"):
             if hasattr(isv_search, name):
                 getattr(isv_search, name).clear()
+        if hasattr(story_rules, "_CHAR_PREFIX_CACHE"):
+            story_rules._CHAR_PREFIX_CACHE.clear()
         isv_search._DB_HAS_ISSUESCOUNT = None
         return self
 

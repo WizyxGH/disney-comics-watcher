@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-28T06:44:56.131419+01:00",
-  "total_count": 428,
+  "generated_at": "2026-11-28T15:51:18.329230+01:00",
+  "total_count": 424,
   "countries": [
     {
       "code": "fr",
@@ -36,7 +36,7 @@
       "code": "gr",
       "name": "Greece",
       "flag": "🇬🇷",
-      "count": 16
+      "count": 14
     },
     {
       "code": "se",
@@ -84,12 +84,6 @@
       "code": "dk",
       "name": "Denmark",
       "flag": "🇩🇰",
-      "count": 2
-    },
-    {
-      "code": "fi",
-      "name": "Finland",
-      "flag": "🇫🇮",
       "count": 2
     },
     {
@@ -508,40 +502,6 @@
       "status": "released"
     },
     {
-      "id": "gr_KXB_149",
-      "issue_code": "KXB 149",
-      "title": "Κόμιξ #149 ΤΟ ΣΦΥΡΙ ΤΟΥ ΘΩΡ",
-      "country": "gr",
-      "country_name": "Greece",
-      "country_flag": "🇬🇷",
-      "date": "2026-11-27",
-      "formatted_date": "Friday, November 27, 2026",
-      "price": "3.50 EUR",
-      "pages": "100",
-      "ean": null,
-      "cover_url": "https://raw.githubusercontent.com/WizyxGH/disney-comics-watcher/datas/covers/gr_kxb_0149a_001.jpg",
-      "url": "https://inducks.org/issue.php?c=gr%2FKXB+149",
-      "source": "dbi",
-      "status": "released"
-    },
-    {
-      "id": "gr_MMB_650",
-      "issue_code": "MMB 650",
-      "title": "Μίκυ Μάους #650 Ο ΗΡΩΑΣ ΚΑΙ Ο ΝΤΕΤΕΚΤΙΒ 2",
-      "country": "gr",
-      "country_name": "Greece",
-      "country_flag": "🇬🇷",
-      "date": "2026-11-27",
-      "formatted_date": "Friday, November 27, 2026",
-      "price": "1.90 EUR",
-      "pages": "100",
-      "ean": null,
-      "cover_url": "https://raw.githubusercontent.com/WizyxGH/disney-comics-watcher/datas/covers/gr_mmb_0650a_001.jpg",
-      "url": "https://inducks.org/issue.php?c=gr%2FMMB+650",
-      "source": "dbi",
-      "status": "released"
-    },
-    {
       "id": "it_342465",
       "issue_code": null,
       "title": "Zio Paperone: Parenti, Amici e Affini",
@@ -660,7 +620,7 @@
       "pages": null,
       "ean": "13459_9",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/64/6466c30b1132f19046e7c3d5939984d4.jpg",
-      "url": "https://direct-editeurs.fr/magazine/13459_super-picsou-geant-hs-jeux_9;jsessionid=4CD3FF1697AFD273BE9151F0CC8DD12B",
+      "url": "https://direct-editeurs.fr/magazine/13459_super-picsou-geant-hs-jeux_9;jsessionid=F13C608F44FABD36620864771C5EFD3F",
       "source": "scraper",
       "status": "released"
     },
@@ -678,7 +638,7 @@
       "pages": null,
       "ean": "13159_598",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/e8/e8062287abc91b5c9807b6150fd7c998.jpg",
-      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_598;jsessionid=4CD3FF1697AFD273BE9151F0CC8DD12B",
+      "url": "https://direct-editeurs.fr/magazine/13159_picsou-magazine_598;jsessionid=F13C608F44FABD36620864771C5EFD3F",
       "source": "scraper",
       "status": "released"
     },
@@ -805,23 +765,6 @@
       "cover_url": "https://www.tidsam.se/covers/hq/cover_0723_202606.jpg",
       "url": "https://www.tidsam.se/magazines/malapyssladisneymalarbok-0723-sv/",
       "source": "scraper",
-      "status": "released"
-    },
-    {
-      "id": "fi_AA2026-48",
-      "issue_code": "AA2026-48",
-      "title": "Aku Ankka 48/26",
-      "country": "fi",
-      "country_name": "Finland",
-      "country_flag": "🇫🇮",
-      "date": "2026-11-24",
-      "formatted_date": "Tuesday, November 24, 2026",
-      "price": null,
-      "pages": null,
-      "ean": null,
-      "cover_url": "https://raw.githubusercontent.com/WizyxGH/disney-comics-watcher/datas/covers/fi_aa2026_48a_001.jpg",
-      "url": "https://inducks.org/issue.php?c=fi%2FAA2026-48",
-      "source": "dbi",
       "status": "released"
     },
     {
@@ -1128,23 +1071,6 @@
       "status": "released"
     },
     {
-      "id": "fi_AA2026-47",
-      "issue_code": "AA2026-47",
-      "title": "Aku Ankka 47/26",
-      "country": "fi",
-      "country_name": "Finland",
-      "country_flag": "🇫🇮",
-      "date": "2026-11-17",
-      "formatted_date": "Tuesday, November 17, 2026",
-      "price": null,
-      "pages": null,
-      "ean": null,
-      "cover_url": "https://raw.githubusercontent.com/WizyxGH/disney-comics-watcher/datas/covers/fi_aa2026_47a_001.jpg",
-      "url": "https://inducks.org/issue.php?c=fi%2FAA2026-47",
-      "source": "dbi",
-      "status": "released"
-    },
-    {
       "id": "nl_DD___2026",
       "issue_code": "DD   2026",
       "title": "Vrolijke Kerst met Donald Duck 2026",
@@ -1336,7 +1262,7 @@
       "pages": null,
       "ean": "14016_257",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/af/af35e5b41d0bd4be8d89f9c7bd1454f3.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_257;jsessionid=4CD3FF1697AFD273BE9151F0CC8DD12B",
+      "url": "https://direct-editeurs.fr/magazine/14016_super-picsou-geant_257;jsessionid=F13C608F44FABD36620864771C5EFD3F",
       "source": "scraper",
       "status": "released"
     },
@@ -2048,7 +1974,7 @@
       "pages": null,
       "ean": "12228_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/ed/ed4704424caf41eb0904db9092da94e9.jpg",
-      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=4CD3FF1697AFD273BE9151F0CC8DD12B",
+      "url": "https://direct-editeurs.fr/magazine/12228_super-picsou-geant-hs-double-duck_3;jsessionid=F13C608F44FABD36620864771C5EFD3F",
       "source": "scraper",
       "status": "released"
     },
@@ -2460,7 +2386,7 @@
       "pages": null,
       "ean": "14068_76",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/a9/a944fd8df9bf4edf2ee81c41895ec88f.jpg",
-      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=4CD3FF1697AFD273BE9151F0CC8DD12B",
+      "url": "https://direct-editeurs.fr/magazine/14068_picsou-magazine-hs-les-tresors-de-picsou_76;jsessionid=F13C608F44FABD36620864771C5EFD3F",
       "source": "scraper",
       "status": "released"
     },
@@ -2478,7 +2404,7 @@
       "pages": null,
       "ean": "15420_1",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/f6/f61e2812c435ff4898d656cb6e28ba5d.jpg",
-      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=4CD3FF1697AFD273BE9151F0CC8DD12B",
+      "url": "https://direct-editeurs.fr/magazine/15420_picsou-hs-la-nouvelle-jeunesse-de-picsou_1;jsessionid=F13C608F44FABD36620864771C5EFD3F",
       "source": "scraper",
       "status": "released"
     },
@@ -2800,7 +2726,7 @@
       "pages": null,
       "ean": "18658_3",
       "cover_url": "https://cdn.direct-editeurs.fr/parutions/e1/e1ab93323e556c5618ab556bcf721c01.jpg",
-      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=4CD3FF1697AFD273BE9151F0CC8DD12B",
+      "url": "https://direct-editeurs.fr/magazine/18658_picsou-soir_3;jsessionid=F13C608F44FABD36620864771C5EFD3F",
       "source": "scraper",
       "status": "released"
     },
@@ -6589,24 +6515,6 @@
       "status": "upcoming"
     },
     {
-      "id": "tr_0002185493001",
-      "issue_code": null,
-      "title": "Disney En Güzel Maceralar - Spor Müsabakaları",
-      "country": "tr",
-      "country_name": "Turkey",
-      "country_flag": "🇹🇷",
-      "publisher": "Beta Kids",
-      "date": null,
-      "formatted_date": null,
-      "price": null,
-      "pages": null,
-      "ean": "0002185493001",
-      "cover_url": null,
-      "url": "https://www.dr.com.tr/kitap/disney-en-guzel-maceralar-spor-musabakalari/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002185493001",
-      "source": "scraper",
-      "status": "upcoming"
-    },
-    {
       "id": "tr_0001787711001",
       "issue_code": null,
       "title": "Tarih Öncesi-Disney En Güzel Maceralar",
@@ -6621,6 +6529,24 @@
       "ean": "0001787711001",
       "cover_url": null,
       "url": "https://www.dr.com.tr/kitap/tarih-oncesi-disney-en-guzel-maceralar/cocuk-ve-genclik/genclik-10-yas/romanoyku/urunno=0001787711001",
+      "source": "scraper",
+      "status": "upcoming"
+    },
+    {
+      "id": "tr_0002185493001",
+      "issue_code": null,
+      "title": "Disney En Güzel Maceralar - Spor Müsabakaları",
+      "country": "tr",
+      "country_name": "Turkey",
+      "country_flag": "🇹🇷",
+      "publisher": "Beta Kids",
+      "date": null,
+      "formatted_date": null,
+      "price": null,
+      "pages": null,
+      "ean": "0002185493001",
+      "cover_url": null,
+      "url": "https://www.dr.com.tr/kitap/disney-en-guzel-maceralar-spor-musabakalari/cocuk-ve-genclik/genclik-10-yas/roman-oyku/urunno=0002185493001",
       "source": "scraper",
       "status": "upcoming"
     },
